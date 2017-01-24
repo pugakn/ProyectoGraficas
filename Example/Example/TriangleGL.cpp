@@ -87,9 +87,10 @@ void TrangleGL::Transform(float *t) {
 	//for (int i = 0; i < 16;i++) {
 	//	transformMatrix.v[i] += t[i];
 	//}
-	transformMatrix.v[3] += t[3];
+	/*transformMatrix.v[3] += t[3];
 	transformMatrix.v[7] += t[7];
-	transformMatrix.v[11] += t[11];
+	transformMatrix.v[11] += t[11];*/
+	transformMatrix = transformMatrix * *reinterpret_cast<Matrix4D*>(t);
 
 
 }
