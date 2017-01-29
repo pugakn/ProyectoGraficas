@@ -25,6 +25,7 @@ void Win32Framework::OnCreateApplication(){
 	pVideoDriver->SetWindow(0);
 	pVideoDriver->InitDriver();
 
+	pBaseApp->InitVars();
 	pBaseApp->CreateAssets();
 }
 void Win32Framework::OnDestroyApplication() {
@@ -40,11 +41,7 @@ void Win32Framework::OnResumeApplication() {
 void Win32Framework::UpdateApplication() {
 	while (m_alive) {
 		ProcessInput();
-
-		pBaseApp->OnInput();
-		pBaseApp->OnUpdate(0);
-		pBaseApp->OnDraw();
-
+		pBaseApp->OnUpdate();
 	}
 }
 void Win32Framework::ProcessInput() {
@@ -55,26 +52,11 @@ void Win32Framework::ProcessInput() {
 				if (evento.key.keysym.sym == SDLK_q) {
 					m_alive = false;
 				}
-				switch (evento.key.keysym.sym)
-				{
-				case SDLK_a:
-					pBaseApp->keyPressed = K_A;
-					break;
-				case SDLK_s:
-					pBaseApp->keyPressed = K_S;
-					break;
-				case SDLK_d:
-					pBaseApp->keyPressed = K_D;
-					break;
-				case SDLK_w:
-					pBaseApp->keyPressed = K_W;
-					break;
-				default:
-					break;
-				}
+				pBaseApp->IManager.KeyStates[0][evento.key.keysym.sym] = true;
 			}break;
 			case SDL_KEYUP: {
-				pBaseApp->keyPressed = NULL;
+				pBaseApp->IManager.KeyStates[0][evento.key.keysym.sym] = false;
+				pBaseApp->IManager.KeyStates[1][evento.key.keysym.sym] = false;
 			}break;
 		}
 	}
