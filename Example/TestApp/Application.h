@@ -1,9 +1,10 @@
 #include <Core.h>
 #include <PrimitiveManager.h>
-
-#include <d3dx9math.h>
+#include <PrimitiveInstance.h>
+#include "Matrix4D.h"
+#include "Vector3D.h"
 #include <Timer.h>
-
+#include "ModelGL.h"
 class TestApp : public AppBase {
 public:
 	TestApp() : AppBase() {}
@@ -20,15 +21,17 @@ public:
 
 	void OnReset();
 
-	void MoveSpiral();
-
 	PrimitiveManager PrimitiveMgr;
+	PrimitiveInst	Models[10];
 
-	D3DXVECTOR3		Position;
-	D3DXVECTOR3		Orientation;
-	D3DXVECTOR3		Scaling;
-	D3DXMATRIX		WorldTransform;
-	float times[100];
+	Vector3D		Position;
+	Vector3D		Orientation;
+	Vector3D		Scaling;
+
+	Matrix4D		View;
+	Matrix4D		Projection;
+	Matrix4D		VP;
 
 	Timer			DtTimer;
+
 };

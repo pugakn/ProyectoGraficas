@@ -1,8 +1,16 @@
 #include "Matrix4D.h"
-
+#include <memory>
+#include <math.h>
 
 Matrix4D::Matrix4D()
 {
+}
+Matrix4D::Matrix4D(float * pMatrix)
+{
+	for (int i = 0; i < 16; i++)
+	{
+		v[i] = pMatrix[i];
+	}
 }
 Matrix4D::Matrix4D(const Matrix4D& A) {
 	*this = A;
@@ -32,15 +40,6 @@ Matrix4D::~Matrix4D()
 {
 }
 
-ostream& operator << (ostream& out, const Matrix4D& A) {
-	for (int j = 0; j < 4; j++)
-		out << A.Row[j] << endl;
-	return out;
-}
-istream& operator >> (istream& in, Matrix4D& A) {
-	for (int j = 0; j < 4; in >> A.Row[j++]);
-	return  in;
-}
 Matrix4D operator* (const Matrix4D& A, const Matrix4D& B) {
 	Matrix4D R = Zero();
 	R.m[0][0] = A.m[0][0] * B.m[0][0] + A.m[0][1] * B.m[1][0] + A.m[0][2] * B.m[2][0] + A.m[0][3] * B.m[3][0];
@@ -96,9 +95,9 @@ Matrix4D Identity() {
 
 Matrix4D TranslationRH(float dx, float dy, float dz) {
 	Matrix4D T = Identity();
-	T.m03 = dx;
-	T.m13 = dy;
-	T.m23 = dz;
+	T.m30 = dx;
+	T.m31 = dy;
+	T.m32 = dz;
 	return T;
 }
 Matrix4D RotationXRH(float theta) {
@@ -124,11 +123,31 @@ Matrix4D RotationZRH(float theta) {
 	R.m01 = -R.m10;
 	return R;
 }
+Matrix4D LookAtRH(const Vector3D& pos, const Vector3D& target, const Vector3D& up)
+{
+	Vector3D zDir = Normalize( pos - target);
+	Vector3D xDir = Normalize(Cross3(up, zDir));
+	Vector3D yDir = Cross3(zDir, xDir);
+	return Matrix4D(xDir.x , yDir.x , zDir.x , 0,
+					xDir.y , yDir.y , zDir.y , 0,
+					xDir.z , yDir.z , zDir.z , 0,
+					-Dot(xDir,pos), -Dot(yDir, pos), -Dot(zDir, pos), 1.f);
+}
+Matrix4D PerspectiveFOVRH(float fov, float aspectRatio, float nearPlane, float farPlane)
+{
+	float yScale = 1/tanf(fov/2.f);
+	float xScale = yScale / aspectRatio;
+	return Matrix4D(xScale,0,0,0,
+					0,yScale,0,0,
+					0,0, farPlane / (nearPlane - farPlane),-1.f,
+					0,0, nearPlane*farPlane / (nearPlane - farPlane),0
+	);
+}
 Matrix4D TranslationLH(float dx, float dy, float dz) {
 	Matrix4D T = Identity();
-	T.m30 = dx;
-	T.m31 = dy;
-	T.m32 = dz;
+	T.m03 = dx;
+	T.m13 = dy;
+	T.m23 = dz;
 	return T;
 }
 Matrix4D RotationXLH(float theta) {

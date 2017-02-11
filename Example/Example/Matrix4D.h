@@ -1,22 +1,22 @@
 #pragma once
 #include "Vector4D.h"
-#include <iostream>
-
+#include "Vector3D.h"
+#define PI    ((float)3.141592654f)
+#define ToRadian( degree ) ((degree) * (PI / 180.0f))
 #define RIGHT_HANDED
 #ifdef RIGHT_HANDED
-	#define Translation( dx,  dy,  dz) TranslationRH(dx, dy, dz);
-	#define RotationX(theta) RotationXRH(theta);
-	#define RotationY(theta) RotationYRH(theta);
-	#define RotationZ(theta) RotationZRH(theta);
+	#define Translation( dx,  dy,  dz) TranslationRH(dx, dy, dz)
+	#define RotationX(theta) RotationXRH(theta)
+	#define RotationY(theta) RotationYRH(theta)
+	#define RotationZ(theta) RotationZRH(theta)
 #else
-	#define Translation( dx,  dy,  dz) TranslationLH(dx, dy, dz);
-	#define RotationX(theta) RotationXLH(theta);
-	#define RotationY(theta) RotationYLH(theta);
-	#define RotationZ(theta) RotationZLH(theta);
+	#define Translation( dx,  dy,  dz) TranslationLH(dx, dy, dz)
+	#define RotationX(theta) RotationXLH(theta)
+	#define RotationY(theta) RotationYLH(theta)
+	#define RotationZ(theta) RotationZLH(theta)
 #endif // RIGHT_HANDED
 
 
-using namespace std;
 struct Matrix4D
 {
 public:
@@ -39,6 +39,7 @@ public:
 	};
 public:
 	Matrix4D();
+	Matrix4D(float *pMatrix);
 	Matrix4D(float a00, float a01, float a02, float a03,
 			 float a10, float a11, float a12, float a13,
 			 float a20, float a21, float a22, float a23,
@@ -50,8 +51,6 @@ public:
 			 const Vector4D &row3);
 	~Matrix4D();
 };
-ostream& operator << (ostream& out, const Matrix4D& A);
-istream& operator >> (istream& in, Matrix4D& A);
 Matrix4D operator* (const Matrix4D& A, const Matrix4D& B);
 Vector4D operator* (const Vector4D& V, const Matrix4D& M);
 Vector4D operator* (const Matrix4D& M, const Vector4D& V);
@@ -61,6 +60,8 @@ Matrix4D TranslationRH(float dx, float dy, float dz);
 Matrix4D RotationXRH(float theta);
 Matrix4D RotationYRH(float theta);
 Matrix4D RotationZRH(float theta);
+Matrix4D LookAtRH(const Vector3D& pos, const Vector3D& target, const Vector3D& up);
+Matrix4D PerspectiveFOVRH(float fov, float aspectRatio, float nearPlane,  float farPlane);
 Matrix4D TranslationLH(float dx, float dy, float dz);
 Matrix4D RotationXLH(float theta);
 Matrix4D RotationYLH(float theta);

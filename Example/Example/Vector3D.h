@@ -1,7 +1,4 @@
 #pragma once
-#include <iostream>
-
-using namespace std;
 
 struct Vector3D
 {
@@ -24,9 +21,6 @@ public:
 	Vector3D(float fx, float fy, float fz);
 	~Vector3D();
 };
-
-ostream& operator << (ostream& out, const Vector3D& V);
-istream& operator >> (istream& in, Vector3D& V);
 Vector3D operator* (const Vector3D &A, const Vector3D &B);
 Vector3D operator* (float s, const Vector3D&A);
 Vector3D operator* (const Vector3D &A, float s);
@@ -36,7 +30,7 @@ Vector3D operator+= (Vector3D &A, const Vector3D &B);
 Vector3D operator- (const Vector3D &A, const Vector3D &B);
 float Dot(const Vector3D &A, const Vector3D &B);
 Vector3D Cross3(const Vector3D &A, const Vector3D &B);
-float Magnity(const Vector3D &A);
+float Magnitude(const Vector3D &A);
 Vector3D Truncate(Vector3D A, float max);
 Vector3D Normalize(const Vector3D &A);
 

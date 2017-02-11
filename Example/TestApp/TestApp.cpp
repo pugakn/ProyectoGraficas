@@ -4,7 +4,6 @@
 
 AppBase		  *pApp = 0;
 RootFramework *pFrameWork = 0;
-
 int main(){
 	pApp = new TestApp;
 	pFrameWork = new Win32Framework((AppBase*)pApp);

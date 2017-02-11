@@ -1,5 +1,5 @@
 #include "Vector4D.h"
-
+#include <math.h>
 
 Vector4D::Vector4D()
 {
@@ -23,14 +23,6 @@ Vector4D::~Vector4D()
 }
 
 
-ostream& operator << (ostream& out, const Vector4D& V) {
-	out << "["<< V.x << "," << V.y << "," << V.z << "," << V.w << "]";
-	return out;
-}
-istream& operator >> (istream& in, Vector4D& V) {
-	in >> V.x >> V.y >> V.z >> V.w;
-	return in;
-}
 Vector4D operator* (const Vector4D &A, const Vector4D &B) {
 	return Vector4D(A.x*B.x, A.y*B.y, A.z*B.z, A.w*B.w);
 }
@@ -59,9 +51,9 @@ Vector4D Cross3(const Vector4D &A, const Vector4D &B) {
 					0);
 }
 
-float Magnity(const Vector4D &A) {
+float Magnitude(const Vector4D &A) {
 	return sqrt(Dot(A,A));
 }
 Vector4D Normalize(const Vector4D &A) {
-	return A / Magnity(A);
+	return A / Magnitude(A);
 }

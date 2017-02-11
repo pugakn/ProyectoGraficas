@@ -1,7 +1,4 @@
 #pragma once
-#include <iostream>
-
-using namespace std;
 
 struct Vector4D
 {
@@ -25,8 +22,6 @@ public:
 	~Vector4D();
 };
 
-ostream& operator << (ostream& out, const Vector4D& V);
-istream& operator >> (istream& in, Vector4D& V);
 Vector4D operator* (const Vector4D &A, const Vector4D &B);
 Vector4D operator* (float s, const Vector4D&A);
 Vector4D operator* (const Vector4D &A, float s);
@@ -35,7 +30,7 @@ Vector4D operator+ (const Vector4D &A, const Vector4D &B);
 Vector4D operator- (const Vector4D &A, const Vector4D &B);
 float Dot(const Vector4D &A, const Vector4D &B);
 Vector4D Cross3(const Vector4D &A, const Vector4D &B);
-float Magnity(const Vector4D &A);
+float Magnitude(const Vector4D &A);
 Vector4D Normalize(const Vector4D &A);
 
 

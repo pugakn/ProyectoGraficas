@@ -1,4 +1,5 @@
 #include "Vector3D.h"
+#include <math.h>
 
 
 Vector3D::Vector3D()
@@ -18,16 +19,6 @@ Vector3D::Vector3D(float fx, float fy, float fz)
 }
 Vector3D::~Vector3D()
 {
-}
-
-
-ostream& operator << (ostream& out, const Vector3D& V) {
-	out << "[" << V.x << "," << V.y << "," << V.z << "]";
-	return out;
-}
-istream& operator >> (istream& in, Vector3D& V) {
-	in >> V.x >> V.y >> V.z;
-	return in;
 }
 Vector3D operator* (const Vector3D &A, const Vector3D &B) {
 	return Vector3D(A.x*B.x, A.y*B.y, A.z*B.z);
@@ -60,18 +51,18 @@ Vector3D Cross3(const Vector3D &A, const Vector3D &B) {
 		A.x*B.y - A.y*B.x);
 }
 
-float Magnity(const Vector3D &A) {
+float Magnitude(const Vector3D &A) {
 	return sqrt(Dot(A, A));
 }
 Vector3D Truncate(Vector3D A, float max)
 {
-	if (Magnity(A) > max) {
+	if (Magnitude(A) > max) {
 		A =  Normalize(A);
 		A = A*max;
 	}
 	return A;
 }
 Vector3D Normalize(const Vector3D &A) {
-	return A / Magnity(A);
+	return A / Magnitude(A);
 }
 
