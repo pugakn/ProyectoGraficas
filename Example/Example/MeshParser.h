@@ -13,13 +13,14 @@ struct vertexStruct {
 class MeshParser
 {
 private:
-	unsigned int m_pointer = 0;
+	//unsigned int m_pointer = 0;
+	char* m_pointer;
 	unsigned int m_meshCount = 0;
 	char * fileBuffer;
 	size_t fileSize;
 
-	std::string getName();
-	int getType(int tempPointer);
+	std::string getName(char* pointer);
+	int getType(char* tempPointer);
 	void getMeshPositions();
 	void getMeshIndices();
 	void getMeshNormals();
