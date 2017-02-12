@@ -26,37 +26,13 @@ bool MeshParser::LoadFile(const char* fileName)
 	delete[] fileBuffer;
 
 	if (m_meshCount != 0) return true;
+	return false;
 }
 
 void MeshParser::ReadFile()
 {
-	char temp;
 	std::string name;
 	int type;
-	//Ignorar templates
-	bool onTemplate = false;
-	while (m_pointer < fileSize)
-	{
-		if (fileBuffer[m_pointer++] == '{')
-		{
-			name = getName();
-			type = getType(m_pointer - 3 - name.length());
-			if (type == TYPE_TEMPLATE)
-				onTemplate = true;
-			else
-			{
-				break;
-			}
-		}
-		while (onTemplate)
-		{
-			if (fileBuffer[m_pointer] == '}')
-			{
-				onTemplate = false;
-			}
-			++m_pointer;
-		}
-	}
 	//Leer Mesh
 	//TODO: Soportar más de una Mesh
 	while (m_pointer < fileSize)
