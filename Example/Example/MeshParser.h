@@ -19,7 +19,7 @@ private:
 	char * fileBuffer;
 	size_t fileSize;
 
-	std::string getName(char* pointer);
+	std::string getName();
 	int getType(char* tempPointer);
 	void getMeshPositions();
 	void getMeshIndices();

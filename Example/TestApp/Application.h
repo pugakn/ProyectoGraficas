@@ -32,6 +32,10 @@ public:
 	Matrix4D		Projection;
 	Matrix4D		VP;
 
+	Vector3D Pos;
+	Vector3D Up;
+	Vector3D LookAt;
+
 	Timer			DtTimer;
 
 };

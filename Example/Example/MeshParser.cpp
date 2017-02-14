@@ -1,33 +1,43 @@
 #include "MeshParser.h"
 #include <stdio.h>
+#include <boost/interprocess/file_mapping.hpp>
+#include <boost/interprocess/mapped_region.hpp>
 #define USING_OPENGL
 bool MeshParser::LoadFile(const char* fileName)
 {
-	FILE * pFile;
-	pFile = fopen(fileName, "r");
-	if (pFile == NULL)
-	{
-		printf( "ERROR AL ABRIR EL ARCHIVO\n" );
-		return false;
-	}
-
-	// Obtain file size
-	fseek(pFile, 0, SEEK_END);
-	fileSize = ftell(pFile);
-	rewind(pFile);
-
-	// Allocate memory
-	fileBuffer = new char[fileSize];
-
-	// Copy the file into the buffer
-	fread(fileBuffer, 1, fileSize, pFile);
-	fclose(pFile);
-	m_pointer = &fileBuffer[0];
+	boost::interprocess::file_mapping maping(fileName, boost::interprocess::read_only);
+	boost::interprocess::mapped_region mapped_reg(maping, boost::interprocess::read_only);
+	fileSize = mapped_reg.get_size();
+	m_pointer = static_cast<char*>(mapped_reg.get_address());
 	ReadFile();
-	delete[] fileBuffer;
-
 	if (m_meshCount != 0) return true;
 	return false;
+	
+	//FILE * pFile;
+	//pFile = fopen(fileName, "r");
+	//if (pFile == NULL)
+	//{
+	//	printf( "ERROR AL ABRIR EL ARCHIVO\n" );
+	//	return false;
+	//}
+
+	//// Obtain file size
+	//fseek(pFile, 0, SEEK_END);
+	//fileSize = ftell(pFile);
+	//rewind(pFile);
+
+	//// Allocate memory
+	//fileBuffer = new char[fileSize];
+
+	//// Copy the file into the buffer
+	//fread(fileBuffer, 1, fileSize, pFile);
+	//fclose(pFile);
+	//m_pointer = &fileBuffer[0];
+	//ReadFile();
+	//delete[] fileBuffer;
+
+	//if (m_meshCount != 0) return true;
+	//return false;
 }
 
 void MeshParser::ReadFile()
@@ -36,11 +46,11 @@ void MeshParser::ReadFile()
 	int type;
 	//Leer Mesh
 	//TODO: Soportar más de una Mesh
-	while (m_pointer != &fileBuffer[fileSize])
+	while (m_pointer != &fileBuffer[fileSize-1])
 	{
 		if (*m_pointer == '{')
 		{
-			name = getName(m_pointer);
+			name = getName();
 			type = getType(m_pointer - 3 - name.length());
 			switch (type)
 			{
@@ -63,9 +73,9 @@ void MeshParser::ReadFile()
 }
 
 
-std::string MeshParser::getName(char* pointer)
+std::string MeshParser::getName()
 {
-	char* tempPointer = pointer - 2;
+	char* tempPointer = m_pointer - 2;
 	std::string name;
 	while (true)
 	{
@@ -164,10 +174,9 @@ void MeshParser::getMeshIndices()
 	numString = "";
 	m_indexSize = nIndices;
 	m_indexBuffer = new unsigned short[nIndices * 3];
-	for (int i = 0; i < nIndices; i++)
+	for (int i = 0; i < nIndices*3; i+=3)
 	{
-		int iIndex = i * 3;
-		m_pointer += 5;
+		m_pointer += 6;
 
 		while (!(*m_pointer == ','))
 		{
@@ -176,11 +185,10 @@ void MeshParser::getMeshIndices()
 		}
 		++m_pointer;
 #ifdef USING_OPENGL
-		m_indexBuffer[iIndex + 2] = std::stoi(numString);
+		m_indexBuffer[i + 2] = std::stoi(numString);
 #else
-		m_indexBuffer[iIndex] = std::stoi(numString);
+		m_indexBuffer[i] = std::stoi(numString);
 #endif // USING_OPENGL
-
 		numString = "";
 		while (!(*m_pointer == ','))
 		{
@@ -188,7 +196,7 @@ void MeshParser::getMeshIndices()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_indexBuffer[iIndex + 1] = std::stoi(numString);
+		m_indexBuffer[i + 1] = std::stoi(numString);
 		numString = "";
 
 		while (!(*m_pointer == ';'))
@@ -198,9 +206,9 @@ void MeshParser::getMeshIndices()
 		}
 		++m_pointer;
 #ifdef USING_OPENGL
-		m_indexBuffer[iIndex] = std::stoi(numString);
+		m_indexBuffer[i] = std::stoi(numString);
 #else
-		m_indexBuffer[iIndex + 2] = std::stoi(numString);
+		m_indexBuffer[i + 2] = std::stoi(numString);
 #endif // USING_OPENGL
 		numString = "";
 		++m_pointer;
@@ -290,6 +298,7 @@ void MeshParser::getMeshTextureCords()
 void MeshParser::Deallocate()
 {
 	delete[] m_vbo;
+	delete[] m_indexBuffer;
 }
 //std::string MeshParser::SearchElement(char condition)
 //{

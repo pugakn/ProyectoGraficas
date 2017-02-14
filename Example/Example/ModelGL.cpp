@@ -57,7 +57,8 @@ void ModelGL::Create()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	parser.Deallocate();
-
+	delete[] vsSourceP;
+	delete[] fsSourceP;
 	transform = Identity();
 }
 

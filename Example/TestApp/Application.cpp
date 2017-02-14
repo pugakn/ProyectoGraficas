@@ -14,14 +14,14 @@ void TestApp::CreateAssets() {
 	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->Create();
 	Models[0].CreateInstance(PrimitiveMgr.GetPrimitive(indexModel), &VP);
 
-	Vector3D Pos	= Vector3D(0.0f,1.0f,5.0f);
-	Vector3D Up		= Vector3D(0.0f,1.0f,0.0f);
-	Vector3D LookAt	= Vector3D(0.0001f, 0.0001f, 0.0001f) - Pos;
-	Matrix4D View = LookAtRH(Pos,LookAt,Up);
+	Pos	= Vector3D(0.0f,1.0f,5.0f);
+	Up = Vector3D(0.0f, 1.0f, 0.0f);
+	LookAt = Vector3D(0.0001f, 0.0001f, 0.0001f) - Pos;
+	View = LookAtRH(Pos, LookAt, Up);
 
-	Matrix4D Proj = PerspectiveFOVRH(ToRadian(45.f),1280.0f/720.0f,0.1f,1000.0f);
+	Projection = PerspectiveFOVRH(ToRadian(45.f), 1280.0f / 720.0f, 0.1f, 1000.0f);
 
-	VP = View*Proj;
+	VP = View*Projection;
 
 
 }
@@ -41,7 +41,6 @@ void TestApp::OnUpdate() {
 	Models[0].RotateZAbsolute(Orientation.z);
 	Models[0].ScaleAbsolute(Scaling.x);
 	Models[0].Update();
-
 
 	OnDraw();
 }
