@@ -10,7 +10,7 @@ void TestApp::InitVars() {
 void TestApp::CreateAssets() {	
 	PrimitiveMgr.SetVP(&VP);
 	int indexModel = PrimitiveMgr.CreateModel();
-	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->SetFileName("Cerdo.X");
+	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->SetFileName("DealerA14.X");
 	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->Create();
 	Models[0].CreateInstance(PrimitiveMgr.GetPrimitive(indexModel), &VP);
 

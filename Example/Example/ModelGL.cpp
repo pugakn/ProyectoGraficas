@@ -48,12 +48,12 @@ void ModelGL::Create()
 
 	glGenBuffers(1, &VB);
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
-	glBufferData(GL_ARRAY_BUFFER, parser.m_vertexSize * sizeof(vertexStruct), parser.m_vbo, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, parser.m_vertexSize * sizeof(vertexStruct), &parser.m_vbo[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &IB);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, parser.m_indexSize * 3 * sizeof( unsigned short), parser.m_indexBuffer, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, parser.m_indexSize * 3 * sizeof( unsigned short), &parser.m_indexBuffer[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	parser.Deallocate();

@@ -1,17 +1,19 @@
 #include "MeshParser.h"
-#include <stdio.h>
-#include <boost/interprocess/file_mapping.hpp>
-#include <boost/interprocess/mapped_region.hpp>
+#include <boost/iostreams/device/mapped_file.hpp>
+
 #define USING_OPENGL
 bool MeshParser::LoadFile(const char* fileName)
 {
-	boost::interprocess::file_mapping maping(fileName, boost::interprocess::read_only);
-	boost::interprocess::mapped_region mapped_reg(maping, boost::interprocess::read_only);
-	fileSize = mapped_reg.get_size();
-	m_pointer = static_cast<char*>(mapped_reg.get_address());
+	boost::iostreams::mapped_file_source file;
+	file.open(fileName);
+	if (file.is_open()) {
+		m_pointer = const_cast<char*>(file.data());
+	}
 	ReadFile();
+	file.close();
 	if (m_meshCount != 0) return true;
 	return false;
+
 	
 	//FILE * pFile;
 	//pFile = fopen(fileName, "r");
@@ -46,6 +48,9 @@ void MeshParser::ReadFile()
 	int type;
 	//Leer Mesh
 	//TODO: Soportar más de una Mesh
+	m_pointer = strstr(m_pointer,"Mesh ");
+	m_pointer = m_pointer + 64;
+	m_pointer = strstr(m_pointer, "Mesh ");
 	while (m_pointer != &fileBuffer[fileSize-1])
 	{
 		if (*m_pointer == '{')
@@ -122,7 +127,7 @@ void MeshParser::getMeshPositions()
 	}
 	++m_pointer;
 	int nPositions = std::stoi(numString);
-	numString = "";
+	numString.clear();
 	m_vertexSize = nPositions;
 	m_vbo = new vertexStruct[nPositions];
 	for (int i = 0; i < nPositions; i++)
@@ -135,8 +140,7 @@ void MeshParser::getMeshPositions()
 		}
 		++m_pointer;
 		m_vbo[i].x = std::stof(numString);
-		numString = "";
-
+		numString.clear();
 		while (!(*m_pointer == ';'))
 		{
 
@@ -145,7 +149,7 @@ void MeshParser::getMeshPositions()
 		}
 		++m_pointer;
 		m_vbo[i].y = std::stof(numString);
-		numString = "";
+		numString.clear();
 
 		while (!(*m_pointer == ';'))
 		{
@@ -155,7 +159,7 @@ void MeshParser::getMeshPositions()
 		++m_pointer;
 		m_vbo[i].z = std::stof(numString);
 		m_vbo[i].w = 1;
-		numString = "";
+		numString.clear();
 		m_pointer += 2;
 	}
 }
@@ -171,7 +175,7 @@ void MeshParser::getMeshIndices()
 	}
 	++m_pointer;
 	int nIndices = std::stoi(numString);
-	numString = "";
+	numString.clear();
 	m_indexSize = nIndices;
 	m_indexBuffer = new unsigned short[nIndices * 3];
 	for (int i = 0; i < nIndices*3; i+=3)
@@ -189,7 +193,7 @@ void MeshParser::getMeshIndices()
 #else
 		m_indexBuffer[i] = std::stoi(numString);
 #endif // USING_OPENGL
-		numString = "";
+		numString.clear();
 		while (!(*m_pointer == ','))
 		{
 			numString.push_back(*m_pointer);
@@ -197,7 +201,7 @@ void MeshParser::getMeshIndices()
 		}
 		++m_pointer;
 		m_indexBuffer[i + 1] = std::stoi(numString);
-		numString = "";
+		numString.clear();
 
 		while (!(*m_pointer == ';'))
 		{
@@ -210,7 +214,7 @@ void MeshParser::getMeshIndices()
 #else
 		m_indexBuffer[i + 2] = std::stoi(numString);
 #endif // USING_OPENGL
-		numString = "";
+		numString.clear();
 		++m_pointer;
 	}
 }
@@ -226,7 +230,7 @@ void MeshParser::getMeshNormals()
 	}
 	++m_pointer;
 	int nNormals = std::stoi(numString);
-	numString = "";
+	numString.clear();
 	m_vertexSize = nNormals;
 	for (int i = 0; i < nNormals; i++)
 	{
@@ -238,7 +242,7 @@ void MeshParser::getMeshNormals()
 		}
 		++m_pointer;
 		m_vbo[i].nx = std::stof(numString);
-		numString = "";
+		numString.clear();
 
 		while (!(*m_pointer == ';'))
 		{
@@ -247,7 +251,7 @@ void MeshParser::getMeshNormals()
 		}
 		++m_pointer;
 		m_vbo[i].ny = std::stof(numString);
-		numString = "";
+		numString.clear();
 
 		while (!(*m_pointer == ';'))
 		{
@@ -257,7 +261,7 @@ void MeshParser::getMeshNormals()
 		++m_pointer;
 		m_vbo[i].nz = std::stof(numString);
 		m_vbo[i].nw = 1;
-		numString = "";
+		numString.clear();
 		m_pointer += 2;
 	}
 }
@@ -272,7 +276,7 @@ void MeshParser::getMeshTextureCords()
 	}
 	++m_pointer;
 	int nTextCords = std::stoi(numString);
-	numString = "";
+	numString.clear();
 	for (int i = 0; i < nTextCords; i++)
 	{
 		++m_pointer;
@@ -283,7 +287,7 @@ void MeshParser::getMeshTextureCords()
 		}
 		++m_pointer;
 		m_vbo[i].s = std::stof(numString);
-		numString = "";
+		numString.clear();
 		while (!(*m_pointer == ';'))
 		{
 			numString.push_back(*m_pointer);
@@ -291,7 +295,7 @@ void MeshParser::getMeshTextureCords()
 		}
 		++m_pointer;
 		m_vbo[i].t = std::stof(numString);
-		numString = "";
+		numString.clear();
 		++m_pointer;
 	}
 }
