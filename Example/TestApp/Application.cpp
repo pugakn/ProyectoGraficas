@@ -1,4 +1,6 @@
 #include "Application.h"
+#include "BMPParser.h"
+
 
 void TestApp::InitVars() {
 	DtTimer.Init();
@@ -22,6 +24,9 @@ void TestApp::CreateAssets() {
 	Projection = PerspectiveFOVRH(ToRadian(45.f), 1280.0f / 720.0f, 0.1f, 1000.0f);
 
 	VP = View*Projection;
+
+	BMPParser bp;
+	bp.LoadFile("bmp.bmp");
 
 
 }

@@ -62,6 +62,9 @@
     <ClInclude Include="ModelGL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BMPParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">
@@ -107,6 +110,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ModelGL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BMPParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

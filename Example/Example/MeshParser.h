@@ -13,10 +13,9 @@ struct vertexStruct {
 class MeshParser
 {
 private:
-	//unsigned int m_pointer = 0;
+	//boost::iostreams::mapped_file_source file;
 	char* m_pointer;
 	unsigned int m_meshCount = 0;
-	char * fileBuffer;
 	size_t fileSize;
 
 	std::string getName();

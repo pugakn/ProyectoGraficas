@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDriver.h" />
+    <ClInclude Include="BMPParser.h" />
     <ClInclude Include="ModelGL.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="CubeGL.h" />
@@ -38,6 +39,7 @@
     <ClInclude Include="Win32Framework.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BMPParser.cpp" />
     <ClCompile Include="ModelGL.cpp" />
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="CubeGL.cpp" />

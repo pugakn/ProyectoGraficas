@@ -1,6 +1,8 @@
 #include "MeshParser.h"
 #include <boost/iostreams/device/mapped_file.hpp>
 
+
+
 #define USING_OPENGL
 bool MeshParser::LoadFile(const char* fileName)
 {
@@ -8,9 +10,10 @@ bool MeshParser::LoadFile(const char* fileName)
 	file.open(fileName);
 	if (file.is_open()) {
 		m_pointer = const_cast<char*>(file.data());
+		fileSize = file.size();
+		ReadFile();
+		file.close();
 	}
-	ReadFile();
-	file.close();
 	if (m_meshCount != 0) return true;
 	return false;
 
@@ -28,7 +31,7 @@ bool MeshParser::LoadFile(const char* fileName)
 	//fileSize = ftell(pFile);
 	//rewind(pFile);
 
-	//// Allocate memory
+	// Allocate memory
 	//fileBuffer = new char[fileSize];
 
 	//// Copy the file into the buffer
@@ -51,7 +54,7 @@ void MeshParser::ReadFile()
 	m_pointer = strstr(m_pointer,"Mesh ");
 	m_pointer = m_pointer + 64;
 	m_pointer = strstr(m_pointer, "Mesh ");
-	while (m_pointer != &fileBuffer[fileSize-1])
+	while (m_pointer != &m_pointer[fileSize-1])
 	{
 		if (*m_pointer == '{')
 		{
