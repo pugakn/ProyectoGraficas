@@ -5,6 +5,7 @@
 #include "Vector3D.h"
 #include <Timer.h>
 #include "ModelGL.h"
+#include "FPCamera.h"
 class TestApp : public AppBase {
 public:
 	TestApp() : AppBase() {}
@@ -24,17 +25,9 @@ public:
 	PrimitiveManager PrimitiveMgr;
 	PrimitiveInst	Models[10];
 
-	Vector3D		Position;
-	Vector3D		Orientation;
-	Vector3D		Scaling;
 
-	Matrix4D		View;
-	Matrix4D		Projection;
-	Matrix4D		VP;
 
-	Vector3D Pos;
-	Vector3D Up;
-	Vector3D LookAt;
+	FPCamera cam;
 
 	Timer			DtTimer;
 

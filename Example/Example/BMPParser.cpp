@@ -17,7 +17,20 @@ bool BMPParser::LoadFile(const char * fileName)
 		offset = *reinterpret_cast<uint32_t*>(&info[10]);
 		//int size = (imgWidth * imgHeight * bitsPerPixel );
 		bmpSize = *reinterpret_cast<uint32_t*>(&info[34]);//Tamaño del buffer
-		m_bmpData = const_cast<char*>(&info[offset]);//Buffer
+
+		m_bmpData = new unsigned char[bmpSize];
+		for (int i = 0; i < bmpSize; i++) {
+			m_bmpData[i] = info[offset + i];
+		}
+		if (bitsPerPixel == 24 || bitsPerPixel == 32)
+		{
+				for (int i = 0; i < bmpSize; i += 3) {
+					unsigned char temp = m_bmpData[i];
+					m_bmpData[i] = m_bmpData[i + 2];
+					m_bmpData[i + 2] = temp;
+				}
+		}
+		//m_bmpData = const_cast<char*>(&info[offset]);//Buffer
 		file.close();
 		return true;
 	}
@@ -27,5 +40,5 @@ bool BMPParser::LoadFile(const char * fileName)
 
 void BMPParser::Deallocate()
 {
-	
+	m_bmpData;
 }

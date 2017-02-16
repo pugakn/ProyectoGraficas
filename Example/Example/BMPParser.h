@@ -1,9 +1,8 @@
 #pragma once
-
 class BMPParser
 {
 private:
-
+	//boost::iostreams::mapped_file_source file;
 	char* info;
 	size_t fileSize;
 	size_t imgWidth;
@@ -11,7 +10,7 @@ private:
 	size_t bitsPerPixel;
 	size_t offset;
 public:
-	char* m_bmpData;
+	unsigned char* m_bmpData;
 	size_t bmpSize;
 	bool LoadFile(const char* fileName);
 	void Deallocate();
