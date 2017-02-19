@@ -3,7 +3,8 @@
 
 
 
-
+//TextureFilename
+//"tmp\\BatmanArmoured_Head_D.tga";
 #define USING_OPENGL
 bool MeshParser::LoadFile(const char* fileName)
 {
@@ -86,6 +87,7 @@ void MeshParser::ReadFile()
 					break;
 				case TYPE_MESH_MATERIAL_LIST:
 					createSubsetts();
+					getMaterials();
 					break;
 			}
 		}
@@ -130,6 +132,8 @@ int MeshParser::getType(char* tempPointer)
 		return TYPE_MESH_TEXT_CORDS;
 	if (type == "tsiLlairetaMhseM")
 		return TYPE_MESH_MATERIAL_LIST;
+	if (type == "lairetaM")
+		return TYPE_MESH_MATERIAL;
 
 	return 0;
 }
@@ -335,7 +339,7 @@ void MeshParser::createSubsetts()
 	++m_pointer;
 	int nMaterials = std::stoi(numString);
 	numString.clear();
-	m_meshes.back().m_subsetIndex.resize(nMaterials);
+	m_meshes.back().m_subsets.resize(nMaterials);
 
 	while (!(*m_pointer == ';'))
 	{
@@ -355,20 +359,34 @@ void MeshParser::createSubsetts()
 		}
 		++m_pointer;
 		int index = i * 3;
-		m_meshes.back().m_subsetIndex[std::stoi(numString)].push_back(m_meshes.back().m_indexBuffer[index]);
-		m_meshes.back().m_subsetIndex[std::stoi(numString)].push_back(m_meshes.back().m_indexBuffer[index +1]);
-		m_meshes.back().m_subsetIndex[std::stoi(numString)].push_back(m_meshes.back().m_indexBuffer[index +2]);
+		m_meshes.back().m_subsets[std::stoi(numString)].m_indexBuffer.push_back(m_meshes.back().m_indexBuffer[index]);
+		m_meshes.back().m_subsets[std::stoi(numString)].m_indexBuffer.push_back(m_meshes.back().m_indexBuffer[index +1]);
+		m_meshes.back().m_subsets[std::stoi(numString)].m_indexBuffer.push_back(m_meshes.back().m_indexBuffer[index +2]);
 
 		numString.clear();
 	}
 
 }
+void MeshParser::getMaterials()
+{
+	for (int i = 0; i < m_meshes.back().m_subsets.size(); i++)
+	{
+		m_pointer = strstr(m_pointer, "TextureFilename");
+		while (!(*m_pointer++ == '\\'));
+		m_pointer++;
+		std::string pathString;
+		while (!(*m_pointer == '"'))
+		{
+			pathString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		m_pointer += 2;
+		m_meshes.back().m_subsets[i].m_effects.m_difusePath = pathString;
+	}
+}
 void MeshParser::Deallocate()
 {
-	//delete[] m_vbo;
-	//delete[] m_indexBuffer;
 	m_vbo.clear();
-	//m_indexBuffer.clear();
 }
 //std::string MeshParser::SearchElement(char condition)
 //{

@@ -7,15 +7,25 @@
 #define TYPE_MESH_NORMALS 4
 #define TYPE_MESH_TEXT_CORDS 5
 #define TYPE_MESH_MATERIAL_LIST 6
+#define TYPE_MESH_MATERIAL 7
 struct vertexStruct {
 	float x, y, z, w;
 	float nx, ny, nz, nw;
 	float s, t;
 };
-struct xMesh{
-	std::vector<std::vector<unsigned short>> m_subsetIndex;
-	std::vector<unsigned short>	m_indexBuffer;
+struct xMeshEffects {
+	std::string m_difusePath;
 };
+struct xMeshSubset {
+	std::vector<unsigned short> m_indexBuffer;
+	xMeshEffects m_effects;
+};
+struct xMesh{
+	//std::vector<std::vector<unsigned short>> m_subsetIndex;
+	std::vector<unsigned short>	m_indexBuffer;
+	std::vector<xMeshSubset> m_subsets;
+};
+
 class MeshParser
 {
 private:
@@ -30,11 +40,10 @@ private:
 	void getMeshNormals();
 	void getMeshTextureCords();
 	void createSubsetts();
+	void getMaterials();
 	//std::string SearchElement(char condition);
 public:
-	//vertexStruct* m_vbo;
 	std::vector<vertexStruct> m_vbo;
-	//unsigned short*	m_indexBuffer;
 	std::vector<unsigned short>	m_indexBuffer;
 	std::vector<xMesh> m_meshes;
 
