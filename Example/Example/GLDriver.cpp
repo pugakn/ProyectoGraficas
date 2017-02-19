@@ -21,7 +21,7 @@ void	GLDriver::InitDriver() {
 
 	EGLNativeDisplayType nativeDisplay;
 
-	if(!OpenNativeDisplay(&nativeDisplay)){
+	if (!OpenNativeDisplay(&nativeDisplay)) {
 		std::cout << "can't open native display" << std::endl;
 	}
 
@@ -45,7 +45,7 @@ void	GLDriver::InitDriver() {
 		EGL_BLUE_SIZE,		8,
 		EGL_GREEN_SIZE,		8,
 		EGL_RED_SIZE,		8,
-		EGL_DEPTH_SIZE,		16,
+		EGL_DEPTH_SIZE,		24,
 		EGL_NONE
 	};
 
@@ -69,7 +69,7 @@ void	GLDriver::InitDriver() {
 
 	eglQuerySurface(eglDisplay, eglSurface, EGL_WIDTH, &w);
 	eglQuerySurface(eglDisplay, eglSurface, EGL_HEIGHT, &h);
-	
+
 	std::string GL_Version = std::string((const char*)glGetString(GL_VERSION));
 	std::string GL_Extensions = std::string((const char*)glGetString(GL_EXTENSIONS));
 	std::cout << "GL Version: " << GL_Version << "\n\nExtensions\n\n" << GL_Extensions << std::endl;
@@ -103,8 +103,8 @@ void	GLDriver::SetWindow(void *window) {
 }
 
 void	GLDriver::Clear() {
-	glClearColor(0.0,0.0,0.0,1.0);
-	glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 }
 

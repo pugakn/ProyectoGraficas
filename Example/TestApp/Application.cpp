@@ -12,7 +12,7 @@ void TestApp::CreateAssets() {
 	cam.Init();
 	PrimitiveMgr.SetVP(&cam.VP);
 	int indexModel = PrimitiveMgr.CreateModel();
-	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->SetFileName("Cerdo.X");
+	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->SetFileName("NuBatman.X");
 	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->Create();
 	Models[0].CreateInstance(PrimitiveMgr.GetPrimitive(indexModel), &cam.VP);
 
@@ -55,20 +55,21 @@ void TestApp::OnDraw() {
 }
 
 void TestApp::OnInput() {
+	//cam.OnInput(DtTimer.GetDTSecs());
 	if (IManager.PressedKey(SDLK_UP)) {
-		cam.Traslate(Vector4D(0, 1.0f*DtTimer.GetDTSecs(), 0, 1));
+		cam.Traslate(Vector4D(0, 3.0f*DtTimer.GetDTSecs(), 0, 1));
 	}
 
 	if (IManager.PressedKey(SDLK_DOWN)) {
-		cam.Traslate(Vector4D(0, -1.0f*DtTimer.GetDTSecs(), 0, 1));
+		cam.Traslate(Vector4D(0, -3.0f*DtTimer.GetDTSecs(), 0, 1));
 	}
 
 	if (IManager.PressedKey(SDLK_LEFT)) {
-		cam.Traslate(Vector4D(-1.0f*DtTimer.GetDTSecs(), 0, 0, 1));
+		cam.Traslate(Vector4D(-3.0f*DtTimer.GetDTSecs(), 0, 0, 1));
 	}
 
 	if (IManager.PressedKey(SDLK_RIGHT)) {
-		cam.Traslate(Vector4D(1.0f*DtTimer.GetDTSecs(), 0, 0, 1));
+		cam.Traslate(Vector4D(3.0f*DtTimer.GetDTSecs(), 0, 0, 1));
 	}
 
 	if (IManager.PressedKey(SDLK_z)) {

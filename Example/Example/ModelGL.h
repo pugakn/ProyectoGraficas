@@ -6,6 +6,9 @@
 #include "UtilsGL.h"
 #include "Matrix4D.h"
 
+#include "Texture.h"
+#include "TextureGL.h"
+
 class ModelGL : public PrimitiveBase
 {
 private:
@@ -13,6 +16,8 @@ private:
 	GLuint	vertexAttribLoc;
 	GLint	normalAttribLoc;
 	GLint	uvAttribLoc;
+	GLuint IdTexUniformLoc;
+	int IdTex;
 
 	GLint  matWorldViewProjUniformLoc;
 	GLint  matWorldUniformLoc;
@@ -23,6 +28,7 @@ private:
 	GLuint			IB;
 
 	std::string m_fileName;
+	std::vector<Texture*> Textures;
 public:
 	void SetFileName(char* fileName);
 	void Create() override;

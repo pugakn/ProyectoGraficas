@@ -29,6 +29,57 @@ void FPCamera::Rotate(Vector4D rotation)
 	VP = m_view*Projection;
 }
 
+void FPCamera::OnInput(float delta)
+{
+	//if (IManager.PressedKey(SDLK_UP)) {
+	//	Traslate(Vector4D(0, 1.0f*delta, 0, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_DOWN)) {
+	//	Traslate(Vector4D(0, -1.0f*delta, 0, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_LEFT)) {
+	//	Traslate(Vector4D(-1.0f*delta, 0, 0, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_RIGHT)) {
+	//	Traslate(Vector4D(1.0f*delta, 0, 0, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_z)) {
+	//	Traslate(Vector4D(0, 0, -10.0f*delta, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_x)) {
+	//	Traslate(Vector4D(0, 0, 10.0f*delta, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_KP5)) {
+	//	Rotate(Vector4D(-1.0f*delta, 0, 0, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_KP6)) {
+	//	Rotate(Vector4D(1.0f*delta, 0, 0, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_KP2)) {
+	//	Rotate(Vector4D(0, -1.0f*delta, 0, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_KP3)) {
+	//	Rotate(Vector4D(0, 1.0f*delta, 0, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_KP0)) {
+	//	Rotate(Vector4D(0, 0, -1.0f*delta, 1));
+	//}
+
+	//if (IManager.PressedKey(SDLK_KP_PERIOD)) {
+	//	Rotate(Vector4D(0, 0, 1.0f*delta, 1));
+	//}
+}
+
 FPCamera::FPCamera()
 {
 }

@@ -3,6 +3,7 @@
 
 
 
+
 #define USING_OPENGL
 bool MeshParser::LoadFile(const char* fileName)
 {
@@ -31,30 +32,38 @@ bool MeshParser::LoadFile(const char* fileName)
 	//fileSize = ftell(pFile);
 	//rewind(pFile);
 
-	// Allocate memory
+	 //Allocate memory
 	//fileBuffer = new char[fileSize];
 
-	//// Copy the file into the buffer
-	//fread(fileBuffer, 1, fileSize, pFile);
-	//fclose(pFile);
-	//m_pointer = &fileBuffer[0];
-	//ReadFile();
-	//delete[] fileBuffer;
+	// Copy the file into the buffer
+	/*fread(fileBuffer, 1, fileSize, pFile);
+	fclose(pFile);
+	m_pointer = &fileBuffer[0];
+	ReadFile();
+	delete[] fileBuffer;
 
-	//if (m_meshCount != 0) return true;
-	//return false;
+	if (m_meshCount != 0) return true;
+	return false;*/
 }
 
 void MeshParser::ReadFile()
 {
+	m_vertexSize = 0;
+	m_meshCount = 0;
+	indexPos = 0;
+	vertexPos = 0;
+	normalPos = 0;
+	textCordsPos = 0;
+
 	std::string name;
 	int type;
 	//Leer Mesh
 	//TODO: Soportar más de una Mesh
+	char* bufferEnd = &m_pointer[fileSize - 1];
 	m_pointer = strstr(m_pointer,"Mesh ");
 	m_pointer = m_pointer + 64;
 	m_pointer = strstr(m_pointer, "Mesh ");
-	while (m_pointer != &m_pointer[fileSize-1])
+	while (m_pointer != bufferEnd)
 	{
 		if (*m_pointer == '{')
 		{
@@ -63,16 +72,20 @@ void MeshParser::ReadFile()
 			switch (type)
 			{
 				case TYPE_MESH:
-					++m_meshCount;
+					m_meshes.push_back(xMesh());
 					getMeshPositions();
 					getMeshIndices();
+					++m_meshCount;
 					break;
 				case TYPE_MESH_NORMALS:
 					getMeshNormals();
 					break;
 				case TYPE_MESH_TEXT_CORDS:
 					getMeshTextureCords();
-					return;//
+					//return;//
+					break;
+				case TYPE_MESH_MATERIAL_LIST:
+					createSubsetts();
 					break;
 			}
 		}
@@ -115,6 +128,8 @@ int MeshParser::getType(char* tempPointer)
 		return TYPE_MESH_NORMALS;
 	if (type == "sdrooCerutxeThseM")
 		return TYPE_MESH_TEXT_CORDS;
+	if (type == "tsiLlairetaMhseM")
+		return TYPE_MESH_MATERIAL_LIST;
 
 	return 0;
 }
@@ -131,9 +146,11 @@ void MeshParser::getMeshPositions()
 	++m_pointer;
 	int nPositions = std::stoi(numString);
 	numString.clear();
-	m_vertexSize = nPositions;
-	m_vbo = new vertexStruct[nPositions];
-	for (int i = 0; i < nPositions; i++)
+	offset = m_vertexSize;
+	m_vertexSize += nPositions;
+	//m_vbo = new vertexStruct[nPositions];
+	m_vbo.resize(m_vertexSize);
+	for (; vertexPos < m_vertexSize; vertexPos++)
 	{
 		m_pointer += 2;
 		while (!(*m_pointer == ';'))
@@ -142,7 +159,8 @@ void MeshParser::getMeshPositions()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[i].x = std::stof(numString);
+		//m_vbo[i].x = std::stof(numString);
+		m_vbo[vertexPos].x = std::stof(numString);
 		numString.clear();
 		while (!(*m_pointer == ';'))
 		{
@@ -151,7 +169,7 @@ void MeshParser::getMeshPositions()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[i].y = std::stof(numString);
+		m_vbo[vertexPos].y = std::stof(numString);
 		numString.clear();
 
 		while (!(*m_pointer == ';'))
@@ -160,11 +178,13 @@ void MeshParser::getMeshPositions()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[i].z = std::stof(numString);
-		m_vbo[i].w = 1;
+		m_vbo[vertexPos].z = std::stof(numString);
+		m_vbo[vertexPos].w = 1;
 		numString.clear();
 		m_pointer += 2;
 	}
+
+	//vertexPos++;
 }
 
 void MeshParser::getMeshIndices()
@@ -179,12 +199,13 @@ void MeshParser::getMeshIndices()
 	++m_pointer;
 	int nIndices = std::stoi(numString);
 	numString.clear();
-	m_indexSize = nIndices;
-	m_indexBuffer = new unsigned short[nIndices * 3];
-	for (int i = 0; i < nIndices*3; i+=3)
+	//m_indexSize += nIndices;
+	m_meshes.back().m_indexBuffer.resize(nIndices*3);
+	//m_indexBuffer = new unsigned short[nIndices * 3];
+	for (int i=0; i < nIndices *3; i +=3)
 	{
-		m_pointer += 6;
-
+		//m_pointer += 5;
+		while (!(*m_pointer++ == ';'));
 		while (!(*m_pointer == ','))
 		{
 			numString.push_back(*m_pointer);
@@ -192,7 +213,7 @@ void MeshParser::getMeshIndices()
 		}
 		++m_pointer;
 #ifdef USING_OPENGL
-		m_indexBuffer[i + 2] = std::stoi(numString);
+		m_meshes.back().m_indexBuffer[i + 2] = std::stoi(numString) + offset;
 #else
 		m_indexBuffer[i] = std::stoi(numString);
 #endif // USING_OPENGL
@@ -203,7 +224,7 @@ void MeshParser::getMeshIndices()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_indexBuffer[i + 1] = std::stoi(numString);
+		m_meshes.back().m_indexBuffer[i + 1] = std::stoi(numString) + offset;
 		numString.clear();
 
 		while (!(*m_pointer == ';'))
@@ -213,13 +234,14 @@ void MeshParser::getMeshIndices()
 		}
 		++m_pointer;
 #ifdef USING_OPENGL
-		m_indexBuffer[i] = std::stoi(numString);
+		m_meshes.back().m_indexBuffer[i] = std::stoi(numString) + offset;
 #else
 		m_indexBuffer[i + 2] = std::stoi(numString);
 #endif // USING_OPENGL
 		numString.clear();
 		++m_pointer;
 	}
+	//indexPos++;
 }
 
 void MeshParser::getMeshNormals()
@@ -234,8 +256,7 @@ void MeshParser::getMeshNormals()
 	++m_pointer;
 	int nNormals = std::stoi(numString);
 	numString.clear();
-	m_vertexSize = nNormals;
-	for (int i = 0; i < nNormals; i++)
+	for (; normalPos < m_vertexSize; normalPos++)
 	{
 		m_pointer += 2;
 		while (!(*m_pointer == ';'))
@@ -244,7 +265,7 @@ void MeshParser::getMeshNormals()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[i].nx = std::stof(numString);
+		m_vbo[normalPos].nx = std::stof(numString);
 		numString.clear();
 
 		while (!(*m_pointer == ';'))
@@ -253,7 +274,7 @@ void MeshParser::getMeshNormals()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[i].ny = std::stof(numString);
+		m_vbo[normalPos].ny = std::stof(numString);
 		numString.clear();
 
 		while (!(*m_pointer == ';'))
@@ -262,8 +283,8 @@ void MeshParser::getMeshNormals()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[i].nz = std::stof(numString);
-		m_vbo[i].nw = 1;
+		m_vbo[normalPos].nz = std::stof(numString);
+		m_vbo[normalPos].nw = 1;
 		numString.clear();
 		m_pointer += 2;
 	}
@@ -280,7 +301,7 @@ void MeshParser::getMeshTextureCords()
 	++m_pointer;
 	int nTextCords = std::stoi(numString);
 	numString.clear();
-	for (int i = 0; i < nTextCords; i++)
+	for (; textCordsPos < m_vertexSize; textCordsPos++)//nTextCords
 	{
 		++m_pointer;
 		while (!(*m_pointer == ';'))
@@ -289,7 +310,7 @@ void MeshParser::getMeshTextureCords()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[i].s = std::stof(numString);
+		m_vbo[textCordsPos].s = std::stof(numString);
 		numString.clear();
 		while (!(*m_pointer == ';'))
 		{
@@ -297,15 +318,57 @@ void MeshParser::getMeshTextureCords()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[i].t = std::stof(numString);
+		m_vbo[textCordsPos].t = std::stof(numString);
 		numString.clear();
 		++m_pointer;
 	}
 }
+void MeshParser::createSubsetts()
+{
+	++m_pointer;
+	std::string numString;
+	while (!(*m_pointer == ';'))
+	{
+		numString.push_back(*m_pointer);
+		++m_pointer;
+	}
+	++m_pointer;
+	int nMaterials = std::stoi(numString);
+	numString.clear();
+	m_meshes.back().m_subsetIndex.resize(nMaterials);
+
+	while (!(*m_pointer == ';'))
+	{
+		numString.push_back(*m_pointer);
+		++m_pointer;
+	}
+	++m_pointer;
+	int nTriangles = std::stoi(numString);
+	numString.clear();
+	for (int i = 0; i < nTriangles; i++)
+	{
+		//while (!(*m_pointer++ == ';'));
+		while (!(*m_pointer == ','))
+		{
+			numString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		int index = i * 3;
+		m_meshes.back().m_subsetIndex[std::stoi(numString)].push_back(m_meshes.back().m_indexBuffer[index]);
+		m_meshes.back().m_subsetIndex[std::stoi(numString)].push_back(m_meshes.back().m_indexBuffer[index +1]);
+		m_meshes.back().m_subsetIndex[std::stoi(numString)].push_back(m_meshes.back().m_indexBuffer[index +2]);
+
+		numString.clear();
+	}
+
+}
 void MeshParser::Deallocate()
 {
-	delete[] m_vbo;
-	delete[] m_indexBuffer;
+	//delete[] m_vbo;
+	//delete[] m_indexBuffer;
+	m_vbo.clear();
+	//m_indexBuffer.clear();
 }
 //std::string MeshParser::SearchElement(char condition)
 //{
