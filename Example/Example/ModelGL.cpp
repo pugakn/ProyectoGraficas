@@ -28,11 +28,22 @@ void ModelGL::Create()
 	delete[] fsSourceP;
 
 	//Crear shaders
-	GLuint vshader_id = createShader(GL_VERTEX_SHADER, const_cast<char*>(vstr.c_str()));
-	GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, const_cast<char*>(fstr.c_str()));
 	//Iterar cada Mesh y subsets
 	for (size_t i = 0; i < parser.m_meshes.size(); i++)
 	{
+
+		std::string Defines = "";
+		if (parser.m_meshes.back().m_vertexAttributes&xf::attributes::E::HAS_NORMAL)
+			Defines += "#define USE_NORMALS\n\n";
+		if (parser.m_meshes.back().m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD0)
+			Defines += "#define USE_TEXCOORD0\n\n";
+
+		vstr = Defines + vstr;
+		fstr = Defines + fstr;
+
+		GLuint vshader_id = createShader(GL_VERTEX_SHADER, const_cast<char*>(vstr.c_str()));
+		GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, const_cast<char*>(fstr.c_str()));
+
 		//Attach Shaders
 		shadersID.push_back(glCreateProgram());
 		glAttachShader(shadersID.back(), vshader_id);
@@ -72,13 +83,15 @@ void ModelGL::Create()
 				}
 				else {
 					std::cout << "Texture not Found" << std::endl;
+					IdsTex.push_back(NULL);//
+					IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "diffuse"));//
 					delete tex;
 				}
 			}
 			//Generar buffer de Indices
 			IBs.push_back(0);//
-			glGenBuffers(1, &IBs[i*2 + j]);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBs[i*2 + j]);
+			glGenBuffers(1, &IBs.back()); //ERROR SUBSETS VARIABLES
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBs.back());
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size() * sizeof(unsigned short), &(parser.m_meshes[i].m_subsets[j].m_indexBuffer[0]), GL_STATIC_DRAW);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
@@ -110,6 +123,7 @@ void ModelGL::Draw(float *t, float *vp)
 
 	//------------------------------------------------------------------//
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
+	size_t index = 0;
 	for (size_t i = 0; i < parser.m_meshes.size(); i++)
 	{
 		//Set actual shader
@@ -131,7 +145,6 @@ void ModelGL::Draw(float *t, float *vp)
 			glVertexAttribPointer(uvAttribLocs[i], 2, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(32));
 		for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
 		{
-			size_t index = i * 2 + j;
 			//Bind Buffers
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBs[index]);
 			//Specify Texture location
@@ -140,7 +153,7 @@ void ModelGL::Draw(float *t, float *vp)
 			glUniform1i(IdTexUniformLocs[index], 0); //Specify location
 
 			glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_SHORT, 0);
-
+			index++;
 
 		}
 		//Disable Shader

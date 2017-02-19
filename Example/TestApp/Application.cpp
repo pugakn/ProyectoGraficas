@@ -11,20 +11,28 @@ void TestApp::InitVars() {
 void TestApp::CreateAssets() {	
 	cam.Init();
 	PrimitiveMgr.SetVP(&cam.VP);
+
 	int indexModel = PrimitiveMgr.CreateModel();
-	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->SetFileName("NuCroc.X");
+	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->SetFileName("NuBatman.X");
 	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->Create();
-	Models[0].CreateInstance(PrimitiveMgr.GetPrimitive(indexModel), &cam.VP);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexModel), &cam.VP);
+
+	int indexCerdo = PrimitiveMgr.CreateModel();
+	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexCerdo))->SetFileName("Cerdo.X");
+	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexCerdo))->Create();
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCerdo), &cam.VP);
 
 
-	BMPParser bp;
-	bp.LoadFile("bmp2.bmp");
-	//for (int i = 0; i < bp.bmpSize;i++) {
-		//if (bp.m_bmpData[0] == 255)
-		//	std::cout << "R";
-	//}
+	//BMPParser bp;
+	//bp.LoadFile("bmp2.bmp");
+	////for (int i = 0; i < bp.bmpSize;i++) {
+	//	//if (bp.m_bmpData[0] == 255)
+	//	//	std::cout << "R";
+	////}
 
-	bp.Deallocate();
+	//bp.Deallocate();
 }
 
 void TestApp::DestroyAssets() {
@@ -49,7 +57,8 @@ void TestApp::OnUpdate() {
 void TestApp::OnDraw() {
 	pFramework->pVideoDriver->Clear();
 	
-	Models[0].Draw();
+	for (auto &it : Models)
+		it.Draw();
 
 	pFramework->pVideoDriver->SwapBuffers();
 }

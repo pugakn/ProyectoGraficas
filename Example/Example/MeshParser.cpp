@@ -47,7 +47,6 @@ void MeshParser::ReadFile()
 {
 	m_vertexSize = 0;
 	m_meshCount = 0;
-	indexPos = 0;
 	vertexPos = 0;
 	normalPos = 0;
 	textCordsPos = 0;
@@ -55,37 +54,38 @@ void MeshParser::ReadFile()
 	std::string name;
 	int type;
 	//Leer Mesh
-	//TODO: Soportar más de una Mesh
 	char* bufferEnd = &m_pointer[fileSize - 1];
 	m_pointer = strstr(m_pointer,"Mesh ");
 	m_pointer = m_pointer + 64;
 	m_pointer = strstr(m_pointer, "Mesh ");
 	while (m_pointer != bufferEnd)
 	{
-		if (*m_pointer == '{')
+		m_pointer = strstr(m_pointer,"{");
+		if (m_pointer == NULL) return;
+		name = getName();
+		type = getType(m_pointer - 3 - name.length());
+		switch (type)
 		{
-			name = getName();
-			type = getType(m_pointer - 3 - name.length());
-			switch (type)
-			{
-				case TYPE_MESH:
-					m_meshes.push_back(xMesh());
-					getMeshPositions();
-					getMeshIndices();
-					++m_meshCount;
-					break;
-				case TYPE_MESH_NORMALS:
-					getMeshNormals();
-					break;
-				case TYPE_MESH_TEXT_CORDS:
-					getMeshTextureCords();
-					//return;//
-					break;
-				case TYPE_MESH_MATERIAL_LIST:
-					createSubsetts();
-					getMaterials();
-					break;
-			}
+			case TYPE_MESH:
+				m_meshes.push_back(xMesh());
+				m_meshes.back().m_vertexAttributes |= xf::attributes::E::HAS_POSITION;
+				getMeshPositions();
+				getMeshIndices();
+				++m_meshCount;
+				break;
+			case TYPE_MESH_NORMALS:
+				m_meshes.back().m_vertexAttributes |= xf::attributes::E::HAS_NORMAL;
+				getMeshNormals();
+				break;
+			case TYPE_MESH_TEXT_CORDS:
+				m_meshes.back().m_vertexAttributes |= xf::attributes::E::HAS_TEXCOORD0;
+				getMeshTextureCords();
+				//return;//
+				break;
+			case TYPE_MESH_MATERIAL_LIST:
+				createSubsetts();
+				getMaterials();
+				break;
 		}
 		++m_pointer;
 	}
@@ -364,19 +364,46 @@ void MeshParser::createSubsetts()
 }
 void MeshParser::getMaterials()
 {
-	for (int i = 0; i < m_meshes.back().m_subsets.size(); i++)
+	std::string pathString;
+	for (int i = 0; i < m_meshes.back().m_subsets.size(); )
 	{
-		m_pointer = strstr(m_pointer, "TextureFilename"); //EffectParamString "diffuseMap";
-		while (!(*m_pointer++ == '\\'));
-		m_pointer++;
-		std::string pathString;
-		while (!(*m_pointer == '"'))
-		{
+		//-------------------------------------------------------------//
+		//Cargar todas las propiedades del Material
+		pathString.clear();
+		char* temp;
+		if (!(temp = strstr(m_pointer, "EffectParamString")))
+			return;
+		m_pointer = temp;
+		while (!(*m_pointer++ == '"'));
+		while (!(*m_pointer == '"')) {
 			pathString.push_back(*m_pointer);
 			++m_pointer;
 		}
-		m_pointer += 2;
-		m_meshes.back().m_subsets[i].m_effects.m_difusePath = pathString;
+		++m_pointer;
+		//Cargar Ruta de DiffuseMap
+		if (pathString == "diffuseMap") {
+			pathString.clear();
+			while (!(*m_pointer++ == '"'));
+			m_pointer++;
+			while (!(*m_pointer == '"'))
+			{
+				pathString.push_back(*m_pointer);
+				++m_pointer;
+			}
+			m_pointer += 2;
+			size_t offset = pathString.find_first_of(' ');
+			if(offset < pathString.size())
+				pathString = pathString.substr(offset+1);
+			else
+			{
+				offset = pathString.find_first_of('\\');
+				if (offset < pathString.size())
+					pathString = pathString.substr(offset + 2);
+			}
+			m_meshes.back().m_subsets[i].m_effects.m_difusePath = pathString;
+			i++;
+		}
+		//-------------------------------------------------------------//
 	}
 }
 void MeshParser::Deallocate()

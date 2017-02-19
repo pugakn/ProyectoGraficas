@@ -6,6 +6,7 @@
 #include <Timer.h>
 #include "ModelGL.h"
 #include "FPCamera.h"
+#include <vector>
 class TestApp : public AppBase {
 public:
 	TestApp() : AppBase() {}
@@ -23,7 +24,7 @@ public:
 	void OnReset();
 
 	PrimitiveManager PrimitiveMgr;
-	PrimitiveInst	Models[10];
+	std::vector<PrimitiveInst>	Models;
 
 
 
