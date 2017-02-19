@@ -12,7 +12,7 @@ void TestApp::CreateAssets() {
 	cam.Init();
 	PrimitiveMgr.SetVP(&cam.VP);
 	int indexModel = PrimitiveMgr.CreateModel();
-	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->SetFileName("NuBatman.X");
+	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->SetFileName("NuCroc.X");
 	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->Create();
 	Models[0].CreateInstance(PrimitiveMgr.GetPrimitive(indexModel), &cam.VP);
 

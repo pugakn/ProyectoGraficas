@@ -1,10 +1,6 @@
 #include "MeshParser.h"
 #include <boost/iostreams/device/mapped_file.hpp>
 
-
-
-//TextureFilename
-//"tmp\\BatmanArmoured_Head_D.tga";
 #define USING_OPENGL
 bool MeshParser::LoadFile(const char* fileName)
 {
@@ -94,7 +90,6 @@ void MeshParser::ReadFile()
 		++m_pointer;
 	}
 }
-
 
 std::string MeshParser::getName()
 {
@@ -371,7 +366,7 @@ void MeshParser::getMaterials()
 {
 	for (int i = 0; i < m_meshes.back().m_subsets.size(); i++)
 	{
-		m_pointer = strstr(m_pointer, "TextureFilename");
+		m_pointer = strstr(m_pointer, "TextureFilename"); //EffectParamString "diffuseMap";
 		while (!(*m_pointer++ == '\\'));
 		m_pointer++;
 		std::string pathString;

@@ -12,12 +12,13 @@
 class ModelGL : public PrimitiveBase
 {
 private:
-	GLuint	shaderID;
-	GLuint	vertexAttribLoc;
-	GLint	normalAttribLoc;
-	GLint	uvAttribLoc;
-	GLuint IdTexUniformLoc;
-	int IdTex;
+	//GLuint	shaderID;
+	std::vector <GLuint>	shadersID;
+	std::vector <GLuint>	vertexAttribLocs;
+	std::vector <GLuint>	normalAttribLocs;
+	std::vector <GLuint>	uvAttribLocs;
+	std::vector <GLuint> IdTexUniformLocs;
+	std::vector <int> IdsTex;
 
 	GLint  matWorldViewProjUniformLoc;
 	GLint  matWorldUniformLoc;
@@ -25,7 +26,7 @@ private:
 	Matrix4D	transform;
 
 	GLuint			VB;
-	GLuint			IB;
+	std::vector <GLuint>			IBs;
 
 	std::string m_fileName;
 	std::vector<Texture*> Textures;
@@ -36,7 +37,7 @@ public:
 	void Draw(float *t, float *vp) override;
 	void Destroy() override;
 	MeshParser parser;
-	ModelGL() : shaderID(0) {};
+	ModelGL()  {};
 	~ModelGL();
 };
 

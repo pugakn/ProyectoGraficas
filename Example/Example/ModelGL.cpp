@@ -30,50 +30,65 @@ void ModelGL::Create()
 	//Crear shaders
 	GLuint vshader_id = createShader(GL_VERTEX_SHADER, const_cast<char*>(vstr.c_str()));
 	GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, const_cast<char*>(fstr.c_str()));
+	//Iterar cada Mesh y subsets
+	for (size_t i = 0; i < parser.m_meshes.size(); i++)
+	{
+		//Attach Shaders
+		shadersID.push_back(glCreateProgram());
+		glAttachShader(shadersID.back(), vshader_id);
+		glAttachShader(shadersID.back(), fshader_id);
 
-	//Attach Shaders
-	shaderID = glCreateProgram();
-	glAttachShader(shaderID, vshader_id);
-	glAttachShader(shaderID, fshader_id);
+		glLinkProgram(shadersID.back());
+		glUseProgram(shadersID.back());
 
-	glLinkProgram(shaderID);
-	glUseProgram(shaderID);
-
-	//Obtener locaciones de Attributes
-	vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
-	normalAttribLoc = glGetAttribLocation(shaderID, "Normal");
-	uvAttribLoc = glGetAttribLocation(shaderID, "UV");
-	//Obtener locaciones de Uniforms
-	matWorldViewProjUniformLoc = glGetUniformLocation(shaderID, "WVP");
-	matWorldUniformLoc = glGetUniformLocation(shaderID, "World");
-
-	//Cargar Texturas
-	Texture *tex = new TextureGL;
-	int textureID = tex->LoadTexture("BatmanArmoured_Head_D.tga");
-	//tex->LoadTexture("BatmanArmoured_Body_E.tga");
-	if (textureID != -1) {
-		Textures.push_back(tex);
-		IdTex = textureID;
-		IdTexUniformLoc = glGetUniformLocation(shaderID, "diffuse");
+		//Obtener locaciones de Attributes
+		vertexAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "Vertex"));
+		normalAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "Normal"));
+		uvAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "UV"));
+		//Obtener locaciones de Uniforms
+		matWorldViewProjUniformLoc = glGetUniformLocation(shadersID.back(), "WVP");
+		matWorldUniformLoc = glGetUniformLocation(shadersID.back(), "World");
+		for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
+		{
+			//Cargar Texturas
+			bool found = false;
+			for (std::size_t f = 0; f<Textures.size(); f++) {
+				Texture *ttex = Textures[f];
+				std::string ttstr = std::string(ttex->optname);
+				if (ttstr == parser.m_meshes[i].m_subsets[j].m_effects.m_difusePath.c_str()) {
+					IdsTex.push_back(ttex->id);
+					IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "diffuse"));
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				Texture *tex = new TextureGL;
+				int textureID = tex->LoadTexture(const_cast<char*>(parser.m_meshes[i].m_subsets[j].m_effects.m_difusePath.c_str()));
+				if (textureID != -1) {
+					Textures.push_back(tex);
+					IdsTex.push_back(textureID);
+					IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "diffuse"));
+				}
+				else {
+					std::cout << "Texture not Found" << std::endl;
+					delete tex;
+				}
+			}
+			//Generar buffer de Indices
+			IBs.push_back(0);//
+			glGenBuffers(1, &IBs[i*2 + j]);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBs[i*2 + j]);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size() * sizeof(unsigned short), &(parser.m_meshes[i].m_subsets[j].m_indexBuffer[0]), GL_STATIC_DRAW);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		}
 	}
-	else {
-		std::cout << "Texture not Found" << std::endl;
-		delete tex;
-	}
-
+	//---------------------------------------------------------------//
 	//Generar buffer de vertices
 	glGenBuffers(1, &VB);
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	glBufferData(GL_ARRAY_BUFFER, parser.m_vertexSize * sizeof(vertexStruct), &parser.m_vbo[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//Generar buffer de Indices
-	glGenBuffers(1, &IB);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, parser.m_meshes[0].m_subsets[1].m_indexBuffer.size() * sizeof(unsigned short), &(parser.m_meshes[0].m_subsets[1].m_indexBuffer[0]), GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-	//---------------------------------------------------------------//
 	//Liberar Memoria
 	parser.Deallocate();
 	transform = Identity();
@@ -94,44 +109,53 @@ void ModelGL::Draw(float *t, float *vp)
 	Matrix4D WVP = transform*VP;
 
 	//------------------------------------------------------------------//
-	//Set actual shader
-	glUseProgram(shaderID);
-	//Set Uniforms
-	glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
-	glUniformMatrix4fv(matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
-	//Bind Buffers
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
-	//Enable Attributes
-	glEnableVertexAttribArray(vertexAttribLoc);
-	if (normalAttribLoc != -1)
-		glEnableVertexAttribArray(normalAttribLoc);
-	if (uvAttribLoc != -1)
-		glEnableVertexAttribArray(uvAttribLoc);
-	//Specify Attributes location
-	glVertexAttribPointer(vertexAttribLoc, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(0));
-	if (normalAttribLoc != -1)
-		glVertexAttribPointer(normalAttribLoc, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(16));
-	if (uvAttribLoc != -1)
-		glVertexAttribPointer(uvAttribLoc, 2, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(32));
-	//Specify Texture location
-	glActiveTexture(GL_TEXTURE0);//Set Active texture unit
-	glBindTexture(GL_TEXTURE_2D, IdTex);
-	glUniform1i(IdTexUniformLoc, 0); //Specify location
+	for (size_t i = 0; i < parser.m_meshes.size(); i++)
+	{
+		//Set actual shader
+		glUseProgram(shadersID[i]);
+		//Set Uniforms
+		glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
+		glUniformMatrix4fv(matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
+		//Enable Attributes
+		glEnableVertexAttribArray(vertexAttribLocs[i]);
+		if (normalAttribLocs[i] != -1)
+			glEnableVertexAttribArray(normalAttribLocs[i]);
+		if (uvAttribLocs[i] != -1)
+			glEnableVertexAttribArray(uvAttribLocs[i]);
+		//Specify Attributes location
+		glVertexAttribPointer(vertexAttribLocs[i], 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(0));
+		if (normalAttribLocs[i] != -1)
+			glVertexAttribPointer(normalAttribLocs[i], 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(16));
+		if (uvAttribLocs[i] != -1)
+			glVertexAttribPointer(uvAttribLocs[i], 2, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(32));
+		for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
+		{
+			size_t index = i * 2 + j;
+			//Bind Buffers
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBs[index]);
+			//Specify Texture location
+			glActiveTexture(GL_TEXTURE0);//Set Active texture unit
+			glBindTexture(GL_TEXTURE_2D, IdsTex[index]);
+			glUniform1i(IdTexUniformLocs[index], 0); //Specify location
 
-	glDrawElements(GL_TRIANGLES, parser.m_meshes[0].m_subsets[1].m_indexBuffer.size(), GL_UNSIGNED_SHORT, 0);
+			glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_SHORT, 0);
 
-	//Disable Shader
+
+		}
+		//Disable Shader
+		
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(vertexAttribLocs[i]);
+		if (normalAttribLocs[i] != -1) {
+			glDisableVertexAttribArray(normalAttribLocs[i]);
+		}
+		if (uvAttribLocs[i] != -1) {
+			glDisableVertexAttribArray(uvAttribLocs[i]);
+		}
+		glUseProgram(0);
+	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(vertexAttribLoc);
-	if (normalAttribLoc != -1) {
-		glDisableVertexAttribArray(normalAttribLoc);
-	}
-	if (uvAttribLoc != -1) {
-		glDisableVertexAttribArray(uvAttribLoc);
-	}
-	glUseProgram(0);
 	//----------------------------------------------------------------//
 }
 
