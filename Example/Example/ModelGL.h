@@ -14,10 +14,10 @@ class ModelGL : public PrimitiveBase
 private:
 	//GLuint	shaderID;
 	std::vector <GLuint>	shadersID;
-	std::vector <GLuint>	vertexAttribLocs;
-	std::vector <GLuint>	normalAttribLocs;
-	std::vector <GLuint>	uvAttribLocs;
-	std::vector <GLuint> IdTexUniformLocs;
+	std::vector <GLint>	vertexAttribLocs;
+	std::vector <GLint>	normalAttribLocs;
+	std::vector <GLint>	uvAttribLocs;
+	std::vector <GLint> IdTexUniformLocs;
 	std::vector <int> IdsTex;
 
 	GLint  matWorldViewProjUniformLoc;
@@ -25,8 +25,8 @@ private:
 
 	Matrix4D	transform;
 
-	GLuint			VB;
-	std::vector <GLuint>			IBs;
+	GLuint					VB;
+	std::vector <GLuint>	IBs;
 
 	std::string m_fileName;
 	std::vector<Texture*> Textures;

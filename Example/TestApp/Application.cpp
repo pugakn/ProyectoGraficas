@@ -1,5 +1,4 @@
 #include "Application.h"
-#include "BMPParser.h"
 #include <iostream>
 
 
@@ -17,6 +16,9 @@ void TestApp::CreateAssets() {
 	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexModel))->Create();
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexModel), &cam.VP);
+	Models.back().ScaleAbsolute(0.2);
+	Models.back().TranslateAbsolute(5.f,0,0);
+	Models.back().Update();
 
 	int indexCerdo = PrimitiveMgr.CreateModel();
 	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexCerdo))->SetFileName("Cerdo.X");
@@ -24,15 +26,38 @@ void TestApp::CreateAssets() {
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCerdo), &cam.VP);
 
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCerdo), &cam.VP);
+	Models.back().TranslateAbsolute(0, 0, 2.5);
+	Models.back().ScaleAbsolute(5);
+	Models.back().Update();
 
-	//BMPParser bp;
-	//bp.LoadFile("bmp2.bmp");
-	////for (int i = 0; i < bp.bmpSize;i++) {
-	//	//if (bp.m_bmpData[0] == 255)
-	//	//	std::cout << "R";
-	////}
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCerdo), &cam.VP);
+	Models.back().TranslateAbsolute(0, 11, 2.5);
+	Models.back().ScaleAbsolute(0.5);
+	Models.back().Update();
 
-	//bp.Deallocate();
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCerdo), &cam.VP);
+	Models.back().TranslateAbsolute(-5, 9, 0);
+	Models.back().ScaleAbsolute(0.5);
+	Models.back().Update();
+
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCerdo), &cam.VP);
+	Models.back().TranslateAbsolute(5, 9, 0);
+	Models.back().ScaleAbsolute(0.5);
+	Models.back().Update();
+
+	int indexCroc = PrimitiveMgr.CreateModel();
+	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexCroc))->SetFileName("NuCroc.X");
+	dynamic_cast<ModelGL*>(PrimitiveMgr.GetPrimitive(indexCroc))->Create();
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCroc), &cam.VP);
+	Models.back().ScaleAbsolute(0.1);
+	Models.back().TranslateAbsolute(-5.f, 0, 0);
+	Models.back().Update();
 }
 
 void TestApp::DestroyAssets() {
@@ -43,13 +68,6 @@ void TestApp::OnUpdate() {
 	DtTimer.Update();
 
 	OnInput();
-
-	//Models[0].TranslateAbsolute(Position.x, Position.y, Position.z);
-	//Models[0].RotateXAbsolute(Orientation.x);
-	//Models[0].RotateYAbsolute(Orientation.y);
-	//Models[0].RotateZAbsolute(Orientation.z);
-	//Models[0].ScaleAbsolute(Scaling.x);
-	//Models[0].Update();
 
 	OnDraw();
 }
@@ -111,6 +129,9 @@ void TestApp::OnInput() {
 	if (IManager.PressedKey(SDLK_KP_PERIOD)) {
 		cam.Rotate(Vector4D(0, 0, 1.0f*DtTimer.GetDTSecs(), 1));
 	}
+
+	Vector3D mRot = IManager.m_normalizedMousePos;
+	cam.Rotate(Vector4D(0, -(mRot.x*2 -1) *DtTimer.GetDTSecs(), 0, 1));
 
 	
 }

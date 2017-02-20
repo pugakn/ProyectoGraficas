@@ -58,6 +58,9 @@ void Win32Framework::ProcessInput() {
 				pBaseApp->IManager.KeyStates[0][evento.key.keysym.sym] = false;
 				pBaseApp->IManager.KeyStates[1][evento.key.keysym.sym] = false;
 			}break;
+			case SDL_MOUSEMOTION: {
+				pBaseApp->IManager.setMouseMotion(evento.motion.x , evento.motion.y);
+			}break;
 		}
 	}
 }

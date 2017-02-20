@@ -4,8 +4,9 @@
 
 void FPCamera::Init()
 {
-	m_pos = Vector4D(0.0f, -1.0f, -5.0f,1.f);
+	m_pos = Vector4D(0.0f, -5.0f, -20.0f,1.f);
 	m_rot = Identity();
+	m_rot = RotationY(ToRadian(180));
 	m_view = m_rot*Translation(m_pos.x, m_pos.y, m_pos.z);
 	Projection = PerspectiveFOVRH(ToRadian(45.f), 1280.0f / 720.0f, 0.1f, 1000.0f);
 	VP = m_view*Projection;

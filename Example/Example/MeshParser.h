@@ -9,6 +9,8 @@
 #define TYPE_MESH_MATERIAL_LIST 6
 #define TYPE_MESH_MATERIAL 7
 
+#define USING_32BIT_IB 0
+
 namespace xf {
 	namespace attributes {
 		enum E
@@ -41,11 +43,19 @@ struct xMeshEffects {
 	std::string m_difusePath;
 };
 struct xMeshSubset {
+#if USING_32BIT_IB
+	std::vector<unsigned int> m_indexBuffer;
+#else
 	std::vector<unsigned short> m_indexBuffer;
+#endif // USING_32BIT_IB
 	xMeshEffects m_effects;
 };
 struct xMesh{
-	std::vector<unsigned short>	m_indexBuffer;
+#if USING_32BIT_IB
+	std::vector<unsigned int> m_indexBuffer;
+#else
+	std::vector<unsigned short> m_indexBuffer;
+#endif // USING_32BIT_IB
 	std::vector<xMeshSubset> m_subsets;
 	unsigned long m_vertexAttributes;
 };
@@ -68,7 +78,7 @@ private:
 	//std::string SearchElement(char condition);
 public:
 	std::vector<vertexStruct> m_vbo;
-	std::vector<unsigned short>	m_indexBuffer;
+	//std::vector<unsigned short>	m_indexBuffer;
 	std::vector<xMesh> m_meshes;
 
 	int m_vertexSize;

@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 InputManager::InputManager() {
+	m_normalizedMousePos = Vector3D(0, 0, 0);
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < MAXKEYS; j++) {
 			KeyStates[i][j] = false;
@@ -46,4 +47,10 @@ bool InputManager::PressedKey(int key) {
 
 bool InputManager::PressedMouseButton(int mb) {
 	return MouseButtonStates[0][mb];
+}
+
+void InputManager::setMouseMotion(float xM, float yM)
+{
+	m_normalizedMousePos.x = xM/1280.f;
+	m_normalizedMousePos.y = yM/720.f;
 }

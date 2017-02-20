@@ -29,13 +29,13 @@ void ModelGL::Create()
 
 	//Crear shaders
 	//Iterar cada Mesh y subsets
-	for (size_t i = 0; i < parser.m_meshes.size(); i++)
+	for (auto &meshIt: parser.m_meshes)
 	{
 
 		std::string Defines = "";
-		if (parser.m_meshes.back().m_vertexAttributes&xf::attributes::E::HAS_NORMAL)
+		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_NORMAL)
 			Defines += "#define USE_NORMALS\n\n";
-		if (parser.m_meshes.back().m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD0)
+		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD0)
 			Defines += "#define USE_TEXCOORD0\n\n";
 
 		vstr = Defines + vstr;
@@ -59,14 +59,14 @@ void ModelGL::Create()
 		//Obtener locaciones de Uniforms
 		matWorldViewProjUniformLoc = glGetUniformLocation(shadersID.back(), "WVP");
 		matWorldUniformLoc = glGetUniformLocation(shadersID.back(), "World");
-		for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
+		for (auto &subsetIt : meshIt.m_subsets)
 		{
 			//Cargar Texturas
 			bool found = false;
 			for (std::size_t f = 0; f<Textures.size(); f++) {
 				Texture *ttex = Textures[f];
 				std::string ttstr = std::string(ttex->optname);
-				if (ttstr == parser.m_meshes[i].m_subsets[j].m_effects.m_difusePath.c_str()) {
+				if (ttstr == subsetIt.m_effects.m_difusePath.c_str()) {
 					IdsTex.push_back(ttex->id);
 					IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "diffuse"));
 					found = true;
@@ -75,7 +75,7 @@ void ModelGL::Create()
 			}
 			if (!found) {
 				Texture *tex = new TextureGL;
-				int textureID = tex->LoadTexture(const_cast<char*>(parser.m_meshes[i].m_subsets[j].m_effects.m_difusePath.c_str()));
+				int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_difusePath.c_str()));
 				if (textureID != -1) {
 					Textures.push_back(tex);
 					IdsTex.push_back(textureID);
@@ -92,7 +92,11 @@ void ModelGL::Create()
 			IBs.push_back(0);//
 			glGenBuffers(1, &IBs.back()); //ERROR SUBSETS VARIABLES
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBs.back());
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size() * sizeof(unsigned short), &(parser.m_meshes[i].m_subsets[j].m_indexBuffer[0]), GL_STATIC_DRAW);
+#if USING_32BIT_IB
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, subsetIt.m_indexBuffer.size() * sizeof(unsigned int), &(subsetIt.m_indexBuffer[0]), GL_STATIC_DRAW);
+#else
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, subsetIt.m_indexBuffer.size() * sizeof(unsigned short), &(subsetIt.m_indexBuffer[0]), GL_STATIC_DRAW);
+#endif // USING_32BIT_IB
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 	}
@@ -152,10 +156,16 @@ void ModelGL::Draw(float *t, float *vp)
 			glBindTexture(GL_TEXTURE_2D, IdsTex[index]);
 			glUniform1i(IdTexUniformLocs[index], 0); //Specify location
 
+#if USING_32BIT_IB
+			glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
+#else
 			glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_SHORT, 0);
+#endif // USING_32BIT_IB
+
 			index++;
 
 		}
+
 		//Disable Shader
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
