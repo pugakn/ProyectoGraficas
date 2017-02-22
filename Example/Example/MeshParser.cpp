@@ -15,7 +15,6 @@ bool MeshParser::LoadFile(const char* fileName)
 	if (m_meshCount != 0) return true;
 	return false;
 }
-
 void MeshParser::ReadFile()
 {
 	m_vertexSize = 0;
@@ -23,9 +22,9 @@ void MeshParser::ReadFile()
 	vertexPos = 0;
 	normalPos = 0;
 	textCordsPos = 0;
+	declDataPos = 0;
 
-	std::string name;
-	int type;
+
 	//Leer Mesh
 	char* bufferEnd = &m_pointer[fileSize - 1];
 	m_pointer = strstr(m_pointer,"Mesh ");
@@ -33,11 +32,14 @@ void MeshParser::ReadFile()
 	m_pointer = strstr(m_pointer, "Mesh ");
 	while (m_pointer != bufferEnd)
 	{
+		m_name.clear();
+		m_type = 0;
+
 		m_pointer = strstr(m_pointer,"{");
 		if (m_pointer == NULL) return;
-		name = getName();
-		type = getType(m_pointer - 3 - name.length());
-		switch (type)
+		m_name = getName();
+		m_type = getType(m_pointer - 3 - m_name.length());
+		switch (m_type)
 		{
 			case TYPE_MESH:
 				m_meshes.push_back(xMesh());
@@ -59,6 +61,9 @@ void MeshParser::ReadFile()
 				getMaterials();
 				//return;//
 				break;
+			case TYPE_MESH_DECL_DATA:
+				getDeclData();
+				break;
 		}
 		++m_pointer;
 	}
@@ -77,7 +82,6 @@ std::string MeshParser::getName()
 	}
 	return name;
 }
-
 int MeshParser::getType(char* tempPointer)
 {
 	std::string type;
@@ -102,6 +106,9 @@ int MeshParser::getType(char* tempPointer)
 		return TYPE_MESH_MATERIAL_LIST;
 	if (type == "lairetaM")
 		return TYPE_MESH_MATERIAL;
+	if (m_name == "ataDlceD")
+		return TYPE_MESH_DECL_DATA;
+	
 
 	return 0;
 }
@@ -156,7 +163,6 @@ void MeshParser::getMeshPositions()
 
 	//vertexPos++;
 }
-
 void MeshParser::getMeshIndices()
 {
 	++m_pointer;
@@ -212,7 +218,6 @@ void MeshParser::getMeshIndices()
 	}
 	//indexPos++;
 }
-
 void MeshParser::getMeshNormals()
 {
 	++m_pointer;
@@ -334,24 +339,17 @@ void MeshParser::createSubsetts()
 void MeshParser::getMaterials()
 {
 	std::string pathString;
-	for (int i = 0; i < m_meshes.back().m_subsets.size(); )
+	for (int i = 0; i < m_meshes.back().m_subsets.size(); i++)
 	{
 		//-------------------------------------------------------------//
 		//Cargar todas las propiedades del Material
 		pathString.clear();
 		char* temp;
-		if (!(temp = strstr(m_pointer, "EffectParamString")))
-			return;
-		m_pointer = temp;
-		while (!(*m_pointer++ == '"'));
-		while (!(*m_pointer == '"')) {
-			pathString.push_back(*m_pointer);
-			++m_pointer;
-		}
-		++m_pointer;
-		//Cargar Ruta de DiffuseMap
-		if (pathString == "diffuseMap") {
-			pathString.clear();
+		if ((temp = strstr(m_pointer, "diffuseMap")))
+		{
+			m_pointer = temp;
+			m_pointer++;
+			while (!(*m_pointer++ == '"'));
 			while (!(*m_pointer++ == '"'));
 			m_pointer++;
 			while (!(*m_pointer == '"'))
@@ -361,8 +359,8 @@ void MeshParser::getMaterials()
 			}
 			m_pointer += 2;
 			size_t offset = pathString.find_first_of(' ');
-			if(offset < pathString.size())
-				pathString = pathString.substr(offset+1);
+			if (offset < pathString.size())
+				pathString = pathString.substr(offset + 1);
 			else
 			{
 				offset = pathString.find_first_of('\\');
@@ -370,9 +368,98 @@ void MeshParser::getMaterials()
 					pathString = pathString.substr(offset + 2);
 			}
 			m_meshes.back().m_subsets[i].m_effects.m_difusePath = pathString;
-			i++;
 		}
 		//-------------------------------------------------------------//
+	}
+}
+void MeshParser::getDeclData()
+{
+	++m_pointer;
+	std::string numString="";
+
+	while (!(*m_pointer++ == '\n'));
+	while (!(*m_pointer++ == '\n'));
+	while (!(*m_pointer++ == '\n'));
+	while (!(*m_pointer++ == '\n'));
+
+
+	while (!(*m_pointer == ';'))
+	{
+		numString.push_back(*m_pointer);
+		++m_pointer;
+	}
+	++m_pointer;
+	int numElements = std::stoi(numString)/6;
+	numString.clear();
+	m_meshes.back().m_tangents.resize(numElements);
+	m_meshes.back().m_binormals.resize(numElements);
+	for (int i= 0; i < numElements; i++)
+	{
+		++m_pointer;
+		while (!(*m_pointer == ','))
+		{
+			numString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		m_meshes.back().m_tangents[i].x = std::stof(numString);
+		numString.clear();
+		++m_pointer;
+		while (!(*m_pointer == ','))
+		{
+			numString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		m_meshes.back().m_tangents[i].y = std::stof(numString);
+		numString.clear();
+		++m_pointer;
+		while (!(*m_pointer == ','))
+		{
+			numString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		m_meshes.back().m_tangents[i].z = std::stof(numString);
+		numString.clear();
+		++m_pointer;
+	}
+
+	for (int i = 0; i < numElements; i++)
+	{
+		++m_pointer;
+		while (!(*m_pointer == ','))
+		{
+			numString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		m_meshes.back().m_binormals[i].x = std::stof(numString);
+		numString.clear();
+		++m_pointer;
+		while (!(*m_pointer == ',') )
+		{
+			numString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		m_meshes.back().m_binormals[i].y = std::stof(numString);
+		numString.clear();
+		++m_pointer;
+		while (!(*m_pointer == ','))
+		{
+			if (*m_pointer == ';')
+				break;
+			numString.push_back(*m_pointer);
+			++m_pointer;
+
+		}
+		++m_pointer;
+		m_meshes.back().m_binormals[i].z = std::stof(numString);
+		numString.clear();
+		
+
+		++m_pointer;
 	}
 }
 void MeshParser::Deallocate()

@@ -31,7 +31,6 @@ void ModelGL::Create()
 	//Iterar cada Mesh y subsets
 	for (auto &meshIt: parser.m_meshes)
 	{
-
 		std::string Defines = "";
 		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_NORMAL)
 			Defines += "#define USE_NORMALS\n\n";

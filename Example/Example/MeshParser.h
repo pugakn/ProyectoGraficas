@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "Vector3D.h"
 #define TYPE_FRAME 1
 #define TYPE_MESH 2
 #define TYPE_TEMPLATE 3
@@ -8,6 +9,7 @@
 #define TYPE_MESH_TEXT_CORDS 5
 #define TYPE_MESH_MATERIAL_LIST 6
 #define TYPE_MESH_MATERIAL 7
+#define TYPE_MESH_DECL_DATA 8
 
 #define USING_32BIT_IB 0
 
@@ -41,6 +43,13 @@ struct vertexStruct {
 };
 struct xMeshEffects {
 	std::string m_difusePath;
+	std::string m_specularMap;
+	std::string m_normalMap;
+	std::string m_glossMap;
+	bool m_noLighting;
+	bool m_blFlipGreenChanel;
+	float m_glossines;
+	float m_specLevel;
 };
 struct xMeshSubset {
 #if USING_32BIT_IB
@@ -58,6 +67,8 @@ struct xMesh{
 #endif // USING_32BIT_IB
 	std::vector<xMeshSubset> m_subsets;
 	unsigned long m_vertexAttributes;
+	std::vector<Vector3D> m_tangents;
+	std::vector<Vector3D> m_binormals;
 };
 
 class MeshParser
@@ -66,6 +77,8 @@ private:
 	char* m_pointer;
 	unsigned int m_meshCount = 0;
 	size_t fileSize;
+	std::string m_name;
+	int m_type;
 
 	std::string getName();
 	int getType(char* tempPointer);
@@ -75,6 +88,7 @@ private:
 	void getMeshTextureCords();
 	void createSubsetts();
 	void getMaterials();
+	void getDeclData();
 	//std::string SearchElement(char condition);
 public:
 	std::vector<vertexStruct> m_vbo;
@@ -86,6 +100,7 @@ public:
 	size_t vertexPos;
 	size_t normalPos;
 	size_t textCordsPos;
+	size_t declDataPos;
 
 	size_t offset;
 
