@@ -322,7 +322,7 @@ void MeshParser::createSubsetts()
 	for (int i = 0; i < nTriangles; i++)
 	{
 		//while (!(*m_pointer++ == ';'));
-		while (!(*m_pointer == ','))
+		while (!(*m_pointer == ',' || *m_pointer == ';'))
 		{
 			numString.push_back(*m_pointer);
 			++m_pointer;
@@ -345,6 +345,24 @@ void MeshParser::getMaterials()
 		//Cargar todas las propiedades del Material
 		pathString.clear();
 		char* temp;
+		//NoLighting"; 0;
+		if ((temp = strstr(m_pointer, "NoLighting")))
+		{
+			m_pointer = temp;
+			m_pointer++;
+			while (!(*m_pointer++ == '\n'));
+			m_pointer++;
+			while (!(*m_pointer == ';'))
+			{
+				pathString.push_back(*m_pointer);
+				++m_pointer;
+			}
+			m_pointer +=2;
+			m_meshes.back().m_subsets[i].m_effects.m_noLighting = std::stoi(pathString);
+		}
+		pathString.clear();
+
+		//diffuseMap
 		if ((temp = strstr(m_pointer, "diffuseMap")))
 		{
 			m_pointer = temp;
@@ -368,6 +386,136 @@ void MeshParser::getMaterials()
 					pathString = pathString.substr(offset + 2);
 			}
 			m_meshes.back().m_subsets[i].m_effects.m_difusePath = pathString;
+		}
+		pathString.clear();
+
+		// speclevel"; 1; 1.0000;
+		if ((temp = strstr(m_pointer, "speclevel")))
+		{
+			m_pointer = temp;
+			m_pointer++;
+			while (!(*m_pointer++ == '\n'));
+			while (!(*m_pointer++ == '\n'));
+			m_pointer++;
+			while (!(*m_pointer == ';'))
+			{
+				pathString.push_back(*m_pointer);
+				++m_pointer;
+			}
+			m_pointer += 2;
+			m_meshes.back().m_subsets[i].m_effects.m_specLevel = std::stof(pathString);
+		}
+		pathString.clear();
+		//specularMap
+		if ((temp = strstr(m_pointer, "specularMap")))
+		{
+			m_pointer = temp;
+			m_pointer++;
+			while (!(*m_pointer++ == '"'));
+			while (!(*m_pointer++ == '"'));
+			m_pointer++;
+			while (!(*m_pointer == '"'))
+			{
+				pathString.push_back(*m_pointer);
+				++m_pointer;
+			}
+			m_pointer += 2;
+			size_t offset = pathString.find_first_of(' ');
+			if (offset < pathString.size())
+				pathString = pathString.substr(offset + 1);
+			else
+			{
+				offset = pathString.find_first_of('\\');
+				if (offset < pathString.size())
+					pathString = pathString.substr(offset + 2);
+			}
+			m_meshes.back().m_subsets[i].m_effects.m_specularMap = pathString;
+		}
+		pathString.clear();
+		//glossMap
+		if ((temp = strstr(m_pointer, "glossMap")))
+		{
+			m_pointer = temp;
+			m_pointer++;
+			while (!(*m_pointer++ == '"'));
+			while (!(*m_pointer++ == '"'));
+			m_pointer++;
+			while (!(*m_pointer == '"'))
+			{
+				pathString.push_back(*m_pointer);
+				++m_pointer;
+			}
+			m_pointer += 2;
+			size_t offset = pathString.find_first_of(' ');
+			if (offset < pathString.size())
+				pathString = pathString.substr(offset + 1);
+			else
+			{
+				offset = pathString.find_first_of('\\');
+				if (offset < pathString.size())
+					pathString = pathString.substr(offset + 2);
+			}
+			m_meshes.back().m_subsets[i].m_effects.m_glossMap = pathString;
+		}
+		pathString.clear();
+		//glossiness"; 1; 2.0000;
+		if ((temp = strstr(m_pointer, "glossiness")))
+		{
+			m_pointer = temp;
+			m_pointer++;
+			while (!(*m_pointer++ == '\n'));
+			while (!(*m_pointer++ == '\n'));
+			m_pointer++;
+			while (!(*m_pointer == ';'))
+			{
+				pathString.push_back(*m_pointer);
+				++m_pointer;
+			}
+			m_pointer += 2;
+			m_meshes.back().m_subsets[i].m_effects.m_glossines = std::stof(pathString);
+		}
+		pathString.clear();
+		//normalMap
+		if ((temp = strstr(m_pointer, "normalMap")))
+		{
+			m_pointer = temp;
+			m_pointer++;
+			while (!(*m_pointer++ == '"'));
+			while (!(*m_pointer++ == '"'));
+			m_pointer++;
+			while (!(*m_pointer == '"'))
+			{
+				pathString.push_back(*m_pointer);
+				++m_pointer;
+			}
+			m_pointer += 2;
+			size_t offset = pathString.find_first_of(' ');
+			if (offset < pathString.size())
+				pathString = pathString.substr(offset + 1);
+			else
+			{
+				offset = pathString.find_first_of('\\');
+				if (offset < pathString.size())
+					pathString = pathString.substr(offset + 2);
+			}
+			m_meshes.back().m_subsets[i].m_effects.m_normalMap = pathString;
+		}
+
+		pathString.clear();
+		// bFlipGreenChannel"; 1;
+		if ((temp = strstr(m_pointer, "bFlipGreenChannel")))
+		{
+			m_pointer = temp;
+			m_pointer++;
+			while (!(*m_pointer++ == '\n'));
+			m_pointer++;
+			while (!(*m_pointer == ';'))
+			{
+				pathString.push_back(*m_pointer);
+				++m_pointer;
+			}
+			m_pointer += 2;
+			m_meshes.back().m_subsets[i].m_effects.m_blFlipGreenChanel = std::stoi(pathString);
 		}
 		//-------------------------------------------------------------//
 	}
