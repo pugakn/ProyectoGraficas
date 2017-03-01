@@ -12,6 +12,8 @@ private:
 	Vector3D xDir;
 	Vector3D yDir;
 
+	float rotY, rotX;
+
 	Vector3D up;
 
 public:

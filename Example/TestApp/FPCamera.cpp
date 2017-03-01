@@ -2,8 +2,10 @@
 #include <math.h>
 void FPCamera::Init()
 {
+	rotX = 0;
+	rotY = 3.1416;
 	Vector3D initTarget(0, 5, 20);
-	m_pos = Vector3D(1.0f, 5.0f, -20.0f);
+	m_pos = Vector3D(0.0f, 5.0f, -20.0f);
 	up = Vector3D(0,1,0);
 	zDir = Normalize( m_pos - initTarget);
 	xDir = Normalize(Cross3(up,zDir));
@@ -29,21 +31,24 @@ void FPCamera::TraslateSide(float velocity)
 
 void FPCamera::RotateX(float rotation)
 {
-	Matrix4D rotationsMTX = RotationX(rotation);
-	zDir = zDir * rotationsMTX;
-	xDir = xDir * rotationsMTX;
-	yDir = yDir * rotationsMTX;
+	rotX += rotation;
 }
 void FPCamera::RotateY(float rotation)
 {
-	Matrix4D rotationsMTX = RotationY(rotation);
-	zDir = zDir * rotationsMTX;
-	xDir = xDir * rotationsMTX;
-	yDir = yDir * rotationsMTX;
+	rotY += rotation;
 }
 
 void FPCamera::Update()
 {
+	float cosPitch = cos(rotX);
+	float sinPitch = sin(rotX);
+	float cosYaw = cos(rotY);
+	float sinYaw = sin(rotY);
+
+	xDir = Vector3D( cosYaw, 0, -sinYaw );
+	yDir = Vector3D( sinYaw * sinPitch, cosPitch, cosYaw * sinPitch );
+	zDir = Vector3D(sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw );
+
 	m_view = Matrix4D(xDir.x, yDir.x, zDir.x, 0,
 		xDir.y, yDir.y, zDir.y, 0,
 		xDir.z, yDir.z, zDir.z, 0,

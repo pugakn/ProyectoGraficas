@@ -103,7 +103,7 @@ void TestApp::OnInput() {
 
 
 	Vector3D mRot = IManager.m_normalizedMousePos;
-	cam.RotateY((mRot.x*2 -1) *DtTimer.GetDTSecs());
+	cam.RotateY(-(mRot.x*2 -1) *DtTimer.GetDTSecs());
 	cam.RotateX(-(mRot.y * 2 - 1) *DtTimer.GetDTSecs());
 	cam.Update();
 
