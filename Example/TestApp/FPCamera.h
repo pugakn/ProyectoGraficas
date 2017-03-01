@@ -13,6 +13,7 @@ private:
 	Vector3D yDir;
 
 	float rotY, rotX;
+	float m_rotationVel;
 
 	Vector3D up;
 
