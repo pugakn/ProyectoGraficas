@@ -5,17 +5,26 @@
 class FPCamera
 {
 private:
-	Matrix4D m_rot;
 	Matrix4D Projection;
 	InputManager IManager;
 
+	Vector3D zDir;
+	Vector3D xDir;
+	Vector3D yDir;
+
+	Vector3D up;
+
 public:
 	void Init();
-	void Traslate(Vector4D traslation);
-	void Rotate(Vector4D rotation);
-	void OnInput(float delta);
+	void TraslateFront(float velocity);
+	void TraslateSide(float velocity);
 
-	Vector4D m_pos;
+	void RotateX(float rotation);
+	void RotateY(float rotation);
+	void OnInput(float delta);
+	void Update();
+
+	Vector3D m_pos;
 	Matrix4D m_view;
 	Matrix4D VP;
 	FPCamera();

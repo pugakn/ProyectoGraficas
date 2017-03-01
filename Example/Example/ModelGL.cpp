@@ -89,7 +89,7 @@ void ModelGL::Create()
 			}
 			//Generar buffer de Indices
 			IBs.push_back(0);//
-			glGenBuffers(1, &IBs.back()); //ERROR SUBSETS VARIABLES
+			glGenBuffers(1, &IBs.back()); 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBs.back());
 #if USING_32BIT_IB
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, subsetIt.m_indexBuffer.size() * sizeof(unsigned int), &(subsetIt.m_indexBuffer[0]), GL_STATIC_DRAW);

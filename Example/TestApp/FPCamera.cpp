@@ -1,85 +1,60 @@
 #include "FPCamera.h"
-
-
-
+#include <math.h>
 void FPCamera::Init()
 {
-	m_pos = Vector4D(0.0f, -5.0f, -20.0f,1.f);
-	m_rot = Identity();
-	m_rot = RotationY(ToRadian(180));
-	m_view = m_rot*Translation(m_pos.x, m_pos.y, m_pos.z);
+	Vector3D initTarget(0, 5, 20);
+	m_pos = Vector3D(1.0f, 5.0f, -20.0f);
+	up = Vector3D(0,1,0);
+	zDir = Normalize( m_pos - initTarget);
+	xDir = Normalize(Cross3(up,zDir));
+	yDir = Cross3(zDir, xDir);
+
+	m_view =  Matrix4D(xDir.x, yDir.x, zDir.x, 0,
+			xDir.y, yDir.y, zDir.y, 0,
+			xDir.z, yDir.z, zDir.z, 0,
+			-Dot(xDir, m_pos), -Dot(yDir, m_pos), -Dot(zDir, m_pos), 1.f);
+
 	Projection = PerspectiveFOVRH(ToRadian(45.f), 1280.0f / 720.0f, 0.1f, 1000.0f);
 	VP = m_view*Projection;
 }
 
-void FPCamera::Traslate(Vector4D traslation)
+void FPCamera::TraslateFront(float velocity)
 {
-	Matrix4D traslationsMTX = Translation(-traslation.x, -traslation.y, -traslation.z);
-	m_pos = m_pos * traslationsMTX;
-	m_view = m_rot*Translation(m_pos.x, m_pos.y, m_pos.z);
-	VP = m_view*Projection;
-
+	m_pos = m_pos + velocity *zDir;
+}
+void FPCamera::TraslateSide(float velocity)
+{
+	m_pos = m_pos + velocity *xDir;
 }
 
-void FPCamera::Rotate(Vector4D rotation)
+void FPCamera::RotateX(float rotation)
 {
-	Matrix4D rotationsMTX = RotationX(rotation.x)
-		* RotationY(rotation.y)* RotationZ(rotation.z);
-	m_rot = m_rot * rotationsMTX;
-	m_view = m_rot*Translation(m_pos.x, m_pos.y, m_pos.z);
-	VP = m_view*Projection;
+	Matrix4D rotationsMTX = RotationX(rotation);
+	zDir = zDir * rotationsMTX;
+	xDir = xDir * rotationsMTX;
+	yDir = yDir * rotationsMTX;
+}
+void FPCamera::RotateY(float rotation)
+{
+	Matrix4D rotationsMTX = RotationY(rotation);
+	zDir = zDir * rotationsMTX;
+	xDir = xDir * rotationsMTX;
+	yDir = yDir * rotationsMTX;
 }
 
+void FPCamera::Update()
+{
+	m_view = Matrix4D(xDir.x, yDir.x, zDir.x, 0,
+		xDir.y, yDir.y, zDir.y, 0,
+		xDir.z, yDir.z, zDir.z, 0,
+		-Dot(xDir, m_pos), -Dot(yDir, m_pos), -Dot(zDir, m_pos), 1.f);
+	VP = m_view*Projection;
+}
 void FPCamera::OnInput(float delta)
 {
-	//if (IManager.PressedKey(SDLK_UP)) {
-	//	Traslate(Vector4D(0, 1.0f*delta, 0, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_DOWN)) {
-	//	Traslate(Vector4D(0, -1.0f*delta, 0, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_LEFT)) {
-	//	Traslate(Vector4D(-1.0f*delta, 0, 0, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_RIGHT)) {
-	//	Traslate(Vector4D(1.0f*delta, 0, 0, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_z)) {
-	//	Traslate(Vector4D(0, 0, -10.0f*delta, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_x)) {
-	//	Traslate(Vector4D(0, 0, 10.0f*delta, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_KP5)) {
-	//	Rotate(Vector4D(-1.0f*delta, 0, 0, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_KP6)) {
-	//	Rotate(Vector4D(1.0f*delta, 0, 0, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_KP2)) {
-	//	Rotate(Vector4D(0, -1.0f*delta, 0, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_KP3)) {
-	//	Rotate(Vector4D(0, 1.0f*delta, 0, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_KP0)) {
-	//	Rotate(Vector4D(0, 0, -1.0f*delta, 1));
-	//}
-
-	//if (IManager.PressedKey(SDLK_KP_PERIOD)) {
-	//	Rotate(Vector4D(0, 0, 1.0f*delta, 1));
-	//}
 }
+
+
 
 FPCamera::FPCamera()
 {

@@ -53,6 +53,7 @@ public:
 };
 Matrix4D operator* (const Matrix4D& A, const Matrix4D& B);
 Vector4D operator* (const Vector4D& V, const Matrix4D& M);
+Vector3D operator* (const Vector3D& V, const Matrix4D& M);
 Vector4D operator* (const Matrix4D& M, const Vector4D& V);
 Matrix4D Zero();
 Matrix4D Identity();

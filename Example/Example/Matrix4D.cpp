@@ -71,6 +71,10 @@ Vector4D operator* (const Vector4D& V, const Matrix4D& M) {
 	R.w = V.x * M.m[0][3] + V.y * M.m[1][3] + V.z * M.m[2][3] + V.w * M.m[3][3];
 	return R;
 }
+Vector3D operator* (const Vector3D& V, const Matrix4D& M) {
+	Vector4D R = Vector4D(V.x, V.y, V.z,0) * M;
+	return Vector3D(R.x,R.y,R.z);
+}
 Vector4D operator* (const Matrix4D& M, const Vector4D& V) {
 	return Vector4D(
 		Dot(M.Row0, V),

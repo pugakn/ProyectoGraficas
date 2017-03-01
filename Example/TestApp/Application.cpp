@@ -83,55 +83,29 @@ void TestApp::OnDraw() {
 
 void TestApp::OnInput() {
 	//cam.OnInput(DtTimer.GetDTSecs());
-	if (IManager.PressedKey(SDLK_UP)) {
-		cam.Traslate(Vector4D(0, 3.0f*DtTimer.GetDTSecs(), 0, 1));
+	if (IManager.PressedKey(SDLK_w)) {
+		cam.TraslateFront(-10.0f*DtTimer.GetDTSecs());
 	}
 
-	if (IManager.PressedKey(SDLK_DOWN)) {
-		cam.Traslate(Vector4D(0, -3.0f*DtTimer.GetDTSecs(), 0, 1));
+	if (IManager.PressedKey(SDLK_s)) {
+		cam.TraslateFront(10.0f*DtTimer.GetDTSecs());
 	}
 
-	if (IManager.PressedKey(SDLK_LEFT)) {
-		cam.Traslate(Vector4D(-3.0f*DtTimer.GetDTSecs(), 0, 0, 1));
+	if (IManager.PressedKey(SDLK_d)) {
+		cam.TraslateSide(10.0f*DtTimer.GetDTSecs());
 	}
 
-	if (IManager.PressedKey(SDLK_RIGHT)) {
-		cam.Traslate(Vector4D(3.0f*DtTimer.GetDTSecs(), 0, 0, 1));
+	if (IManager.PressedKey(SDLK_a)) {
+		cam.TraslateSide(-10.0f*DtTimer.GetDTSecs());
 	}
 
-	if (IManager.PressedKey(SDLK_z)) {
-		cam.Traslate(Vector4D(0, 0, -10.0f*DtTimer.GetDTSecs(), 1));
-	}
 
-	if (IManager.PressedKey(SDLK_x)) {
-		cam.Traslate(Vector4D(0, 0, 10.0f*DtTimer.GetDTSecs(), 1));
-	}
 
-	if (IManager.PressedKey(SDLK_KP5)) {
-		cam.Rotate(Vector4D(-1.0f*DtTimer.GetDTSecs(), 0, 0, 1));
-	}
-
-	if (IManager.PressedKey(SDLK_KP6)) {
-		cam.Rotate(Vector4D(1.0f*DtTimer.GetDTSecs(), 0, 0, 1));
-	}
-
-	if (IManager.PressedKey(SDLK_KP2)) {
-		cam.Rotate(Vector4D(0, -1.0f*DtTimer.GetDTSecs(), 0, 1));	}
-
-	if (IManager.PressedKey(SDLK_KP3)) {
-		cam.Rotate(Vector4D(0, 1.0f*DtTimer.GetDTSecs(), 0, 1));
-	}
-
-	if (IManager.PressedKey(SDLK_KP0)) {
-		cam.Rotate(Vector4D(0, 0, -1.0f*DtTimer.GetDTSecs(), 1));
-	}
-
-	if (IManager.PressedKey(SDLK_KP_PERIOD)) {
-		cam.Rotate(Vector4D(0, 0, 1.0f*DtTimer.GetDTSecs(), 1));
-	}
 
 	Vector3D mRot = IManager.m_normalizedMousePos;
-	cam.Rotate(Vector4D(0, -(mRot.x*2 -1) *DtTimer.GetDTSecs(), 0, 1));
+	cam.RotateY((mRot.x*2 -1) *DtTimer.GetDTSecs());
+	cam.RotateX(-(mRot.y * 2 - 1) *DtTimer.GetDTSecs());
+	cam.Update();
 
 	
 }
