@@ -26,6 +26,7 @@ void Win32Framework::OnCreateApplication(){
 	pVideoDriver->InitDriver();
 
 	pBaseApp->InitVars();
+	SDL_WarpMouse(1280 / 2, 720 / 2);
 	pBaseApp->CreateAssets();
 }
 void Win32Framework::OnDestroyApplication() {
@@ -42,6 +43,7 @@ void Win32Framework::UpdateApplication() {
 	while (m_alive) {
 		ProcessInput();
 		pBaseApp->OnUpdate();
+		//SDL_WarpMouse(1280/2, 720/2);
 	}
 }
 void Win32Framework::ProcessInput() {

@@ -7,7 +7,7 @@ void FPCamera::Init()
 	m_rotationVel = 2.0f;
 	m_pos = Vector3D(0.0f, 5.0f, -20.0f);
 	Projection = PerspectiveFOVRH(ToRadian(45.f), 1280.0f / 720.0f, 0.1f, 1000.0f);
-
+	Update();
 }
 
 void FPCamera::TraslateFront(float velocity)
@@ -21,11 +21,13 @@ void FPCamera::TraslateSide(float velocity)
 
 void FPCamera::RotateX(float rotation)
 {
-	rotX += rotation * m_rotationVel;
+	//rotX += rotation * m_rotationVel;
+	rotX = rotation * 3.1416f ;
 }
 void FPCamera::RotateY(float rotation)
 {
-	rotY += rotation * m_rotationVel;
+	//rotY += rotation * m_rotationVel;
+	rotY = rotation * 3.1416f  + 3.1416f;
 }
 
 void FPCamera::Update()
