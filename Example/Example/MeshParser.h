@@ -12,8 +12,6 @@
 #define TYPE_MESH_MATERIAL 7
 #define TYPE_MESH_DECL_DATA 8
 
-#define USING_32BIT_IB 0
-
 namespace xf {
 	namespace attributes {
 		enum E

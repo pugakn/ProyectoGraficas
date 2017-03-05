@@ -387,26 +387,7 @@ void MeshParser::getMaterials()
 			}
 			m_meshes.back().m_subsets[i].m_effects.m_difusePath = pathString;
 		}
-		else
-			if (temp = strstr(m_pointer, "TextureFilename Diffuse")) {
-				while (!(*m_pointer++ == '"'));
-				while (!(*m_pointer == '"'))
-				{
-					pathString.push_back(*m_pointer);
-					++m_pointer;
-				}
-				m_pointer += 2;
-				size_t offset = pathString.find_first_of(' ');
-				if (offset < pathString.size())
-					pathString = pathString.substr(offset + 1);
-				else
-				{
-					offset = pathString.find_first_of('\\');
-					if (offset < pathString.size())
-						pathString = pathString.substr(offset + 2);
-				}
-				m_meshes.back().m_subsets[i].m_effects.m_difusePath = pathString;
-			}
+
 		pathString.clear();
 
 		// speclevel"; 1; 1.0000;
@@ -538,6 +519,27 @@ void MeshParser::getMaterials()
 			m_pointer += 2;
 			m_meshes.back().m_subsets[i].m_effects.m_blFlipGreenChanel = std::stoi(pathString);
 		}
+		pathString.clear();
+		if (m_meshes.back().m_subsets[i].m_effects.m_difusePath == "")
+			if (temp = strstr(m_pointer, "TextureFilename Diffuse")) {
+				while (!(*m_pointer++ == '"'));
+				while (!(*m_pointer == '"'))
+				{
+					pathString.push_back(*m_pointer);
+					++m_pointer;
+				}
+				m_pointer += 2;
+				size_t offset = pathString.find_first_of(' ');
+				if (offset < pathString.size())
+					pathString = pathString.substr(offset + 1);
+				else
+				{
+					offset = pathString.find_first_of('\\');
+					if (offset < pathString.size())
+						pathString = pathString.substr(offset + 2);
+				}
+				m_meshes.back().m_subsets[i].m_effects.m_difusePath = pathString;
+			}
 		//-------------------------------------------------------------//
 	}
 }

@@ -162,7 +162,7 @@ void MeshD3D::Create()
 		bdesc.ByteWidth = sizeof(MeshD3D::ConstBuffer);
 		bdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
-		if (D3D11Device->CreateBuffer(&bdesc, 0, m_meshInfo[meshInfoIndex].pd3dConstantBuffer.GetAddressOf()) != S_OK) {
+		if (D3D11Device->CreateBuffer(&bdesc, 0, m_meshInfo[meshInfoIndex].ConstantBuffer.GetAddressOf()) != S_OK) {
 			printf("Error Creating Buffer Layout\n");
 			return;
 		}
@@ -179,7 +179,7 @@ void MeshD3D::Create()
 				Texture *ttex = m_Textures[f];
 				std::string ttstr = std::string(ttex->optname);
 				if (ttstr == subsetIt.m_effects.m_difusePath.c_str()) {
-					it_subsetinfo->m_difuseText = ttex;
+					it_subsetinfo->difuseText = ttex;
 					found = true;
 					break;
 				}
@@ -189,7 +189,7 @@ void MeshD3D::Create()
 				int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_difusePath.c_str()));
 				if (textureID != -1) {
 					m_Textures.push_back(tex);
-					it_subsetinfo->m_difuseText = tex;
+					it_subsetinfo->difuseText = tex;
 				}
 				else {
 					std::cout << "Texture not Found" << std::endl;
@@ -202,7 +202,7 @@ void MeshD3D::Create()
 			bdesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 			D3D11_SUBRESOURCE_DATA subData = { &subsetIt.m_indexBuffer[0], 0, 0 };
 
-			if (D3D11Device->CreateBuffer(&bdesc, &subData, &it_subsetinfo->m_IB) != S_OK) {
+			if (D3D11Device->CreateBuffer(&bdesc, &subData, &it_subsetinfo->IB) != S_OK) {
 				printf("Error Creating Index Buffer\n");
 				return;
 			}
@@ -251,18 +251,18 @@ void MeshD3D::Draw(float * t, float * vp)
 		//==================== Set Input Layout (describe the input-buffer data) =====================
 		D3D11DeviceContext->IASetInputLayout(m_meshInfo[i].Layout.Get());
 		//==================== Update Constant Buffers =====================
-		D3D11DeviceContext->UpdateSubresource(m_meshInfo[i].pd3dConstantBuffer.Get(), 0, 0, &m_meshInfo[i].CnstBuffer, 0, 0);
-		D3D11DeviceContext->VSSetConstantBuffers(0, 1, m_meshInfo[i].pd3dConstantBuffer.GetAddressOf());
-		D3D11DeviceContext->PSSetConstantBuffers(0, 1, m_meshInfo[i].pd3dConstantBuffer.GetAddressOf());
+		D3D11DeviceContext->UpdateSubresource(m_meshInfo[i].ConstantBuffer.Get(), 0, 0, &m_meshInfo[i].CnstBuffer, 0, 0);
+		D3D11DeviceContext->VSSetConstantBuffers(0, 1, m_meshInfo[i].ConstantBuffer.GetAddressOf());
+		D3D11DeviceContext->PSSetConstantBuffers(0, 1, m_meshInfo[i].ConstantBuffer.GetAddressOf());
 
 		for (std::size_t k = 0; k < m_meshInfo[i].m_subSets.size(); k++) {
 			SubSetInfo *it_subsetinfo = &m_meshInfo[i].m_subSets[k];
 			//==================== Set Texture =====================
-			TextureD3D *texd3d = dynamic_cast<TextureD3D*>(it_subsetinfo->m_difuseText);
+			TextureD3D *texd3d = dynamic_cast<TextureD3D*>(it_subsetinfo->difuseText);
 			D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
 			D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
 			//==================== Set IB =====================
-			D3D11DeviceContext->IASetIndexBuffer(it_subsetinfo->m_IB.Get(), DXGI_FORMAT_R16_UINT, 0);
+			D3D11DeviceContext->IASetIndexBuffer(it_subsetinfo->IB.Get(), DXGI_FORMAT_R16_UINT, 0);
 
 			//==================== Draw =====================
 			D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

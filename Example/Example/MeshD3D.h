@@ -20,8 +20,8 @@ class MeshD3D : public PrimitiveBase
 	};
 private:
 	struct SubSetInfo {
-		ComPtr<ID3D11Buffer> m_IB;
-		Texture*			 m_difuseText;
+		ComPtr<ID3D11Buffer> IB;
+		Texture*			 difuseText;
 	};
 	struct MeshInfo {
 		ComPtr<ID3D11VertexShader>  pVS;
@@ -29,7 +29,7 @@ private:
 		ComPtr<ID3DBlob>            VS_blob;
 		ComPtr<ID3DBlob>            FS_blob;
 		ComPtr<ID3D11InputLayout>   Layout;
-		ComPtr<ID3D11Buffer>        pd3dConstantBuffer;
+		ComPtr<ID3D11Buffer>        ConstantBuffer;
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC>	VertexDecl;
 		MeshD3D::ConstBuffer					CnstBuffer;
