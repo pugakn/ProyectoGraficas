@@ -8,10 +8,7 @@
 #include "UtilsGL.h"
 #include "Matrix4D.h"
 
-#include "Texture.h"
-#include "TextureGL.h"
-
-
+class Texture;
 
 class ModelGL : public PrimitiveBase
 {

@@ -1,4 +1,5 @@
 #include "MeshD3D.h"
+#ifdef USING_D3D11
 #include "Timer.h"
 #include <iostream>
 
@@ -274,6 +275,6 @@ void MeshD3D::Destroy()
 {
 
 }
-
+#endif // USING_D3D11
 
 

@@ -40,9 +40,11 @@ int	 PrimitiveManager::CreateModel(char * fileName) {
 #ifdef USING_OPENGL_ES
 	PrimitiveBase *primitive = new ModelGL();
 	dynamic_cast<ModelGL*>(primitive)->SetFileName(fileName);
+	dynamic_cast<ModelGL*>(primitive)->Create();
 #elif defined(USING_D3D11)
 	PrimitiveBase *primitive = new MeshD3D();
 	dynamic_cast<MeshD3D*>(primitive)->SetFileName(fileName);
+	dynamic_cast<MeshD3D*>(primitive)->Create();
 #endif
 	
 	primitives.push_back(primitive);

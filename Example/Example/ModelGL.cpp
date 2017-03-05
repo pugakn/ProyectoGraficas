@@ -3,6 +3,7 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 #include "Timer.h"
 #include <iostream>
+#include "TextureGL.h"
 void ModelGL::SetFileName(char * fileName)
 {
 	m_fileName = std::string(fileName);

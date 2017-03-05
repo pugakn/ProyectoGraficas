@@ -15,102 +15,102 @@ void TestApp::CreateAssets() {
 
 	
 
-	int indexScene = PrimitiveMgr.CreateModel("Models/Scene.X");
-	PrimitiveMgr.GetPrimitive(indexScene)->Create();
+	int index = PrimitiveMgr.CreateModel("Models/Scene.X");
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+
+
+	index = PrimitiveMgr.CreateModel("Models/House.X");
 
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexScene), &cam.VP);
-
-
-	int indexHouse = PrimitiveMgr.CreateModel("Models/House.X");
-	PrimitiveMgr.GetPrimitive(indexHouse)->Create();
-
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexHouse), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
 	Models.back().ScaleAbsolute(2);
-	Models.back().RotateYAbsolute(180);
-	Models.back().TranslateAbsolute(200.f, 0, 200);
+	Models.back().TranslateAbsolute(-350, 0, -75);
 	Models.back().Update();
 
-	int indexLink = PrimitiveMgr.CreateModel("Models/Link.X");
-	PrimitiveMgr.GetPrimitive(indexLink)->Create();
 
+	index = PrimitiveMgr.CreateModel("Models/Jinx.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexLink), &cam.VP);
-	Models.back().ScaleAbsolute(0.3f);
-	Models.back().TranslateAbsolute(75, 0, 70.0f);
-	Models.back().RotateYAbsolute(180);
-	Models.back().Update();
-
-	int indexDarius = PrimitiveMgr.CreateModel("Models/Darius.X");
-	PrimitiveMgr.GetPrimitive(indexDarius)->Create();
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexDarius), &cam.VP);
-	Models.back().ScaleAbsolute(7);
-	Models.back().TranslateAbsolute(0.f, 0, 70.0f);
-	Models.back().RotateYAbsolute(215);
-	Models.back().Update();
-
-	int indexJinx = PrimitiveMgr.CreateModel("Models/Jinx.X");
-	PrimitiveMgr.GetPrimitive(indexJinx)->Create();
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexJinx), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
 	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(-60.f, 0, 70.0f);
-	Models.back().RotateYAbsolute(200);
+	Models.back().TranslateAbsolute(350, 0, 0);
+	Models.back().RotateYAbsolute(180);
 	Models.back().Update();
 
-	int indexModel = PrimitiveMgr.CreateModel("Models/NuBatman.X");
-	PrimitiveMgr.GetPrimitive(indexModel)->Create();
-
+	index = PrimitiveMgr.CreateModel("Models/Vi.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexModel), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
 	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(100.f, 0, -100);
+	Models.back().TranslateAbsolute(250, 0, 0);
 	Models.back().RotateYAbsolute(180);
 	Models.back().Update();
 
-	int indexCerdo = PrimitiveMgr.CreateModel("Models/Cerdo.X");
-	PrimitiveMgr.GetPrimitive(indexCerdo)->Create();
-
-
+	index = PrimitiveMgr.CreateModel("Models/grag.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCerdo), &cam.VP);
-	Models.back().TranslateAbsolute(50, 0, -200);
-	Models.back().ScaleAbsolute(50);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().ScaleAbsolute(2);
+	Models.back().TranslateAbsolute(150, 0, 0);
 	Models.back().RotateYAbsolute(180);
 	Models.back().Update();
 
+	index = PrimitiveMgr.CreateModel("Models/ashe.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCerdo), &cam.VP);
-	Models.back().TranslateAbsolute(50, 110, -100);
-	Models.back().ScaleAbsolute(15);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().ScaleAbsolute(2);
+	Models.back().TranslateAbsolute(50, 0, 0);
 	Models.back().RotateYAbsolute(180);
 	Models.back().Update();
 
+	index = PrimitiveMgr.CreateModel("Models/ahri.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCerdo), &cam.VP);
-	Models.back().TranslateAbsolute(0, 90, -100);
-	Models.back().ScaleAbsolute(15);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().ScaleAbsolute(2);
+	Models.back().TranslateAbsolute(-50, 0, 0);
 	Models.back().RotateYAbsolute(180);
 	Models.back().Update();
 
+	index = PrimitiveMgr.CreateModel("Models/ahriFire.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCerdo), &cam.VP);
-	Models.back().TranslateAbsolute(100, 90, -100);
-	Models.back().ScaleAbsolute(15);
-	Models.back().RotateYAbsolute(180);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().ScaleAbsolute(2);
+	Models.back().TranslateAbsolute(350, 0, -150);
 	Models.back().Update();
 
-	int indexCroc = PrimitiveMgr.CreateModel("Models/NuCroc.X");
-	PrimitiveMgr.GetPrimitive(indexCroc)->Create();
-
+	index = PrimitiveMgr.CreateModel("Models/amumu.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(indexCroc), &cam.VP);
-	Models.back().TranslateAbsolute(0, 0, -100);
-	Models.back().RotateYAbsolute(180);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().ScaleAbsolute(2);
+	Models.back().TranslateAbsolute(250, 0, -150);
 	Models.back().Update();
 
+	index = PrimitiveMgr.CreateModel("Models/anie.X");
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().ScaleAbsolute(2);
+	Models.back().TranslateAbsolute(150, 0, -150);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/Darius.X");
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().ScaleAbsolute(10);
+	Models.back().TranslateAbsolute(50, 0, -150);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/garen.X");
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().ScaleAbsolute(2);
+	Models.back().TranslateAbsolute(-50, 0, -150);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/sona.X");
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().ScaleAbsolute(2);
+	Models.back().TranslateAbsolute(-50, 0, -75);
+	Models.back().RotateYAbsolute(90);
+	Models.back().Update();
 	
 }
 

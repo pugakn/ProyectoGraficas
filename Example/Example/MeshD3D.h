@@ -1,5 +1,6 @@
 #pragma once
 #include "Config.h"
+#ifdef USING_D3D11
 #include "TextureD3D.h"
 #include <D3Dcompiler.h>
 #include "PrimitiveBase.h"
@@ -51,4 +52,5 @@ public:
 	MeshD3D() {};
 	~MeshD3D() {};
 };
+#endif
 
