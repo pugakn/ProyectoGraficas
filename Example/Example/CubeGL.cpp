@@ -1,4 +1,5 @@
 #include "CubeGL.h"
+#ifdef USING_OPENGL_ES
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 void CubeGL::Create() {
@@ -169,3 +170,4 @@ void CubeGL::Draw(float *t,float *vp) {
 void CubeGL::Destroy() {
 	glDeleteProgram(shaderID);
 }
+#endif

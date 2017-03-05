@@ -4,6 +4,7 @@
 #include "Core.h"
 #include "BaseDriver.h"
 #include <memory>
+#include "Config.h"
 
 class Win32Framework : public RootFramework {
 public:

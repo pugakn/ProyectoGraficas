@@ -1,12 +1,14 @@
 #ifndef UAD_CUBE_GL_H
 #define UAD_CUBE_GL_H
-
+#include "Config.h"
+#ifdef USING_OPENGL_ES
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include <d3dx9math.h>
 
 #include "PrimitiveBase.h"
 #include "UtilsGL.h"
+
 
 
 
@@ -41,5 +43,5 @@ public:
 	D3DXMATRIX	transform;
 };
 
-
+#endif // USING_OPENGL_ES
 #endif

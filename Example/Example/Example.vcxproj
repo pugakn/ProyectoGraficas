@@ -21,6 +21,9 @@
   <ItemGroup>
     <ClInclude Include="BaseDriver.h" />
     <ClInclude Include="BMPParser.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="D3DXDriver.h" />
+    <ClInclude Include="MeshD3D.h" />
     <ClInclude Include="ModelGL.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="CubeGL.h" />
@@ -32,6 +35,7 @@
     <ClInclude Include="PrimitiveInstance.h" />
     <ClInclude Include="PrimitiveManager.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureD3D.h" />
     <ClInclude Include="TextureGL.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="TriangleGL.h" />
@@ -42,6 +46,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BMPParser.cpp" />
+    <ClCompile Include="D3DXDriver.cpp" />
+    <ClCompile Include="MeshD3D.cpp" />
     <ClCompile Include="ModelGL.cpp" />
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="CubeGL.cpp" />
@@ -52,6 +58,7 @@
     <ClCompile Include="PrimitiveInstance.cpp" />
     <ClCompile Include="PrimitiveManager.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureD3D.cpp" />
     <ClCompile Include="TextureGL.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="TriangleGL.cpp" />

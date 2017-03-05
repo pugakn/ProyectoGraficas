@@ -1,4 +1,5 @@
 #include "ModelGL.h"
+#ifdef USING_OPENGL_ES
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 #include "Timer.h"
 #include <iostream>
@@ -20,8 +21,8 @@ void ModelGL::Create()
 	timer.Update();
 	std::cout << "Archivo cargado en: " << timer.GetDTSecs() << " segundos..." << std::endl;
 	//-------------------------------------------------------------------------//
-	char *vsSourceP = file2string("VS_Mesh.glsl");
-	char *fsSourceP = file2string("FS_Mesh.glsl");
+	char *vsSourceP = file2string("Shaders/VS_Mesh.glsl");
+	char *fsSourceP = file2string("Shaders/FS_Mesh.glsl");
 	std::string vstr = std::string(vsSourceP);
 	std::string fstr = std::string(fsSourceP);
 	delete[] vsSourceP;
@@ -36,6 +37,12 @@ void ModelGL::Create()
 			Defines += "#define USE_NORMALS\n\n";
 		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD0)
 			Defines += "#define USE_TEXCOORD0\n\n";
+		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD1)
+			Defines += "#define USE_TEXCOORD1\n\n";
+		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TANGENT)
+			Defines += "#define USE_TANGENTS\n\n";
+		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_BINORMAL)
+			Defines += "#define USE_BINORMALS\n\n";
 
 		vstr = Defines + vstr;
 		fstr = Defines + fstr;
@@ -187,3 +194,4 @@ void ModelGL::Destroy()
 ModelGL::~ModelGL()
 {
 }
+#endif

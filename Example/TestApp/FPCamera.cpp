@@ -5,8 +5,8 @@ void FPCamera::Init()
 	rotX = 0;
 	rotY = 3.1416;
 	m_rotationVel = 2.0f;
-	m_pos = Vector3D(0.0f, 5.0f, -20.0f);
-	Projection = PerspectiveFOVRH(ToRadian(45.f), 1280.0f / 720.0f, 0.1f, 1000.0f);
+	m_pos = Vector3D(0.0f, 50.0f, -200.0f);
+	Projection = PerspectiveFOVRH(ToRadian(45.f), 1280.0f / 720.0f, 1.f, 5000.0f);
 	Update();
 }
 

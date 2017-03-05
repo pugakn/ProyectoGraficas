@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "Config.h"
 #include "Vector3D.h"
 #define TYPE_FRAME 1
 #define TYPE_MESH 2

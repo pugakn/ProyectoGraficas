@@ -4,6 +4,7 @@
 #include <vector>
 #include "Matrix4D.h"
 #include "PrimitiveBase.h"
+#include "Config.h"
 
 class PrimitiveManager {
 public:
@@ -12,7 +13,7 @@ public:
 	}
 	int  CreateTriangle();
 	int	 CreateCube();
-	int CreateModel();
+	int CreateModel(char * fileName);
 
 	void DrawPrimitives();
 	void DestroyPrimitives();

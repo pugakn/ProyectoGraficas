@@ -1,4 +1,6 @@
 #pragma once
+#include "Config.h"
+#ifdef USING_OPENGL_ES
 #include "PrimitiveBase.h"
 #include "MeshParser.h"
 #include <GLES2/gl2.h>
@@ -8,6 +10,8 @@
 
 #include "Texture.h"
 #include "TextureGL.h"
+
+
 
 class ModelGL : public PrimitiveBase
 {
@@ -40,4 +44,5 @@ public:
 	ModelGL()  {};
 	~ModelGL();
 };
+#endif
 

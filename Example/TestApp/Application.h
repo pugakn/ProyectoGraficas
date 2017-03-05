@@ -4,7 +4,6 @@
 #include "Matrix4D.h"
 #include "Vector3D.h"
 #include <Timer.h>
-#include "ModelGL.h"
 #include "FPCamera.h"
 #include <vector>
 class TestApp : public AppBase {

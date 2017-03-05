@@ -1,5 +1,6 @@
-
 #include "TriangleGL.h"
+#ifdef USING_OPENGL_ES
+
 
 
 void TrangleGL::Create() {
@@ -127,3 +128,4 @@ void TrangleGL::Draw(float *t,float *vp) {
 void TrangleGL::Destroy() {
 	glDeleteProgram(shaderID);
 }
+#endif

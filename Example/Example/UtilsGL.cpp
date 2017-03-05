@@ -1,7 +1,20 @@
+/*********************************************************
+* Copyright (C) 2017 Daniel Enriquez (camus_mm@hotmail.com)
+* All Rights Reserved
+*
+* You may use, distribute and modify this code under the
+* following terms:
+* ** Do not claim that you wrote this software
+* ** A mention would be appreciated but not needed
+* ** I do not and will not provide support, this software is "as is"
+* ** Enjoy, learn and share.
+*********************************************************/
+
 #include "UtilsGL.h"
 #include <stdio.h>    
 #include <stdlib.h>
 
+#ifdef USING_OPENGL_ES
 void checkcompilederrors(GLuint shader, GLenum type) {
 	GLint bShaderCompiled;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &bShaderCompiled);
@@ -34,6 +47,7 @@ GLuint createShader(GLenum type, char* pSource) {
 	checkcompilederrors(shader, type);
 	return shader;
 }
+#endif
 
 char *file2string(const char *path) {
 	FILE *fd;
@@ -46,8 +60,7 @@ char *file2string(const char *path) {
 	fseek(fd, 0, SEEK_END);
 	len = ftell(fd);
 	fseek(fd, 0, SEEK_SET);
-	//str = (char*)malloc(len * sizeof(char));
-	str = new char[len+1];
+	str = (char*)malloc(1 + len * sizeof(char));
 	r = fread(str, sizeof(char), len, fd);
 	str[r] = '\0';
 	fclose(fd);

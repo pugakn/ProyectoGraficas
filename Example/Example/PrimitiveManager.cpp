@@ -1,8 +1,12 @@
 
 #include "PrimitiveManager.h"
+#ifdef USING_OPENGL_ES
 #include "TriangleGL.h"
 #include "CubeGL.h"
 #include "ModelGL.h"
+#elif defined(USING_D3D11)
+#include "MeshD3D.h"
+#endif
 
 PrimitiveBase*	PrimitiveManager::GetPrimitive(unsigned int index) {
 	if (index >= primitives.size())
@@ -12,21 +16,35 @@ PrimitiveBase*	PrimitiveManager::GetPrimitive(unsigned int index) {
 }
 
 int  PrimitiveManager::CreateTriangle() {
+#ifdef USING_OPENGL_ES
 	PrimitiveBase *primitive = new TrangleGL();
+//
 	primitive->Create();
 	primitives.push_back(primitive);
 	return (int)(primitives.size()-1);
+#endif;
+	return -1;
 }
 
 int	 PrimitiveManager::CreateCube(){
+#ifdef USING_OPENGL_ES
 	PrimitiveBase *primitive = new CubeGL();
 	primitive->Create();
 	primitives.push_back(primitive);
 	return (int)(primitives.size() - 1);
+#endif;
+	return -1;
 }
 
-int	 PrimitiveManager::CreateModel() {
+int	 PrimitiveManager::CreateModel(char * fileName) {
+#ifdef USING_OPENGL_ES
 	PrimitiveBase *primitive = new ModelGL();
+	dynamic_cast<ModelGL*>(primitive)->SetFileName(fileName);
+#elif defined(USING_D3D11)
+	PrimitiveBase *primitive = new MeshD3D();
+	dynamic_cast<MeshD3D*>(primitive)->SetFileName(fileName);
+#endif
+	
 	primitives.push_back(primitive);
 	return (int)(primitives.size() - 1);
 }

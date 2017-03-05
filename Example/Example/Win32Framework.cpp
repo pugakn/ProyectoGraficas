@@ -1,5 +1,22 @@
+
+/*********************************************************
+* Copyright (C) 2017 Daniel Enriquez (camus_mm@hotmail.com)
+* All Rights Reserved
+*
+* You may use, distribute and modify this code under the
+* following terms:
+* ** Do not claim that you wrote this software
+* ** A mention would be appreciated but not needed
+* ** I do not and will not provide support, this software is "as is"
+* ** Enjoy, learn and share.
+*********************************************************/
+
 #include "Win32Framework.h"
+#ifdef USING_OPENGL_ES
 #include "GLDriver.h"
+#elif defined(USING_D3D11)
+#include "D3DXDriver.h"
+#endif
 // SDL
 #include <SDL/SDL.h>
 // Windows 
@@ -8,10 +25,10 @@
 
 void Win32Framework::InitGlobalVars() {
 
-	
+
 }
 
-void Win32Framework::OnCreateApplication(){
+void Win32Framework::OnCreateApplication() {
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_WM_SetCaption("UAD Framework Daniel", 0);
 	int flags = SDL_HWSURFACE;
@@ -20,14 +37,20 @@ void Win32Framework::OnCreateApplication(){
 	int width = 1280;
 	int height = 720;
 	SDL_SetVideoMode(width, height, 32, flags);
-
+#ifdef USING_OPENGL_ES
 	pVideoDriver = new GLDriver;
+#elif defined(USING_D3D11)
+	pVideoDriver = new D3DXDriver;
+	pVideoDriver->SetDimensions(width, height);
+#endif
 	pVideoDriver->SetWindow(0);
 	pVideoDriver->InitDriver();
 
 	pBaseApp->InitVars();
-	SDL_WarpMouse(1280 / 2, 720 / 2);
 	pBaseApp->CreateAssets();
+	SDL_WarpMouse(1280 / 2, 720 / 2);
+
+
 }
 void Win32Framework::OnDestroyApplication() {
 	pBaseApp->DestroyAssets();
@@ -43,28 +66,30 @@ void Win32Framework::UpdateApplication() {
 	while (m_alive) {
 		ProcessInput();
 		pBaseApp->OnUpdate();
-		//SDL_WarpMouse(1280/2, 720/2);
 	}
 }
 void Win32Framework::ProcessInput() {
 	SDL_Event       evento;
 	while (SDL_PollEvent(&evento)) {
 		switch (evento.type) {
-			case SDL_KEYDOWN: {
-				if (evento.key.keysym.sym == SDLK_q) {
-					m_alive = false;
-				}
-				pBaseApp->IManager.KeyStates[0][evento.key.keysym.sym] = true;
-			}break;
-			case SDL_KEYUP: {
-				pBaseApp->IManager.KeyStates[0][evento.key.keysym.sym] = false;
-				pBaseApp->IManager.KeyStates[1][evento.key.keysym.sym] = false;
-			}break;
-			case SDL_MOUSEMOTION: {
-				pBaseApp->IManager.setMouseMotion(evento.motion.x , evento.motion.y);
-			}break;
+		case SDL_KEYDOWN: {
+			if (evento.key.keysym.sym == SDLK_q) {
+				m_alive = false;
+			}
+			pBaseApp->IManager.KeyStates[0][evento.key.keysym.sym] = true;
+		}break;
+		case SDL_KEYUP: {
+			pBaseApp->IManager.KeyStates[0][evento.key.keysym.sym] = false;
+			pBaseApp->IManager.KeyStates[1][evento.key.keysym.sym] = false;
+
+		}break;
+		case SDL_MOUSEMOTION: {
+			pBaseApp->IManager.setMouseMotion(evento.motion.x, evento.motion.y);
+		}break;
+
 		}
 	}
 }
+
 void Win32Framework::ResetApplication() {
 }

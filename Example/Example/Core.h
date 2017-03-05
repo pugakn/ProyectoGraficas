@@ -1,6 +1,6 @@
 #ifndef UAD_CORE_H
 #define UAD_CORE_H
-
+#include "Config.h"
 #include "BaseDriver.h"
 #include "InputManager.h"
 

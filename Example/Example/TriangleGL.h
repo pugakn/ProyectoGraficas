@@ -1,5 +1,8 @@
 #ifndef UAD_TRIANGLEGL_H
 #define UAD_TRIANGLEGL_H
+#include "Config.h"
+#ifdef USING_OPENGL_ES
+
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -59,4 +62,5 @@ public:
 	D3DXMATRIX	transform;
 };
 
-#endif
+#endif//USING_OPENGL_ES
+#endif 
