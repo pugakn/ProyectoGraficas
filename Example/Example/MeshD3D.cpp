@@ -52,12 +52,12 @@ void MeshD3D::Create()
 		fstr = Defines + fstr;
 		if (!vsSourceP || !fsSourceP)
 			return;
-		//==================== Create VS blob and compile VS =====================
+		//==================== compile VS =====================
 		m_meshInfo[meshInfoIndex].VS_blob = nullptr;
 		ComPtr<ID3DBlob> errorBlob = nullptr;
 		if (D3DCompile(vstr.c_str(), vstr.size(), 0, 0, 0, "VS", "vs_5_0", 0, 0, &m_meshInfo[meshInfoIndex].VS_blob, &errorBlob) != S_OK) {
 			if (errorBlob) {
-				printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
+				std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
 				return;
 			}
 			if (m_meshInfo[meshInfoIndex].VS_blob) {
@@ -66,15 +66,16 @@ void MeshD3D::Create()
 		}
 		//=========== Create VS ============
 		if (D3D11Device->CreateVertexShader(m_meshInfo[meshInfoIndex].VS_blob->GetBufferPointer(), m_meshInfo[meshInfoIndex].VS_blob->GetBufferSize(), 0, &m_meshInfo[meshInfoIndex].pVS) != S_OK) {
-			printf("Error Creating Vertex Shader\n");
+			std::cout << "Error Creatong Vertex Shader" << std::endl;
+
 			return;
 		}
-		//==================== Create PS blob and compile PS =====================
+		//==================== compile PS =====================
 		m_meshInfo[meshInfoIndex].FS_blob = nullptr;
 		errorBlob.Reset();
 		if (D3DCompile(fstr.c_str(), fstr.size(), 0, 0, 0, "FS", "ps_5_0", 0, 0, &m_meshInfo[meshInfoIndex].FS_blob, &errorBlob) != S_OK) {
 			if (errorBlob) {
-				printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
+				std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
 				return;
 			}
 
@@ -84,7 +85,7 @@ void MeshD3D::Create()
 		}
 		//=========== Create PS ==============
 		if (D3D11Device->CreatePixelShader(m_meshInfo[meshInfoIndex].FS_blob->GetBufferPointer(), m_meshInfo[meshInfoIndex].FS_blob->GetBufferSize(), 0, &m_meshInfo[meshInfoIndex].pFS) != S_OK) {
-			printf("Error Creating Pixel Shader\n");
+			std::cout << "Error Creating Pixel Shader" << std::endl;
 			return;
 		}
 
@@ -151,7 +152,7 @@ void MeshD3D::Create()
 
 		//==================== Create Input Layout =====================
 		if (D3D11Device->CreateInputLayout(&m_meshInfo[meshInfoIndex].VertexDecl[0], m_meshInfo[meshInfoIndex].VertexDecl.size(), m_meshInfo[meshInfoIndex].VS_blob->GetBufferPointer(), m_meshInfo[meshInfoIndex].VS_blob->GetBufferSize(), &m_meshInfo[meshInfoIndex].Layout) != S_OK) {
-			printf("Error Creating Input Layout\n");
+			std::cout << "Error Creating Input Layout" << std::endl;
 			return;
 		}
 		D3D11DeviceContext->IASetInputLayout(m_meshInfo[meshInfoIndex].Layout.Get());
@@ -163,7 +164,7 @@ void MeshD3D::Create()
 		bdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 		if (D3D11Device->CreateBuffer(&bdesc, 0, m_meshInfo[meshInfoIndex].ConstantBuffer.GetAddressOf()) != S_OK) {
-			printf("Error Creating Buffer Layout\n");
+			std::cout << "Error Creating Buffer Layout" << std::endl;
 			return;
 		}
 
@@ -203,7 +204,7 @@ void MeshD3D::Create()
 			D3D11_SUBRESOURCE_DATA subData = { &subsetIt.m_indexBuffer[0], 0, 0 };
 
 			if (D3D11Device->CreateBuffer(&bdesc, &subData, &it_subsetinfo->IB) != S_OK) {
-				printf("Error Creating Index Buffer\n");
+				std::cout << "Error Creating IB" << std::endl;
 				return;
 			}
 			++subsetInfoIndex;
@@ -217,7 +218,7 @@ void MeshD3D::Create()
 	D3D11_SUBRESOURCE_DATA subData = { &m_parser.m_vbo[0], 0, 0 };
 
 	if (D3D11Device->CreateBuffer(&bdesc, &subData, &m_VB) != S_OK) {
-		printf("Error Creating Vertex Buffer\n");
+		std::cout << "Error Creating VB" << std::endl;
 		return;
 	}
 	delete[] vsSourceP;

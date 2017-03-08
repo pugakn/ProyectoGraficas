@@ -122,7 +122,7 @@ void TestApp::OnUpdate() {
 	DtTimer.Update();
 
 	OnInput();
-
+	
 	OnDraw();
 }
 
