@@ -18,6 +18,14 @@ attribute highp vec2 UV;
 #endif
 
 varying highp vec3 vecTransformed;
+#ifdef USE_PIXELLIGHTING
+varying highp vec3 normalTransformed;
+#endif
+#ifdef USE_VERTEXLIGHTING
+varying highp float light_mod;
+uniform highp vec3 lightDir;
+#endif
+
 
 #ifdef USE_TEXCOORD0
 varying highp vec2 vecUVCoords;
@@ -39,4 +47,10 @@ void main(){
 #endif
 
 	gl_Position = WVP*Vertex;
+#ifdef USE_PIXELLIGHTING
+	normalTransformed = normalize(mat3(World)*Normal.rgb);
+#endif
+#ifdef USE_VERTEXLIGHTING
+light_mod = clamp(dot(Normal.xyz,lightDir)/(length(Normal.xyz)*length(lightDir)),0.0,1.0) ;
+#endif
 }

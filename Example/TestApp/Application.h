@@ -28,7 +28,7 @@ public:
 
 
 	FPCamera cam;
-
+	Vector3D lightDir;
 	Timer			DtTimer;
 
 

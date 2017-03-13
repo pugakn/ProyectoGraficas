@@ -78,7 +78,7 @@ void TrangleGL::Transform(float *t) {
 	transform = t;
 }
 
-void TrangleGL::Draw(float *t,float *vp) {
+void TrangleGL::Draw(float *t,float *vp, float*l) {
 	glUseProgram(shaderID);
 	
 	if (t)

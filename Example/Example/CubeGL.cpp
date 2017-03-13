@@ -125,7 +125,7 @@ void CubeGL::Transform(float *t) {
 	transform = t;
 }
 
-void CubeGL::Draw(float *t,float *vp) {
+void CubeGL::Draw(float *t,float *vp, float*l) {
 	glUseProgram(shaderID);
 
 	if (t)

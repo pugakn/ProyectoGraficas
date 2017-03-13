@@ -7,9 +7,10 @@
 
 class PrimitiveInst {
 	public:
-		void	CreateInstance(PrimitiveBase *pPrim, Matrix4D *pVP) {
+		void	CreateInstance(PrimitiveBase *pPrim, Matrix4D *pVP, Vector3D* l) {
 			pBase = pPrim;
-			pViewProj = pVP;		
+			pViewProj = pVP;	
+			lightDir = l;
 
 			Position = Identity();
 			Scale = Identity();
@@ -43,6 +44,7 @@ class PrimitiveInst {
 		Matrix4D		Final;
 
 		Matrix4D		*pViewProj;
+		Vector3D		*lightDir;
 
 		PrimitiveBase	*pBase;
 };

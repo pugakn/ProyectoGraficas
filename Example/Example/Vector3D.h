@@ -17,6 +17,7 @@ public:
 
 	};
 	Vector3D();
+	Vector3D(float *V);
 	Vector3D(const Vector3D& V);
 	Vector3D(float fx, float fy, float fz);
 	~Vector3D();

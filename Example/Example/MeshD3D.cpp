@@ -48,6 +48,8 @@ void MeshD3D::Create()
 		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_BINORMAL)
 			Defines += "#define USE_BINORMALS\n\n";
 
+		Defines += "#define USE_PIXELLIGHTING \n\n";
+
 		vstr = Defines + vstr;
 		fstr = Defines + fstr;
 		if (!vsSourceP || !fsSourceP)
@@ -230,12 +232,13 @@ void MeshD3D::Transform(float * t)
 	m_transform = t;
 }
 
-void MeshD3D::Draw(float * t, float * vp)
+void MeshD3D::Draw(float * t, float * vp, float *l)
 {
 	if (t)
 		m_transform = t;
 	Matrix4D VP = Matrix4D(vp);
 	Matrix4D WVP = m_transform*VP;
+	Vector4D lightDir = Vector4D(Vector3D(l),0);
 	//==================== Set VB =====================
 	UINT stride = sizeof(vertexStruct);
 	UINT offset = 0;
@@ -246,6 +249,7 @@ void MeshD3D::Draw(float * t, float * vp)
 		//==================== Set Constant Buffer info =====================
 		m_meshInfo[i].CnstBuffer.WVP = WVP;
 		m_meshInfo[i].CnstBuffer.World = m_transform;
+		m_meshInfo[i].CnstBuffer.lightDir = lightDir;
 		//==================== Set Shaders =====================
 		D3D11DeviceContext->VSSetShader(m_meshInfo[i].pVS.Get(), 0, 0);
 		D3D11DeviceContext->PSSetShader(m_meshInfo[i].pFS.Get(), 0, 0);

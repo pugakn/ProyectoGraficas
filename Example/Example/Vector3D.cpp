@@ -5,6 +5,12 @@
 Vector3D::Vector3D()
 {
 }
+Vector3D::Vector3D(float * V)
+{
+	x = V[0];
+	y = V[1];
+	z = V[2];
+}
 Vector3D::Vector3D(const Vector3D &V)
 {
 	x = V.x;

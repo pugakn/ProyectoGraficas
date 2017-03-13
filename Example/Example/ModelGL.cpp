@@ -45,6 +45,8 @@ void ModelGL::Create()
 		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_BINORMAL)
 			Defines += "#define USE_BINORMALS\n\n";
 
+		Defines += "#define USE_PIXELLIGHTING \n\n";
+
 		vstr = Defines + vstr;
 		fstr = Defines + fstr;
 
@@ -66,6 +68,7 @@ void ModelGL::Create()
 		//Obtener locaciones de Uniforms
 		matWorldViewProjUniformLoc = glGetUniformLocation(shadersID.back(), "WVP");
 		matWorldUniformLoc = glGetUniformLocation(shadersID.back(), "World");
+		lightDirLoc = glGetUniformLocation(shadersID.back(), "lightDir");
 		for (auto &subsetIt : meshIt.m_subsets)
 		{
 			//Cargar Texturas
@@ -123,7 +126,7 @@ void ModelGL::Transform(float * t)
 	transform = t;
 }
 
-void ModelGL::Draw(float *t, float *vp)
+void ModelGL::Draw(float *t, float *vp, float *l)
 {
 
 	if (t)
@@ -132,6 +135,7 @@ void ModelGL::Draw(float *t, float *vp)
 	Matrix4D VP = Matrix4D(vp);
 	Matrix4D WVP = transform*VP;
 
+	Vector3D light = Vector3D(l);
 	//------------------------------------------------------------------//
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	size_t index = 0;
@@ -142,6 +146,8 @@ void ModelGL::Draw(float *t, float *vp)
 		//Set Uniforms
 		glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
 		glUniformMatrix4fv(matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
+		if (lightDirLoc != -1)
+			glUniform3fv(lightDirLoc,1, &light.r);
 		//Enable Attributes
 		glEnableVertexAttribArray(vertexAttribLocs[i]);
 		if (normalAttribLocs[i] != -1)

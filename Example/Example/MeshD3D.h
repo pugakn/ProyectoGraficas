@@ -17,6 +17,7 @@ class MeshD3D : public PrimitiveBase
 	struct ConstBuffer {
 		Matrix4D WVP;
 		Matrix4D World;
+		Vector4D lightDir;
 	};
 private:
 	struct SubSetInfo {
@@ -45,7 +46,7 @@ public:
 	void SetFileName(char* fileName);
 	void Create() override;
 	void Transform(float *t) override;
-	void Draw(float *t, float *vp) override;
+	void Draw(float *t, float *vp, float *l) override;
 	void Destroy() override;
 	MeshParser m_parser;
 	std::vector<MeshInfo> m_meshInfo;

@@ -6,6 +6,7 @@
 
 void TestApp::InitVars() {
 	DtTimer.Init();
+	lightDir = Vector3D(1, 1, 1);
 
 }
 
@@ -17,13 +18,13 @@ void TestApp::CreateAssets() {
 
 	int index = PrimitiveMgr.CreateModel("Models/Scene.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP,&lightDir);
 
 
 	index = PrimitiveMgr.CreateModel("Models/House.X");
 
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(-350, 0, -75);
 	Models.back().Update();
@@ -31,7 +32,7 @@ void TestApp::CreateAssets() {
 
 	index = PrimitiveMgr.CreateModel("Models/Jinx.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(350, 0, 0);
 	Models.back().RotateYAbsolute(180);
@@ -39,7 +40,7 @@ void TestApp::CreateAssets() {
 
 	index = PrimitiveMgr.CreateModel("Models/Vi.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(250, 0, 0);
 	Models.back().RotateYAbsolute(180);
@@ -47,7 +48,7 @@ void TestApp::CreateAssets() {
 
 	index = PrimitiveMgr.CreateModel("Models/grag.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(150, 0, 0);
 	Models.back().RotateYAbsolute(180);
@@ -55,7 +56,7 @@ void TestApp::CreateAssets() {
 
 	index = PrimitiveMgr.CreateModel("Models/ashe.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(50, 0, 0);
 	Models.back().RotateYAbsolute(180);
@@ -63,7 +64,7 @@ void TestApp::CreateAssets() {
 
 	index = PrimitiveMgr.CreateModel("Models/ahri.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(-50, 0, 0);
 	Models.back().RotateYAbsolute(180);
@@ -71,42 +72,42 @@ void TestApp::CreateAssets() {
 
 	index = PrimitiveMgr.CreateModel("Models/ahriFire.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(350, 0, -150);
 	Models.back().Update();
 
 	index = PrimitiveMgr.CreateModel("Models/amumu.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(250, 0, -150);
 	Models.back().Update();
 
 	index = PrimitiveMgr.CreateModel("Models/anie.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(150, 0, -150);
 	Models.back().Update();
 
 	index = PrimitiveMgr.CreateModel("Models/Darius.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(10);
 	Models.back().TranslateAbsolute(50, 0, -150);
 	Models.back().Update();
 
 	index = PrimitiveMgr.CreateModel("Models/garen.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(-50, 0, -150);
 	Models.back().Update();
 
 	index = PrimitiveMgr.CreateModel("Models/sona.X");
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP);
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index), &cam.VP, &lightDir);
 	Models.back().ScaleAbsolute(2);
 	Models.back().TranslateAbsolute(-50, 0, -75);
 	Models.back().RotateYAbsolute(90);
@@ -151,6 +152,20 @@ void TestApp::OnInput() {
 
 	if (IManager.PressedKey(SDLK_a)) {
 		cam.TraslateSide(-100.0f*DtTimer.GetDTSecs());
+	}
+
+	//Light
+	if (IManager.PressedKey(SDLK_KP4)) {
+		lightDir = lightDir*RotationY(-1 * DtTimer.GetDTSecs());
+	}
+	if (IManager.PressedKey(SDLK_KP6)) {
+		lightDir = lightDir*RotationY(1 * DtTimer.GetDTSecs());
+	}
+	if (IManager.PressedKey(SDLK_KP8)) {
+		lightDir = lightDir*RotationX(-1 * DtTimer.GetDTSecs());
+	}
+	if (IManager.PressedKey(SDLK_KP5)) {
+		lightDir = lightDir*RotationX(1 * DtTimer.GetDTSecs());
 	}
 
 

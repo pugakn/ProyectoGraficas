@@ -38,7 +38,7 @@ public:
 	TrangleGL() : shaderID(0) {}
 	void Create();
 	void Transform(float *t);
-	void Draw(float *t,float *vp);
+	void Draw(float *t,float *vp, float*l);
 	void Destroy();
 
 	GLuint	shaderID;

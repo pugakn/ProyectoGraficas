@@ -53,7 +53,7 @@ int	 PrimitiveManager::CreateModel(char * fileName) {
 
 void PrimitiveManager::DrawPrimitives() {
 	for(unsigned int i=0;i<primitives.size();i++){
-		primitives[i]->Draw(0,&(*pVP).m[0][0]);
+		primitives[i]->Draw(0,&(*pVP).m[0][0], &lightDir->x);
 	}
 }
 

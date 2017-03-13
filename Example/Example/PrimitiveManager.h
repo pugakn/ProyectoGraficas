@@ -11,6 +11,9 @@ public:
 	void SetVP(Matrix4D *vp) {
 		pVP = vp;
 	}
+	void SetLightDir(Vector3D *l) {
+		lightDir = l;
+	}
 	int  CreateTriangle();
 	int	 CreateCube();
 	int CreateModel(char * fileName);
@@ -22,6 +25,7 @@ public:
 	std::vector<PrimitiveBase*> primitives;
 
 	Matrix4D *pVP;
+	Vector3D *lightDir;
 };
 
 #endif

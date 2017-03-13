@@ -11,6 +11,13 @@ Vector4D::Vector4D(const Vector4D &V)
 	z = V.z;
 	w = V.w;
 }
+Vector4D::Vector4D(const Vector3D & V, float other)
+{
+	x = V.x;
+	y = V.y;
+	z = V.z;
+	w = other;
+}
 Vector4D::Vector4D(float fx, float fy, float fz, float fw)
 {
 	x = fx;

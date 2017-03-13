@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Vector3D.h"
 struct Vector4D
 {
 public:
@@ -18,6 +18,7 @@ public:
 	};
 	Vector4D();
 	Vector4D(const Vector4D& V);
+	Vector4D(const Vector3D& V, float other);
 	Vector4D(float fx, float fy, float fz, float fw);
 	~Vector4D();
 };
