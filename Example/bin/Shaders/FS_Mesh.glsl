@@ -22,7 +22,7 @@ void main(){
 #endif
 	#ifdef USE_PIXELLIGHTING
 	highp vec3 norm = normalize(normalTransformed);
-	highp float light_mod = clamp(dot(normalTransformed,lightDir)/(length(normalTransformed)*length(lightDir)),0.0,1.0) ;
+	highp float light_mod = clamp(dot(norm,normalize(lightDir))),0.0,1.0) ;
 	#else
 		#ifndef USE_VERTEXLIGHTING
 			highp float light_mod = 1.0;

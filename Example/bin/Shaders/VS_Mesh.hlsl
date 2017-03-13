@@ -70,7 +70,7 @@ VS_OUTPUT VS( VS_INPUT input ){
 #endif
 
 #ifdef USE_VERTEXLIGHTING
-    OUT.light_mod = clamp(dot(input.normal,lightDir)/(length(input.normal)*length(lightDir)),0.0,1.0) ;
+    OUT.light_mod = clamp(dot(normalize(mul((float3x3)World , input.normal.xyz )),normalize(lightDir)),0.0,1.0) ;
 #endif
 
 

@@ -46,7 +46,7 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
 #endif
 
 #ifdef USE_PIXELLIGHTING
-  float light_mod = clamp(dot(input.hnormal,lightDir)/(length(input.hnormal)*length(lightDir)),0.0,1.0) ;
+  float light_mod = clamp(dot(normalize(input.hnormal),normalize(lightDir)),0.0,1.0) ;
   #else
     #ifndef USE_VERTEXLIGHTING
     float light_mod = 1.0;

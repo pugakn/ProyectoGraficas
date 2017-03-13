@@ -45,7 +45,7 @@ void ModelGL::Create()
 		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_BINORMAL)
 			Defines += "#define USE_BINORMALS\n\n";
 
-		Defines += "#define USE_PIXELLIGHTING \n\n";
+		Defines += "#define USE_VERTEXLIGHTING \n\n";
 
 		vstr = Defines + vstr;
 		fstr = Defines + fstr;

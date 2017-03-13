@@ -51,6 +51,6 @@ void main(){
 	normalTransformed = normalize(mat3(World)*Normal.rgb);
 #endif
 #ifdef USE_VERTEXLIGHTING
-light_mod = clamp(dot(Normal.xyz,lightDir)/(length(Normal.xyz)*length(lightDir)),0.0,1.0) ;
+light_mod = clamp(dot(normalize(mat3(World)*Normal.rgb),normalize(lightDir)),0.0,1.0) ;
 #endif
 }
