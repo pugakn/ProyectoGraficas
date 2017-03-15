@@ -10,6 +10,7 @@ void ModelGL::SetFileName(char * fileName)
 }
 void ModelGL::Create()
 {
+	lightColor = Vector3D(1, 1, 0.8);
 	//------------------------------------------------------------------------//
 	//Leer Archivo .X
 	Timer timer;
@@ -22,8 +23,8 @@ void ModelGL::Create()
 	timer.Update();
 	std::cout << "Archivo cargado en: " << timer.GetDTSecs() << " segundos..." << std::endl;
 	//-------------------------------------------------------------------------//
-	char *vsSourceP = file2string("Shaders/VS_Mesh.glsl");
-	char *fsSourceP = file2string("Shaders/FS_Mesh.glsl");
+	char *vsSourceP = file2string("Shaders/VS_MeshPL.glsl");
+	char *fsSourceP = file2string("Shaders/FS_MeshPL.glsl");
 	std::string vstr = std::string(vsSourceP);
 	std::string fstr = std::string(fsSourceP);
 	delete[] vsSourceP;
@@ -45,7 +46,9 @@ void ModelGL::Create()
 		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_BINORMAL)
 			Defines += "#define USE_BINORMALS\n\n";
 
-		Defines += "#define USE_VERTEXLIGHTING \n\n";
+		Defines += "#define USE_PIXELLIGHTING \n\n";
+		Defines += "#define USING_ATENUATION \n\n";
+		
 
 		vstr = Defines + vstr;
 		fstr = Defines + fstr;
@@ -68,7 +71,9 @@ void ModelGL::Create()
 		//Obtener locaciones de Uniforms
 		matWorldViewProjUniformLoc = glGetUniformLocation(shadersID.back(), "WVP");
 		matWorldUniformLoc = glGetUniformLocation(shadersID.back(), "World");
-		lightDirLoc = glGetUniformLocation(shadersID.back(), "lightDir");
+		lightLoc = glGetUniformLocation(shadersID.back(), "light");
+		lightColLoc = glGetUniformLocation(shadersID.back(), "lightColor");
+		
 		for (auto &subsetIt : meshIt.m_subsets)
 		{
 			//Cargar Texturas
@@ -146,8 +151,11 @@ void ModelGL::Draw(float *t, float *vp, float *l)
 		//Set Uniforms
 		glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
 		glUniformMatrix4fv(matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
-		if (lightDirLoc != -1)
-			glUniform3fv(lightDirLoc,1, &light.r);
+		if (lightLoc != -1)
+			glUniform3fv(lightLoc,1, &light.r);
+		if (lightColLoc != -1)
+			glUniform3fv(lightColLoc, 1, &lightColor.r);
+		
 		//Enable Attributes
 		glEnableVertexAttribArray(vertexAttribLocs[i]);
 		if (normalAttribLocs[i] != -1)

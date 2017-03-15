@@ -23,7 +23,10 @@ private:
 
 	GLint  matWorldViewProjUniformLoc;
 	GLint  matWorldUniformLoc;
-	GLint lightDirLoc;
+	GLint lightLoc;
+	GLint lightColLoc;
+
+	Vector3D lightColor;
 
 	Matrix4D	transform;
 

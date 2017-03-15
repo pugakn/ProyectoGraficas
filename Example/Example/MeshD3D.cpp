@@ -26,8 +26,8 @@ void MeshD3D::Create()
 	std::cout << "Archivo cargado en: " << timer.GetDTSecs() << " segundos..." << std::endl;
 	//-------------------------------------------------------------------------//
 
-	char *vsSourceP = file2string("Shaders/VS_Mesh.hlsl");
-	char *fsSourceP = file2string("Shaders/FS_Mesh.hlsl");
+	char *vsSourceP = file2string("Shaders/VS_MeshPL.hlsl");
+	char *fsSourceP = file2string("Shaders/FS_MeshPL.hlsl");
 
 	std::string vstr = std::string(vsSourceP);
 	std::string fstr = std::string(fsSourceP);
@@ -49,6 +49,7 @@ void MeshD3D::Create()
 			Defines += "#define USE_BINORMALS\n\n";
 
 		Defines += "#define USE_PIXELLIGHTING \n\n";
+		Defines += "#define USING_ATENUATION \n\n";
 
 		vstr = Defines + vstr;
 		fstr = Defines + fstr;
@@ -250,6 +251,7 @@ void MeshD3D::Draw(float * t, float * vp, float *l)
 		m_meshInfo[i].CnstBuffer.WVP = WVP;
 		m_meshInfo[i].CnstBuffer.World = m_transform;
 		m_meshInfo[i].CnstBuffer.lightDir = lightDir;
+		m_meshInfo[i].CnstBuffer.lightColor = Vector4D(1,0,0,1);
 		//==================== Set Shaders =====================
 		D3D11DeviceContext->VSSetShader(m_meshInfo[i].pVS.Get(), 0, 0);
 		D3D11DeviceContext->PSSetShader(m_meshInfo[i].pFS.Get(), 0, 0);

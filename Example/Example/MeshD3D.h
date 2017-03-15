@@ -18,6 +18,7 @@ class MeshD3D : public PrimitiveBase
 		Matrix4D WVP;
 		Matrix4D World;
 		Vector4D lightDir;
+		Vector4D lightColor;
 	};
 private:
 	struct SubSetInfo {

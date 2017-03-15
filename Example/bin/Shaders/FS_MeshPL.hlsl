@@ -1,7 +1,8 @@
 cbuffer ConstantBuffer{
     float4x4 World;
     float4x4 WVP;
-    float4 lightDir;
+    float4 light;
+    float4 lightColor;
 }
 
 Texture2D TextureRGB : register(t0);
@@ -30,6 +31,7 @@ struct VS_OUTPUT{
 #ifdef USE_VERTEXLIGHTING
     float light_mod : PSIZE;
 #endif
+  float4 pixelPos : POSITION1;
 };
 
 float4 FS( VS_OUTPUT input ) : SV_TARGET  {
@@ -46,7 +48,13 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
 #endif
 
 #ifdef USE_PIXELLIGHTING
-  float light_mod = clamp(dot(normalize(input.hnormal),normalize(lightDir)),0.0,1.0) ;
+  float3 norm = normalize(input.hnormal);
+  float3 lightDir = normalize(light - input.pixelPos);
+  float lightDist = length(input.pixelPos - light);
+  float  light_mod = clamp(dot(norm,lightDir),0.0,1.0) ;
+  #ifdef USING_ATENUATION
+  light_mod = min(light_mod / ((lightDist * lightDist)/15000.0),light_mod );
+  #endif
   #else
     #ifndef USE_VERTEXLIGHTING
     float light_mod = 1.0;
@@ -54,8 +62,8 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
 #endif
 
 #ifdef USE_VERTEXLIGHTING
-return color * 0.3 + color * input.light_mod * float4(1.0,1.0,0.8,1.0);
+return color * 0.3 + color * input.light_mod * lightColor;
 #else
-    return color * 0.3 + color * light_mod * float4(1.0,1.0,0.8,1.0);
+    return color * 0.3 + color * light_mod * lightColor;
   #endif
 }

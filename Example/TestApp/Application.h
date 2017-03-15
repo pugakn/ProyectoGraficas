@@ -24,11 +24,11 @@ public:
 
 	PrimitiveManager PrimitiveMgr;
 	std::vector<PrimitiveInst>	Models;
-
+	PrimitiveInst lightPrimitive;
 
 
 	FPCamera cam;
-	Vector3D lightDir;
+	Vector3D lightPos;
 	Timer			DtTimer;
 
 
