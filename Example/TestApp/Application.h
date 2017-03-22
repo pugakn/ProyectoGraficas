@@ -6,6 +6,8 @@
 #include <Timer.h>
 #include "FPCamera.h"
 #include <vector>
+
+#include <SceneProp.h>
 class TestApp : public AppBase {
 public:
 	TestApp() : AppBase() {}
@@ -28,8 +30,10 @@ public:
 
 
 	FPCamera cam;
-	Vector3D lightPos;
+	//Vector3D lightPos;
 	Timer			DtTimer;
+
+	SceneProps		SceneProp;
 
 
 };

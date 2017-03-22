@@ -53,7 +53,7 @@ int	 PrimitiveManager::CreateModel(char * fileName) {
 
 void PrimitiveManager::DrawPrimitives() {
 	for(unsigned int i=0;i<primitives.size();i++){
-		primitives[i]->Draw(0,&(*pVP).m[0][0], &lightDir->x);
+		primitives[i]->Draw(0);
 	}
 }
 
@@ -63,4 +63,9 @@ void PrimitiveManager::DestroyPrimitives() {
 		delete primitives[i];
 	}
 	primitives.clear();
+}
+void PrimitiveManager::SetSceneProps(SceneProps *p) {
+	for (unsigned int i = 0; i < primitives.size(); i++) {
+		primitives[i]->SetSceneProps(p);
+	}
 }

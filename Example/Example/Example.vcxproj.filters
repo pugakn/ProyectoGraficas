@@ -83,6 +83,12 @@
     <ClInclude Include="MeshD3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SceneProp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FPCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">
@@ -146,6 +152,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MeshD3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneProp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FPCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

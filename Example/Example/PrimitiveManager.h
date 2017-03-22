@@ -5,15 +5,16 @@
 #include "Matrix4D.h"
 #include "PrimitiveBase.h"
 #include "Config.h"
+#include "SceneProp.h"
 
 class PrimitiveManager {
 public:
-	void SetVP(Matrix4D *vp) {
-		pVP = vp;
-	}
-	void SetLightDir(Vector3D *l) {
-		lightDir = l;
-	}
+	//void SetVP(Matrix4D *vp) {
+	//	pVP = vp;
+	//}
+	//void SetLightDir(Vector3D *l) {
+	//	lightDir = l;
+	//}
 	int  CreateTriangle();
 	int	 CreateCube();
 	int CreateModel(char * fileName);
@@ -24,8 +25,10 @@ public:
 
 	std::vector<PrimitiveBase*> primitives;
 
-	Matrix4D *pVP;
-	Vector3D *lightDir;
+	void SetSceneProps(SceneProps *p);
+
+	//Matrix4D *pVP;
+	//Vector3D *lightDir;
 };
 
 #endif

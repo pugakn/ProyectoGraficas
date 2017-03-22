@@ -118,21 +118,21 @@ void CubeGL::Create() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned short), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	D3DXMatrixIdentity(&transform);
+	transform = Identity();
 }
 
 void CubeGL::Transform(float *t) {
 	transform = t;
 }
 
-void CubeGL::Draw(float *t,float *vp, float*l) {
+void CubeGL::Draw(float *t) {
 	glUseProgram(shaderID);
 
 	if (t)
 		transform = t;
 
-	D3DXMATRIX VP = D3DXMATRIX(vp);
-	D3DXMATRIX WVP = transform*VP;
+	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->m_view);
+	Matrix4D WVP = transform*VP;
 
 	glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
 	glUniformMatrix4fv(matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);

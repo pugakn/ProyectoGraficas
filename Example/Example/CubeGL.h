@@ -24,7 +24,7 @@ public:
 	CubeGL() : shaderID(0) {}
 	void Create();
 	void Transform(float *t);
-	void Draw(float *t,float *vp,float*l);
+	void Draw(float *t);
 	void Destroy();
 
 	GLuint	shaderID;
@@ -40,7 +40,7 @@ public:
 	GLuint			VB;
 	GLuint			IB;
 
-	D3DXMATRIX	transform;
+	Matrix4D	transform;
 };
 
 #endif // USING_OPENGL_ES

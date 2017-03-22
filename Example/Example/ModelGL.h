@@ -25,6 +25,7 @@ private:
 	GLint  matWorldUniformLoc;
 	GLint lightLoc;
 	GLint lightColLoc;
+	GLint camPosLoc;
 
 	Vector3D lightColor;
 
@@ -39,7 +40,7 @@ public:
 	void SetFileName(char* fileName);
 	void Create() override;
 	void Transform(float *t) override;
-	void Draw(float *t, float *vp, float *l) override;
+	void Draw(float *t) override;
 	void Destroy() override;
 	MeshParser parser;
 	ModelGL()  {};

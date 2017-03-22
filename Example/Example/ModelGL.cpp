@@ -10,7 +10,7 @@ void ModelGL::SetFileName(char * fileName)
 }
 void ModelGL::Create()
 {
-	lightColor = Vector3D(1, 1, 0.8);
+	lightColor = Vector3D(1, 0.2, 0.2);
 	//------------------------------------------------------------------------//
 	//Leer Archivo .X
 	Timer timer;
@@ -48,6 +48,8 @@ void ModelGL::Create()
 
 		Defines += "#define USE_PIXELLIGHTING \n\n";
 		Defines += "#define USING_ATENUATION \n\n";
+		Defines += "#define USE_SPECULAR \n\n";
+		
 		
 
 		vstr = Defines + vstr;
@@ -73,6 +75,7 @@ void ModelGL::Create()
 		matWorldUniformLoc = glGetUniformLocation(shadersID.back(), "World");
 		lightLoc = glGetUniformLocation(shadersID.back(), "light");
 		lightColLoc = glGetUniformLocation(shadersID.back(), "lightColor");
+		camPosLoc = glGetUniformLocation(shadersID.back(), "camPos");
 		
 		for (auto &subsetIt : meshIt.m_subsets)
 		{
@@ -131,16 +134,16 @@ void ModelGL::Transform(float * t)
 	transform = t;
 }
 
-void ModelGL::Draw(float *t, float *vp, float *l)
+void ModelGL::Draw(float *t)
 {
 
 	if (t)
 		transform = t;
 
-	Matrix4D VP = Matrix4D(vp);
+	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D WVP = transform*VP;
 
-	Vector3D light = Vector3D(l);
+	//Vector3D light = Vector3D(l);
 	//------------------------------------------------------------------//
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	size_t index = 0;
@@ -152,9 +155,11 @@ void ModelGL::Draw(float *t, float *vp, float *l)
 		glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
 		glUniformMatrix4fv(matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
 		if (lightLoc != -1)
-			glUniform3fv(lightLoc,1, &light.r);
+			glUniform3fv(lightLoc,1, &pScProp->Lights[0].Position.x);
 		if (lightColLoc != -1)
-			glUniform3fv(lightColLoc, 1, &lightColor.r);
+			glUniform3fv(lightColLoc, 1, &pScProp->Lights[0].Color.r);
+		if (camPosLoc != -1)
+			glUniform3fv(camPosLoc, 1, &pScProp->pCameras[0]->m_pos.x);
 		
 		//Enable Attributes
 		glEnableVertexAttribArray(vertexAttribLocs[i]);
