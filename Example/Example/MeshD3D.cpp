@@ -50,6 +50,7 @@ void MeshD3D::Create()
 
 		Defines += "#define USE_PIXELLIGHTING \n\n";
 		Defines += "#define USING_ATENUATION \n\n";
+		Defines += "#define USE_SPECULAR \n\n";
 
 		vstr = Defines + vstr;
 		fstr = Defines + fstr;
@@ -233,13 +234,15 @@ void MeshD3D::Transform(float * t)
 	m_transform = t;
 }
 
-void MeshD3D::Draw(float * t, float * vp, float *l)
+void MeshD3D::Draw(float * t)
 {
 	if (t)
 		m_transform = t;
-	Matrix4D VP = Matrix4D(vp);
+	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D WVP = m_transform*VP;
-	Vector4D lightDir = Vector4D(Vector3D(l),0);
+	Vector4D lightDir = Vector4D(Vector3D(pScProp->Lights[0].Position),0);
+	Vector4D lightCol = Vector4D(Vector3D(pScProp->Lights[0].Color), 1);
+	Vector4D camPos = Vector4D(Vector3D(pScProp->pCameras[0]->m_pos), 0);
 	//==================== Set VB =====================
 	UINT stride = sizeof(vertexStruct);
 	UINT offset = 0;
@@ -251,7 +254,8 @@ void MeshD3D::Draw(float * t, float * vp, float *l)
 		m_meshInfo[i].CnstBuffer.WVP = WVP;
 		m_meshInfo[i].CnstBuffer.World = m_transform;
 		m_meshInfo[i].CnstBuffer.lightDir = lightDir;
-		m_meshInfo[i].CnstBuffer.lightColor = Vector4D(1,0,0,1);
+		m_meshInfo[i].CnstBuffer.lightColor = lightCol;
+		m_meshInfo[i].CnstBuffer.camPos = camPos;
 		//==================== Set Shaders =====================
 		D3D11DeviceContext->VSSetShader(m_meshInfo[i].pVS.Get(), 0, 0);
 		D3D11DeviceContext->PSSetShader(m_meshInfo[i].pFS.Get(), 0, 0);

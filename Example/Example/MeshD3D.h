@@ -19,6 +19,7 @@ class MeshD3D : public PrimitiveBase
 		Matrix4D World;
 		Vector4D lightDir;
 		Vector4D lightColor;
+		Vector4D camPos;
 	};
 private:
 	struct SubSetInfo {
@@ -47,7 +48,7 @@ public:
 	void SetFileName(char* fileName);
 	void Create() override;
 	void Transform(float *t) override;
-	void Draw(float *t, float *vp, float *l) override;
+	void Draw(float *t) override;
 	void Destroy() override;
 	MeshParser m_parser;
 	std::vector<MeshInfo> m_meshInfo;

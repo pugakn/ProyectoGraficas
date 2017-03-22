@@ -3,6 +3,9 @@ cbuffer ConstantBuffer{
     float4x4 WVP;
     float4 light;
     float4 lightColor;
+    #ifdef USE_SPECULAR
+    float4 camPos;
+    #endif
 }
 
 Texture2D TextureRGB : register(t0);
@@ -55,6 +58,12 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
   #ifdef USING_ATENUATION
   light_mod = min(light_mod / ((lightDist * lightDist)/15000.0),light_mod );
   #endif
+  #ifdef USE_SPECULAR
+  float4 specularCol = lightColor;
+  float3 RL = reflect(lightDir,norm);
+  float3 eyeDir = normalize(camPos - input.pixelPos).xyz;
+  float specular = pow(dot(-eyeDir,RL),50.0);
+  #endif
   #else
     #ifndef USE_VERTEXLIGHTING
     float light_mod = 1.0;
@@ -64,6 +73,10 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
 #ifdef USE_VERTEXLIGHTING
 return color * 0.3 + color * input.light_mod * lightColor;
 #else
+    #ifdef USE_SPECULAR
+    return color * 0.3 + color * light_mod * lightColor + specularCol* specular;
+    #else
     return color * 0.3 + color * light_mod * lightColor;
+    #endif
   #endif
 }

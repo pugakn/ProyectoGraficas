@@ -3,6 +3,9 @@ cbuffer ConstantBuffer{
 	  float4x4 World;
     float4 light;
     float4 lightColor;
+    #ifdef USE_SPECULAR
+    float4 camPos;
+    #endif
 }
 
 struct VS_INPUT{
