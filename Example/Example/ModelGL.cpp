@@ -76,6 +76,9 @@ void ModelGL::Create()
 		lightLoc = glGetUniformLocation(shadersID.back(), "light");
 		lightColLoc = glGetUniformLocation(shadersID.back(), "lightColor");
 		camPosLoc = glGetUniformLocation(shadersID.back(), "camPos");
+		specExpLoc = glGetUniformLocation(shadersID.back(), "specExp");
+		attMaxLoc = glGetUniformLocation(shadersID.back(), "attMax");
+		
 		
 		for (auto &subsetIt : meshIt.m_subsets)
 		{
@@ -160,7 +163,10 @@ void ModelGL::Draw(float *t)
 			glUniform3fv(lightColLoc, 1, &pScProp->Lights[0].Color.r);
 		if (camPosLoc != -1)
 			glUniform3fv(camPosLoc, 1, &pScProp->pCameras[0]->m_pos.x);
-		
+		if (specExpLoc != -1)
+			glUniform1fv(specExpLoc, 1, &pScProp->specExp);
+		if (attMaxLoc != 1)
+			glUniform1fv(attMaxLoc, 1, &pScProp->attMax);
 		//Enable Attributes
 		glEnableVertexAttribArray(vertexAttribLocs[i]);
 		if (normalAttribLocs[i] != -1)

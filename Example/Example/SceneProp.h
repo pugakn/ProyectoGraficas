@@ -42,6 +42,9 @@ struct SceneProps{
 
 	int	ActiveLights;
 	int ActiveCamera;
+
+	float specExp;
+	float attMax;
 };
 
 #endif

@@ -26,6 +26,8 @@ private:
 	GLint lightLoc;
 	GLint lightColLoc;
 	GLint camPosLoc;
+	GLint specExpLoc;
+	GLint attMaxLoc;
 
 	Vector3D lightColor;
 

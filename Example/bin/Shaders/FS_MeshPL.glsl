@@ -14,6 +14,10 @@ varying highp float light_mod;
 #endif
 #ifdef USE_SPECULAR
 uniform highp vec3 camPos;
+uniform highp float specExp;
+#endif
+#ifdef USING_ATENUATION
+uniform highp float attMax;
 #endif
 //
 
@@ -24,19 +28,20 @@ void main(){
 	highp vec3 vector = normalize(pixelPos*0.5 + 0.5);
 #endif
 	#ifdef USE_PIXELLIGHTING
-	highp vec3 norm = normalize(normalTransformed);
-	highp vec3 lightDir = normalize(light - pixelPos);
-	highp float lightDist = length(pixelPos - light);
-	highp float light_mod = clamp(dot(norm,lightDir),0.0,1.0) ;
-	#ifdef USING_ATENUATION
-	light_mod = min(light_mod / ((lightDist * lightDist)/12000.0),light_mod );
-	#endif
-	#ifdef USE_SPECULAR
-		highp vec3 specularCol = lightColor;
-		highp vec3 RL = reflect(lightDir,norm);
-		highp vec3 eyeDir = normalize(camPos - pixelPos);
-		highp float specular = pow(dot(-eyeDir,RL),50.0);
-	#endif
+		highp vec3 norm = normalize(normalTransformed);
+		highp vec3 lightDir = normalize(light - pixelPos);
+		highp float lightDist = length(pixelPos - light);
+		highp float light_mod = clamp(dot(norm,lightDir),0.0,1.0) ;
+		#ifdef USE_SPECULAR
+			highp vec3 specularCol = lightColor;
+			highp vec3 RL = reflect(lightDir,norm);
+			highp vec3 eyeDir = normalize(camPos - pixelPos);
+			highp float specular = pow(dot(-eyeDir,RL),specExp);
+		#endif
+		#ifdef USING_ATENUATION
+		light_mod = min(light_mod / ((lightDist * lightDist)/attMax),light_mod );
+		specular = min(specular / ((lightDist * lightDist)/attMax),specular);
+		#endif
 	#else
 		#ifndef USE_VERTEXLIGHTING
 			highp float light_mod = 1.0;

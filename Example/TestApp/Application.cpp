@@ -11,6 +11,9 @@ void TestApp::InitVars() {
 
 	SceneProp.AddCamera(&cam);
 	SceneProp.AddLight(Vector3D(0.0f, 0.0f, 0.0f), Vector3D(1.0f, 0.8f, 0.8f), true);
+	SceneProp.specExp = 5.0f;
+	SceneProp.attMax = 12000.0f;
+	//12000.0
 	//SceneProp.AmbientColor = Vector3D(0.15f, 0.15f, 0.15f);
 
 }
@@ -168,19 +171,18 @@ void TestApp::OnInput() {
 		cam.TraslateSide(-100.0f*DtTimer.GetDTSecs());
 	}
 
+	if (IManager.PressedKey(SDLK_r)) {
+		SceneProp.Lights[0].Color = Vector3D(1,0.5,0.5);
+	}
+	if (IManager.PressedKey(SDLK_g)) {
+		SceneProp.Lights[0].Color = Vector3D(0.5, 1, 0.5);
+	}
+	if (IManager.PressedKey(SDLK_b)) {
+		SceneProp.Lights[0].Color = Vector3D(0.5, 0.5, 1);
+	}
+
 	//Light
-	//if (IManager.PressedKey(SDLK_KP4)) {
-	//	lightDir = lightDir*RotationY(-1 * DtTimer.GetDTSecs());
-	//}
-	//if (IManager.PressedKey(SDLK_KP6)) {
-	//	lightDir = lightDir*RotationY(1 * DtTimer.GetDTSecs());
-	//}
-	//if (IManager.PressedKey(SDLK_KP8)) {
-	//	lightDir = lightDir*RotationX(-1 * DtTimer.GetDTSecs());
-	//}
-	//if (IManager.PressedKey(SDLK_KP5)) {
-	//	lightDir = lightDir*RotationX(1 * DtTimer.GetDTSecs());
-	//}
+
 	if (IManager.PressedKey(SDLK_KP4)) {
 		SceneProp.Lights[0].Position.x += -100 * DtTimer.GetDTSecs();
 	}
@@ -199,6 +201,20 @@ void TestApp::OnInput() {
 	if (IManager.PressedKey(SDLK_KP9)) {
 		SceneProp.Lights[0].Position.y += 100 * DtTimer.GetDTSecs();
 	}
+
+	if (IManager.PressedKey(SDLK_z)) {
+		SceneProp.specExp -= 20 * DtTimer.GetDTSecs();
+	}
+	if (IManager.PressedKey(SDLK_x)) {
+		SceneProp.specExp += 20 * DtTimer.GetDTSecs();
+	}
+	if (IManager.PressedKey(SDLK_c)) {
+		SceneProp.attMax -= 20000 * DtTimer.GetDTSecs();
+	}
+	if (IManager.PressedKey(SDLK_v)) {
+		SceneProp.attMax += 20000 * DtTimer.GetDTSecs();
+	}
+
 
 
 
