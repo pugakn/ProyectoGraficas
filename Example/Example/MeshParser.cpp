@@ -62,6 +62,8 @@ void MeshParser::ReadFile()
 				//return;//
 				break;
 			case TYPE_MESH_DECL_DATA:
+				m_meshes.back().m_vertexAttributes |= xf::attributes::E::HAS_BINORMAL;
+				m_meshes.back().m_vertexAttributes |= xf::attributes::E::HAS_TANGENT;
 				getDeclData();
 				break;
 		}
@@ -390,116 +392,128 @@ void MeshParser::getMaterials()
 
 		pathString.clear();
 
-		// speclevel"; 1; 1.0000;
-		if ((temp = strstr(m_pointer, "speclevel")))
-		{
-			m_pointer = temp;
-			m_pointer++;
-			while (!(*m_pointer++ == '\n'));
-			while (!(*m_pointer++ == '\n'));
-			m_pointer++;
-			while (!(*m_pointer == ';'))
-			{
-				pathString.push_back(*m_pointer);
-				++m_pointer;
-			}
-			m_pointer += 2;
-			m_meshes.back().m_subsets[i].m_effects.m_specLevel = std::stof(pathString);
-		}
-		pathString.clear();
-		//specularMap
+		//// speclevel"; 1; 1.0000;
+		//if ((temp = strstr(m_pointer, "speclevel")))
+		//{
+		//	m_pointer = temp;
+		//	m_pointer++;
+		//	while (!(*m_pointer++ == '\n'));
+		//	while (!(*m_pointer++ == '\n'));
+		//	m_pointer++;
+		//	while (!(*m_pointer == ';'))
+		//	{
+		//		pathString.push_back(*m_pointer);
+		//		++m_pointer;
+		//	}
+		//	m_pointer += 2;
+		//	m_meshes.back().m_subsets[i].m_effects.m_specLevel = std::stof(pathString);
+		//}
+		//pathString.clear();
+		////specularMap
 		if ((temp = strstr(m_pointer, "specularMap")))
 		{
-			m_pointer = temp;
-			m_pointer++;
-			while (!(*m_pointer++ == '"'));
-			while (!(*m_pointer++ == '"'));
-			m_pointer++;
-			while (!(*m_pointer == '"'))
+			if (temp - m_pointer < 1000)
 			{
-				pathString.push_back(*m_pointer);
-				++m_pointer;
-			}
-			m_pointer += 2;
-			size_t offset = pathString.find_first_of(' ');
-			if (offset < pathString.size())
-				pathString = pathString.substr(offset + 1);
-			else
-			{
-				offset = pathString.find_first_of('\\');
+				m_pointer = temp;
+				m_pointer++;
+				while (!(*m_pointer++ == '"'));
+				while (!(*m_pointer++ == '"'));
+				m_pointer++;
+				while (!(*m_pointer == '"'))
+				{
+					pathString.push_back(*m_pointer);
+					++m_pointer;
+				}
+				m_pointer += 2;
+				size_t offset = pathString.find_first_of(' ');
 				if (offset < pathString.size())
-					pathString = pathString.substr(offset + 2);
+					pathString = pathString.substr(offset + 1);
+				else
+				{
+					offset = pathString.find_first_of('\\');
+					if (offset < pathString.size())
+						pathString = pathString.substr(offset + 2);
+				}
+				m_meshes.back().m_subsets[i].m_effects.m_specularMap = pathString;
 			}
-			m_meshes.back().m_subsets[i].m_effects.m_specularMap = pathString;
 		}
 		pathString.clear();
 		//glossMap
 		if ((temp = strstr(m_pointer, "glossMap")))
 		{
-			m_pointer = temp;
-			m_pointer++;
-			while (!(*m_pointer++ == '"'));
-			while (!(*m_pointer++ == '"'));
-			m_pointer++;
-			while (!(*m_pointer == '"'))
+			if (temp - m_pointer < 1000)
 			{
-				pathString.push_back(*m_pointer);
-				++m_pointer;
-			}
-			m_pointer += 2;
-			size_t offset = pathString.find_first_of(' ');
-			if (offset < pathString.size())
-				pathString = pathString.substr(offset + 1);
-			else
-			{
-				offset = pathString.find_first_of('\\');
+				m_pointer = temp;
+				m_pointer++;
+				while (!(*m_pointer++ == '"'));
+				while (!(*m_pointer++ == '"'));
+				m_pointer++;
+				while (!(*m_pointer == '"'))
+				{
+					pathString.push_back(*m_pointer);
+					++m_pointer;
+				}
+				m_pointer += 2;
+				size_t offset = pathString.find_first_of(' ');
 				if (offset < pathString.size())
-					pathString = pathString.substr(offset + 2);
+					pathString = pathString.substr(offset + 1);
+				else
+				{
+					offset = pathString.find_first_of('\\');
+					if (offset < pathString.size())
+						pathString = pathString.substr(offset + 2);
+				}
+				m_meshes.back().m_subsets[i].m_effects.m_glossMap = pathString;
 			}
-			m_meshes.back().m_subsets[i].m_effects.m_glossMap = pathString;
 		}
 		pathString.clear();
 		//glossiness"; 1; 2.0000;
 		if ((temp = strstr(m_pointer, "glossiness")))
 		{
-			m_pointer = temp;
-			m_pointer++;
-			while (!(*m_pointer++ == '\n'));
-			while (!(*m_pointer++ == '\n'));
-			m_pointer++;
-			while (!(*m_pointer == ';'))
+			if (temp - m_pointer < 1000)
 			{
-				pathString.push_back(*m_pointer);
-				++m_pointer;
+				m_pointer = temp;
+				m_pointer++;
+				while (!(*m_pointer++ == '\n'));
+				while (!(*m_pointer++ == '\n'));
+				m_pointer++;
+				while (!(*m_pointer == ';'))
+				{
+					pathString.push_back(*m_pointer);
+					++m_pointer;
+				}
+				m_pointer += 2;
+				m_meshes.back().m_subsets[i].m_effects.m_glossines = std::stof(pathString);
 			}
-			m_pointer += 2;
-			m_meshes.back().m_subsets[i].m_effects.m_glossines = std::stof(pathString);
 		}
 		pathString.clear();
 		//normalMap
-		if ((temp = strstr(m_pointer, "normalMap")))
+		if ((temp = strstr(m_pointer, "normalMap\"")))
 		{
-			m_pointer = temp;
-			m_pointer++;
-			while (!(*m_pointer++ == '"'));
-			while (!(*m_pointer++ == '"'));
-			m_pointer++;
-			while (!(*m_pointer == '"'))
+			if (temp - m_pointer < 1000)
 			{
-				pathString.push_back(*m_pointer);
-				++m_pointer;
-			}
-			m_pointer += 2;
-			size_t offset = pathString.find_first_of(' ');
-			if (offset < pathString.size())
-				pathString = pathString.substr(offset + 1);
-			else
-			{
-				offset = pathString.find_first_of('\\');
+				m_pointer = temp;
+				m_pointer++;
+				while (!(*m_pointer++ == '"'));
+				while (!(*m_pointer++ == '"'));
+				m_pointer++;
+				while (!(*m_pointer == '"'))
+				{
+					pathString.push_back(*m_pointer);
+					++m_pointer;
+				}
+				m_pointer += 2;
+				size_t offset = pathString.find_first_of(' ');
 				if (offset < pathString.size())
-					pathString = pathString.substr(offset + 2);
+					pathString = pathString.substr(offset + 1);
+				else
+				{
+					offset = pathString.find_first_of('\\');
+					if (offset < pathString.size())
+						pathString = pathString.substr(offset + 2);
+				}
+				m_meshes.back().m_subsets[i].m_effects.m_normalMap = pathString;
 			}
-			m_meshes.back().m_subsets[i].m_effects.m_normalMap = pathString;
 		}
 
 		pathString.clear();
@@ -560,11 +574,11 @@ void MeshParser::getDeclData()
 		++m_pointer;
 	}
 	++m_pointer;
-	int numElements = std::stoi(numString)/6;
+	int numElements = std::stoi(numString)/6 + declDataPos;
 	numString.clear();
-	m_meshes.back().m_tangents.resize(numElements);
-	m_meshes.back().m_binormals.resize(numElements);
-	for (int i= 0; i < numElements; i++)
+	//m_meshes.back().m_tangents.resize(numElements);
+	//m_meshes.back().m_binormals.resize(numElements);
+	for (; declDataPos < numElements; declDataPos++)
 	{
 		++m_pointer;
 		while (!(*m_pointer == ','))
@@ -573,7 +587,10 @@ void MeshParser::getDeclData()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_meshes.back().m_tangents[i].x = std::stof(numString);
+		unsigned long long temp = std::stoul(numString);
+		float *fval = (float*)&temp;
+		m_vbo[declDataPos].tx = *fval;
+		//m_meshes.back().m_tangents[i].x = std::stof(numString);
 		numString.clear();
 		++m_pointer;
 		while (!(*m_pointer == ','))
@@ -582,7 +599,10 @@ void MeshParser::getDeclData()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_meshes.back().m_tangents[i].y = std::stof(numString);
+		temp = std::stoul(numString);
+		fval = (float*)&temp;
+		m_vbo[declDataPos].ty = *fval;
+		//m_meshes.back().m_tangents[i].y = std::stof(numString);
 		numString.clear();
 		++m_pointer;
 		while (!(*m_pointer == ','))
@@ -591,14 +611,60 @@ void MeshParser::getDeclData()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_meshes.back().m_tangents[i].z = std::stof(numString);
+		temp = std::stoul(numString);
+		fval = (float*)&temp;
+		m_vbo[declDataPos].tz = *fval;
+	//	m_meshes.back().m_tangents[i].z = std::stof(numString);
 		numString.clear();
+		++m_pointer;
+		m_vbo[declDataPos].tw = 0;
+
+		//++m_pointer;
+		while (!(*m_pointer == ','))
+		{
+			numString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		temp = std::stoul(numString);
+		fval = (float*)&temp;
+		m_vbo[declDataPos].bx = *fval;
+		//m_meshes.back().m_binormals[i].x = std::stof(numString);
+		numString.clear();
+		++m_pointer;
+		while (!(*m_pointer == ','))
+		{
+			numString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		temp = std::stoul(numString);
+		fval = (float*)&temp;
+		m_vbo[declDataPos].by = *fval;
+		//m_meshes.back().m_binormals[i].y = std::stof(numString);
+		numString.clear();
+		++m_pointer;
+		while (!(*m_pointer == ','))
+		{
+			if (*m_pointer == ';')
+				break;
+			numString.push_back(*m_pointer);
+			++m_pointer;
+
+		}
+		++m_pointer;
+		temp = std::stoul(numString);
+		fval = (float*)&temp;
+		m_vbo[declDataPos].bz = *fval;
+		//m_meshes.back().m_binormals[i].z = std::stof(numString);
+		numString.clear();
+		m_vbo[declDataPos].bw = 0;
 		++m_pointer;
 	}
 
-	for (int i = 0; i < numElements; i++)
-	{
-		++m_pointer;
+	/*for (int i = 0; i < numElements; i++)
+	{*/
+		/*++m_pointer;
 		while (!(*m_pointer == ','))
 		{
 			numString.push_back(*m_pointer);
@@ -630,8 +696,8 @@ void MeshParser::getDeclData()
 		numString.clear();
 		
 
-		++m_pointer;
-	}
+		++m_pointer;*/
+	//}
 }
 void MeshParser::Deallocate()
 {

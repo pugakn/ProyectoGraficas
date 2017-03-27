@@ -9,7 +9,11 @@
 #include "Matrix4D.h"
 
 class Texture;
-
+struct TextureInfo
+{
+	std::vector <int> IdsTex;
+	std::vector <GLint> IdTexUniformLocs;
+};
 class ModelGL : public PrimitiveBase
 {
 private:
@@ -17,9 +21,9 @@ private:
 	std::vector <GLuint>	shadersID;
 	std::vector <GLint>	vertexAttribLocs;
 	std::vector <GLint>	normalAttribLocs;
+	std::vector <GLint>	binormalAttribLocs;
+	std::vector <GLint>	tangentAttribLocs;
 	std::vector <GLint>	uvAttribLocs;
-	std::vector <GLint> IdTexUniformLocs;
-	std::vector <int> IdsTex;
 
 	GLint  matWorldViewProjUniformLoc;
 	GLint  matWorldUniformLoc;
@@ -37,7 +41,11 @@ private:
 	std::vector <GLuint>	IBs;
 
 	std::string m_fileName;
+
+
+	std::vector<TextureInfo> textureInfo;
 	std::vector<Texture*> Textures;
+	std::vector<Texture*> SpecularTextures;
 public:
 	void SetFileName(char* fileName);
 	void Create() override;

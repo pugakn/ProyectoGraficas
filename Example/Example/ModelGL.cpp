@@ -30,85 +30,173 @@ void ModelGL::Create()
 	delete[] vsSourceP;
 	delete[] fsSourceP;
 
-	//Crear shaders
+
 	//Iterar cada Mesh y subsets
 	for (auto &meshIt: parser.m_meshes)
-	{
-		std::string Defines = "";
-		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_NORMAL)
-			Defines += "#define USE_NORMALS\n\n";
-		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD0)
-			Defines += "#define USE_TEXCOORD0\n\n";
-		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD1)
-			Defines += "#define USE_TEXCOORD1\n\n";
-		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TANGENT)
-			Defines += "#define USE_TANGENTS\n\n";
-		if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_BINORMAL)
-			Defines += "#define USE_BINORMALS\n\n";
-
-		Defines += "#define USE_PIXELLIGHTING \n\n";
-		Defines += "#define USING_ATENUATION \n\n";
-		Defines += "#define USE_SPECULAR \n\n";
-		
-		
-
-		vstr = Defines + vstr;
-		fstr = Defines + fstr;
-
-		GLuint vshader_id = createShader(GL_VERTEX_SHADER, const_cast<char*>(vstr.c_str()));
-		GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, const_cast<char*>(fstr.c_str()));
-
-		//Attach Shaders
-		shadersID.push_back(glCreateProgram());
-		glAttachShader(shadersID.back(), vshader_id);
-		glAttachShader(shadersID.back(), fshader_id);
-
-		glLinkProgram(shadersID.back());
-		glUseProgram(shadersID.back());
-
-		//Obtener locaciones de Attributes
-		vertexAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "Vertex"));
-		normalAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "Normal"));
-		uvAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "UV"));
-		//Obtener locaciones de Uniforms
-		matWorldViewProjUniformLoc = glGetUniformLocation(shadersID.back(), "WVP");
-		matWorldUniformLoc = glGetUniformLocation(shadersID.back(), "World");
-		lightLoc = glGetUniformLocation(shadersID.back(), "light");
-		lightColLoc = glGetUniformLocation(shadersID.back(), "lightColor");
-		camPosLoc = glGetUniformLocation(shadersID.back(), "camPos");
-		specExpLoc = glGetUniformLocation(shadersID.back(), "specExp");
-		attMaxLoc = glGetUniformLocation(shadersID.back(), "attMax");
-		
-		
+	{		
 		for (auto &subsetIt : meshIt.m_subsets)
 		{
+			//Crear shaders
+			std::string Defines = "";
+			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_NORMAL)
+				Defines += "#define USE_NORMALS\n\n";
+			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD0)
+				Defines += "#define USE_TEXCOORD0\n\n";
+			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD1)
+				Defines += "#define USE_TEXCOORD1\n\n";
+			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TANGENT)
+				Defines += "#define USE_TANGENTS\n\n";
+			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_BINORMAL)
+				Defines += "#define USE_BINORMALS\n\n";
+
+
+			if (subsetIt.m_effects.m_specularMap != "")
+				Defines += "#define USE_SPEC_MAP\n\n";
+			if (subsetIt.m_effects.m_glossMap != "")
+				Defines += "#define USE_GLOSS_MAP\n\n";
+			if (subsetIt.m_effects.m_normalMap != "")
+				Defines += "#define USE_NORMAL_MAP\n\n";
+
+			Defines += "#define USE_PIXELLIGHTING \n\n";
+			Defines += "#define USING_ATENUATION \n\n";
+			Defines += "#define USE_SPECULAR_BLIN \n\n";
+
+
+
+			vstr = Defines + vstr;
+			fstr = Defines + fstr;
+
+			GLuint vshader_id = createShader(GL_VERTEX_SHADER, const_cast<char*>(vstr.c_str()));
+			GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, const_cast<char*>(fstr.c_str()));
+
+			//Attach Shaders
+			shadersID.push_back(glCreateProgram());
+			glAttachShader(shadersID.back(), vshader_id);
+			glAttachShader(shadersID.back(), fshader_id);
+
+			glLinkProgram(shadersID.back());
+			glUseProgram(shadersID.back());
+
+			//Obtener locaciones de Attributes
+			vertexAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "Vertex"));
+			normalAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "Normal"));
+			binormalAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "Binormal"));
+			tangentAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "Tangent"));
+			uvAttribLocs.push_back(glGetAttribLocation(shadersID.back(), "UV"));
+
+			//Obtener locaciones de Uniforms
+			matWorldViewProjUniformLoc = glGetUniformLocation(shadersID.back(), "WVP");
+			matWorldUniformLoc = glGetUniformLocation(shadersID.back(), "World");
+			lightLoc = glGetUniformLocation(shadersID.back(), "light");
+			lightColLoc = glGetUniformLocation(shadersID.back(), "lightColor");
+			camPosLoc = glGetUniformLocation(shadersID.back(), "camPos");
+			specExpLoc = glGetUniformLocation(shadersID.back(), "specExp");
+			attMaxLoc = glGetUniformLocation(shadersID.back(), "attMax");
 			//Cargar Texturas
-			bool found = false;
+			textureInfo.push_back(TextureInfo());
+			bool DifFound = false;
 			for (std::size_t f = 0; f<Textures.size(); f++) {
 				Texture *ttex = Textures[f];
 				std::string ttstr = std::string(ttex->optname);
 				if (ttstr == subsetIt.m_effects.m_difusePath.c_str()) {
-					IdsTex.push_back(ttex->id);
-					IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "diffuse"));
-					found = true;
+					textureInfo.back().IdsTex.push_back(ttex->id);
+					textureInfo.back().IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "diffuse"));
+					DifFound = true;
 					break;
 				}
 			}
-			if (!found) {
+			if (!DifFound) {
 				Texture *tex = new TextureGL;
 				int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_difusePath.c_str()));
 				if (textureID != -1) {
 					Textures.push_back(tex);
-					IdsTex.push_back(textureID);
-					IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "diffuse"));
+					textureInfo.back().IdsTex.push_back(textureID);
+					textureInfo.back().IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "diffuse"));
 				}
 				else {
 					std::cout << "Texture not Found" << std::endl;
-					IdsTex.push_back(NULL);//
-					IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "diffuse"));//
 					delete tex;
 				}
 			}
+			if (subsetIt.m_effects.m_specularMap != "") {
+				bool SpecFound = false;
+				for (std::size_t f = 0; f<SpecularTextures.size(); f++) {
+					Texture *ttex = SpecularTextures[f];
+					std::string ttstr = std::string(ttex->optname);
+					if (ttstr == subsetIt.m_effects.m_specularMap.c_str()) {
+						textureInfo.back().IdsTex.push_back(ttex->id);
+						textureInfo.back().IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "specularMap"));
+						SpecFound = true;
+						break;
+					}
+				}
+				if (!SpecFound) {
+					Texture *tex = new TextureGL;
+					int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_specularMap.c_str()));
+					if (textureID != -1) {
+						SpecularTextures.push_back(tex);
+						textureInfo.back().IdsTex.push_back(textureID);
+						textureInfo.back().IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "specularMap"));
+					}
+					else {
+						std::cout << "Texture not Found" << std::endl;
+						delete tex;
+					}
+				}
+			}
+			if (subsetIt.m_effects.m_glossMap != "") {
+				bool GlossFound = false;
+				for (std::size_t f = 0; f<Textures.size(); f++) {
+					Texture *ttex = Textures[f];
+					std::string ttstr = std::string(ttex->optname);
+					if (ttstr == subsetIt.m_effects.m_glossMap.c_str()) {
+						textureInfo.back().IdsTex.push_back(ttex->id);
+						textureInfo.back().IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "glossMap"));
+						GlossFound = true;
+						break;
+					}
+				}
+				if (!GlossFound) {
+					Texture *tex = new TextureGL;
+					int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_glossMap.c_str()));
+					if (textureID != -1) {
+						Textures.push_back(tex);
+						textureInfo.back().IdsTex.push_back(textureID);
+						textureInfo.back().IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "glossMap"));
+					}
+					else {
+						std::cout << "Texture not Found" << std::endl;
+						delete tex;
+					}
+				}
+			}
+			if (subsetIt.m_effects.m_normalMap != "") {
+				bool NormalFound = false;
+				for (std::size_t f = 0; f<Textures.size(); f++) {
+					Texture *ttex = Textures[f];
+					std::string ttstr = std::string(ttex->optname);
+					if (ttstr == subsetIt.m_effects.m_normalMap.c_str()) {
+						textureInfo.back().IdsTex.push_back(ttex->id);
+						textureInfo.back().IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "normalMap"));
+						NormalFound = true;
+						break;
+					}
+				}
+				if (!NormalFound) {
+					Texture *tex = new TextureGL;
+					int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_normalMap.c_str()));
+					if (textureID != -1) {
+						Textures.push_back(tex);
+						textureInfo.back().IdsTex.push_back(textureID);
+						textureInfo.back().IdTexUniformLocs.push_back(glGetUniformLocation(shadersID.back(), "normalMap"));
+					}
+					else {
+						std::cout << "Texture not Found" << std::endl;
+						delete tex;
+					}
+				}
+			}
+
 			//Generar buffer de Indices
 			IBs.push_back(0);//
 			glGenBuffers(1, &IBs.back()); 
@@ -171,22 +259,42 @@ void ModelGL::Draw(float *t)
 		glEnableVertexAttribArray(vertexAttribLocs[i]);
 		if (normalAttribLocs[i] != -1)
 			glEnableVertexAttribArray(normalAttribLocs[i]);
+		if (binormalAttribLocs[i] != -1)
+			glEnableVertexAttribArray(binormalAttribLocs[i]);
+		if (tangentAttribLocs[i] != -1)
+			glEnableVertexAttribArray(tangentAttribLocs[i]);
 		if (uvAttribLocs[i] != -1)
 			glEnableVertexAttribArray(uvAttribLocs[i]);
 		//Specify Attributes location
 		glVertexAttribPointer(vertexAttribLocs[i], 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(0));
 		if (normalAttribLocs[i] != -1)
+		{
 			glVertexAttribPointer(normalAttribLocs[i], 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(16));
+		}
+		if (tangentAttribLocs[i] != -1)
+		{
+			glVertexAttribPointer(tangentAttribLocs[i], 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(32));
+		}
+		if (binormalAttribLocs[i] != -1)
+		{
+			glVertexAttribPointer(binormalAttribLocs[i], 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(48));
+		}
 		if (uvAttribLocs[i] != -1)
-			glVertexAttribPointer(uvAttribLocs[i], 2, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(32));
+		{
+			glVertexAttribPointer(uvAttribLocs[i], 2, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(64));
+		}
 		for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
 		{
 			//Bind Buffers
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBs[index]);
-			//Specify Texture location
-			glActiveTexture(GL_TEXTURE0);//Set Active texture unit
-			glBindTexture(GL_TEXTURE_2D, IdsTex[index]);
-			glUniform1i(IdTexUniformLocs[index], 0); //Specify location
+			int active = 0;
+			for (size_t k = 0; k < textureInfo[index].IdsTex.size(); k++)
+			{
+				glActiveTexture(GL_TEXTURE0 + active);//Set Active texture unit
+				glBindTexture(GL_TEXTURE_2D, textureInfo[index].IdsTex[k]);
+				glUniform1i(textureInfo[index].IdTexUniformLocs[k], active); //Specify location
+				active++;
+			}
 
 #if USING_32BIT_IB
 			glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_INT, 0);

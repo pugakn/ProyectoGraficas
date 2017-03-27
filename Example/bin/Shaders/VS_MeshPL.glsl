@@ -18,8 +18,15 @@ attribute highp vec2 UV;
 #endif
 
 varying highp vec3 pixelPos;
-#ifdef USE_PIXELLIGHTING
+
+#ifdef USE_NORMALS
 varying highp vec3 normalTransformed;
+#endif
+#ifdef USE_TANGENTS
+varying highp vec3 tangentTransformed;
+#endif
+#ifdef USE_BINORMALS
+varying highp vec3 binormalTransformed;
 #endif
 #ifdef USE_VERTEXLIGHTING
 varying highp float light_mod;
@@ -45,8 +52,14 @@ void main(){
 #endif
 
 	gl_Position = WVP*Vertex;
-#ifdef USE_PIXELLIGHTING
+#ifdef USE_NORMALS
 	normalTransformed = normalize(mat3(World)*Normal.rgb);
+#endif
+#ifdef USE_TANGENTS
+	tangentTransformed = normalize(mat3(World)*Tangent.rgb);
+#endif
+#ifdef USE_BINORMALS
+	binormalTransformed = normalize(mat3(World)*Binormal.rgb);
 #endif
 #ifdef USE_VERTEXLIGHTING
 	highp vec3 norm = normalize(mat3(World)*Normal.rgb);

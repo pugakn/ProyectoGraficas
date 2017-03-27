@@ -10,10 +10,9 @@ void TestApp::InitVars() {
 	cam.Init();
 
 	SceneProp.AddCamera(&cam);
-	SceneProp.AddLight(Vector3D(0.0f, 0.0f, 0.0f), Vector3D(1.0f, 0.8f, 0.8f), true);
-	SceneProp.specExp = 5.0f;
+	SceneProp.AddLight(Vector3D(250, 25.0f, 120), Vector3D(1.0f, 0.8f, 0.8f), true);
+	SceneProp.specExp = 14.0f;
 	SceneProp.attMax = 12000.0f;
-	//12000.0
 	//SceneProp.AmbientColor = Vector3D(0.15f, 0.15f, 0.15f);
 
 }
@@ -120,11 +119,37 @@ void TestApp::CreateAssets() {
 	Models.back().RotateYAbsolute(90);
 	Models.back().Update();
 
-	index = PrimitiveMgr.CreateModel("Models/Cerdo.X");
+	index = PrimitiveMgr.CreateModel("Models/CerdoNuevo.X");
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().ScaleAbsolute(20);
+	Models.back().RotateXAbsolute(90);
+	Models.back().RotateZAbsolute(-30);
+	Models.back().TranslateAbsolute(200, 25, 220);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/NuBatman.X");
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().ScaleAbsolute(3);
+	Models.back().TranslateAbsolute(200, 0, 140);
+	Models.back().RotateYAbsolute(90);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/NuVenomJok.X");
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(200, 0, 90);
+	Models.back().RotateYAbsolute(90);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/CerdoNuevo.X");
 	lightPrimitive.CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	lightPrimitive.ScaleAbsolute(3);
+	lightPrimitive.RotateXAbsolute(90);
+	lightPrimitive.RotateZAbsolute(-30);
 	lightPrimitive.Update();
-	
+
 
 	PrimitiveMgr.SetSceneProps(&SceneProp);
 }

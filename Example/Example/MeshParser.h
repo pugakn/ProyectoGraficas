@@ -31,13 +31,15 @@ namespace xf {
 			HAS_SKININDEXES1 = HAS_POSITION << 12,
 			HAS_CUSTOM_DATA_4BYTES = HAS_POSITION << 13,
 			HAS_CUSTOM_DATA_8BYTES = HAS_POSITION << 14,
-			HAS_CUSTOM_DATA_16BYTES = HAS_POSITION << 15,
+			HAS_CUSTOM_DATA_16BYTES = HAS_POSITION << 15
 		};
 	}
 }
 struct vertexStruct {
 	float x, y, z, w;
 	float nx, ny, nz, nw;
+	float tx, ty, tz, tw;
+	float bx, by, bz, bw;
 	float s, t;
 };
 struct xMeshEffects {
@@ -66,8 +68,6 @@ struct xMesh{
 #endif // USING_32BIT_IB
 	std::vector<xMeshSubset> m_subsets;
 	unsigned long m_vertexAttributes;
-	std::vector<Vector3D> m_tangents;
-	std::vector<Vector3D> m_binormals;
 };
 
 class MeshParser
