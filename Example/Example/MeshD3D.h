@@ -25,17 +25,21 @@ private:
 	struct SubSetInfo {
 		ComPtr<ID3D11Buffer> IB;
 		Texture*			 difuseText;
-	};
-	struct MeshInfo {
+		Texture*			 specularText;
+		Texture*			 glossText;
+		Texture*			 normalText;
+
 		ComPtr<ID3D11VertexShader>  pVS;
 		ComPtr<ID3D11PixelShader>   pFS;
 		ComPtr<ID3DBlob>            VS_blob;
 		ComPtr<ID3DBlob>            FS_blob;
 		ComPtr<ID3D11InputLayout>   Layout;
-		ComPtr<ID3D11Buffer>        ConstantBuffer;
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC>	VertexDecl;
-		MeshD3D::ConstBuffer					CnstBuffer;
+		ComPtr<ID3D11Buffer>        ConstantBuffer;
+		MeshD3D::ConstBuffer		CnstBuffer;
+	};
+	struct MeshInfo {
 		std::vector<SubSetInfo>					m_subSets;
 	};
 

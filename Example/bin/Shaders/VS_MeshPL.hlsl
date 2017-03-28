@@ -65,11 +65,11 @@ VS_OUTPUT VS( VS_INPUT input ){
 #endif
 
 #ifdef USE_TANGENTS
-	OUT.htangent = normalize( mul( World , input.tangent ) );
+	OUT.htangent = float4(normalize( mul((float3x3) World , input.tangent.xyz ) ),0.0);
 #endif
 
 #ifdef USE_BINORMALS
-	OUT.hbinormal = normalize( mul( World , input.binormal ) );
+	OUT.hbinormal = float4(normalize( mul((float3x3) World , input.binormal.xyz ) ),0.0);
 #endif
 
 #ifdef USE_TEXCOORD0

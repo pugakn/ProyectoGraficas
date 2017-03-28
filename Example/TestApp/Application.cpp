@@ -18,10 +18,7 @@ void TestApp::InitVars() {
 }
 
 void TestApp::CreateAssets() {	
-
-
 	
-
 	int index = PrimitiveMgr.CreateModel("Models/Scene.X");
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
@@ -209,16 +206,16 @@ void TestApp::OnInput() {
 	//Light
 
 	if (IManager.PressedKey(SDLK_KP4)) {
-		SceneProp.Lights[0].Position.x += -100 * DtTimer.GetDTSecs();
+		SceneProp.Lights[0].Position.z += 100 * DtTimer.GetDTSecs();
 	}
 	if (IManager.PressedKey(SDLK_KP6)) {
-		SceneProp.Lights[0].Position.x += 100 * DtTimer.GetDTSecs();
-	}
-	if (IManager.PressedKey(SDLK_KP8)) {
 		SceneProp.Lights[0].Position.z += -100 * DtTimer.GetDTSecs();
 	}
+	if (IManager.PressedKey(SDLK_KP8)) {
+		SceneProp.Lights[0].Position.x += -100 * DtTimer.GetDTSecs();
+	}
 	if (IManager.PressedKey(SDLK_KP5)) {
-		SceneProp.Lights[0].Position.z += 100 * DtTimer.GetDTSecs();
+		SceneProp.Lights[0].Position.x += 100 * DtTimer.GetDTSecs();
 	}
 	if (IManager.PressedKey(SDLK_KP7)) {
 		SceneProp.Lights[0].Position.y += -100 * DtTimer.GetDTSecs();

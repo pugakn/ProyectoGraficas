@@ -75,6 +75,7 @@ void main(){
 			highp float specular = dot(RL,norm) * 0.5 + 0.5;
 			#ifdef USE_GLOSS_MAP
 					specular = pow( specular ,texture2D(glossMap,vecUVCoords).r);
+					//specular = pow( specular ,specExp);
 					#else
 					specular = pow( specular ,specExp);
 			#endif
@@ -97,14 +98,14 @@ void main(){
 	Lambert*= color * vec4(light_mod,light_mod,light_mod,1.0);
 	//Specular
 	lowp vec4 Specular = vec4(lightColor,1.0);
-	Specular *= specular * att * 1.3;
+	Specular *= specular;
 	#ifdef USE_SPEC_MAP
 		Specular *= texture2D(specularMap,vecUVCoords);
 	#endif
+	Specular *= att;
 	#if defined USE_SPECULAR_BLIN || defined USE_SPECULAR_PHONG
 	gl_FragColor = Ambient + Lambert + Specular;
 	#else
 	gl_FragColor = Ambient + Lambert;
 	#endif
-		//gl_FragColor = vec4(norm,1.0);
 }

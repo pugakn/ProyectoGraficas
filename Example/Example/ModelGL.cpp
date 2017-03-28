@@ -52,8 +52,8 @@ void ModelGL::Create()
 
 			if (subsetIt.m_effects.m_specularMap != "")
 				Defines += "#define USE_SPEC_MAP\n\n";
-			if (subsetIt.m_effects.m_glossMap != "")
-				Defines += "#define USE_GLOSS_MAP\n\n";
+			//if (subsetIt.m_effects.m_glossMap != "")
+			//	Defines += "#define USE_GLOSS_MAP\n\n";
 			if (subsetIt.m_effects.m_normalMap != "")
 				Defines += "#define USE_NORMAL_MAP\n\n";
 
@@ -287,13 +287,11 @@ void ModelGL::Draw(float *t)
 		{
 			//Bind Buffers
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBs[index]);
-			int active = 0;
 			for (size_t k = 0; k < textureInfo[index].IdsTex.size(); k++)
 			{
-				glActiveTexture(GL_TEXTURE0 + active);//Set Active texture unit
+				glActiveTexture(GL_TEXTURE0 + k);//Set Active texture unit
 				glBindTexture(GL_TEXTURE_2D, textureInfo[index].IdsTex[k]);
-				glUniform1i(textureInfo[index].IdTexUniformLocs[k], active); //Specify location
-				active++;
+				glUniform1i(textureInfo[index].IdTexUniformLocs[k], k); //Specify location
 			}
 
 #if USING_32BIT_IB
