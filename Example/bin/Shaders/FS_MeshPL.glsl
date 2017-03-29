@@ -40,72 +40,72 @@ varying highp vec3 binormalTransformed;
 
 void main(){
 	lowp vec4 color = vec4(0.0,0.0,0.0,1.0);
-	#ifdef USE_TANGENTS
-	lowp vec3 tang = normalize(tangentTransformed);
-	#endif
-	#ifdef USE_BINORMALS
-	lowp vec3 binor = normalize(binormalTransformed);
-	#endif
-#ifdef USE_NORMAL_MAP
-	lowp vec3 norm = texture2D(normalMap,vecUVCoords).xyz * 2.0 - 1.0;
-	norm.g = -norm.g;
-	highp mat3 TBN = mat3(tang,binor,normalize(normalTransformed));
-	norm = TBN * norm;
-	norm = normalize(norm);
-#else
-	lowp vec3 norm = normalize(normalTransformed);
-#endif
 #ifdef USE_TEXCOORD0
-	color = texture2D(diffuse,vecUVCoords);
+		#ifdef USE_TANGENTS
+		lowp vec3 tang = normalize(tangentTransformed);
+		#endif
+		#ifdef USE_BINORMALS
+		lowp vec3 binor = normalize(binormalTransformed);
+		#endif
+	#ifdef USE_NORMAL_MAP
+		lowp vec3 norm = texture2D(normalMap,vecUVCoords).xyz * 2.0 - 1.0;
+		norm.g = -norm.g;
+		highp mat3 TBN = mat3(tang,binor,normalize(normalTransformed));
+		norm = TBN * norm;
+		norm = normalize(norm);
+	#else
+		lowp vec3 norm = normalize(normalTransformed);
+	#endif
+		color = texture2D(diffuse,vecUVCoords);
 #else
 	color = normalize(pixelPos*0.5 + 0.5);
 #endif
-	#ifdef USE_PIXELLIGHTING
-		lowp vec3 lightDir = normalize(light - pixelPos);
-	//	highp float light_mod = clamp(dot(norm,lightDir),0.0,1.0) ;
-		highp float att = pow(dot(norm,lightDir) * 0.5 + 0.5,2.0);
-		highp float light_mod = clamp( att,0.0,1.0) ;
-		#ifdef USE_SPECULAR_PHONG
-			lowp vec3 RL = reflect(lightDir,norm);
-			lowp vec3 eyeDir = normalize(camPos - pixelPos);
-			highp float specular = pow(dot(-eyeDir,RL),specExp);
-			#elif defined USE_SPECULAR_BLIN
-			lowp vec3 eyeDir = normalize(camPos - pixelPos);
-			lowp vec3 RL = normalize(eyeDir+lightDir);
-			highp float specular = dot(RL,norm) * 0.5 + 0.5;
-			#ifdef USE_GLOSS_MAP
+#ifdef USE_PIXELLIGHTING
+	lowp vec3 lightDir = normalize(light - pixelPos);
+//	highp float light_mod = clamp(dot(norm,lightDir),0.0,1.0) ;
+	highp float att = pow(dot(norm,lightDir) * 0.5 + 0.5,2.0);
+	highp float light_mod = clamp( att,0.0,1.0) ;
+	#ifdef USE_SPECULAR_PHONG
+		lowp vec3 RL = reflect(lightDir,norm);
+		lowp vec3 eyeDir = normalize(camPos - pixelPos);
+		highp float specular = pow(dot(-eyeDir,RL),specExp);
+	#elif defined USE_SPECULAR_BLIN
+		lowp vec3 eyeDir = normalize(camPos - pixelPos);
+		lowp vec3 RL = normalize(eyeDir+lightDir);
+		highp float specular = dot(RL,norm) * 0.5 + 0.5;
+		#ifdef USE_GLOSS_MAP
 					specular = pow( specular ,texture2D(glossMap,vecUVCoords).r);
 					//specular = pow( specular ,specExp);
 					#else
 					specular = pow( specular ,specExp);
-			#endif
-
 		#endif
-		#ifdef USING_ATENUATION
+  #endif
+	#ifdef USING_ATENUATION
 		highp float lightDist = length(pixelPos - light);
 		light_mod = min(light_mod / ((lightDist * lightDist)/attMax),light_mod );
 		specular = min(specular / ((lightDist * lightDist)/attMax),specular);
-		#endif
-	#else
-		#ifndef USE_VERTEXLIGHTING
-			highp float light_mod = 1.0;
-		#endif
 	#endif
-	//Ambient
-	lowp vec4 Ambient = color * vec4(0.3,0.3,0.3,1);
-	//Lambert
-	lowp vec4 Lambert = vec4(lightColor,1.0);
-	Lambert*= color * vec4(light_mod,light_mod,light_mod,1.0);
-	//Specular
-	lowp vec4 Specular = vec4(lightColor,1.0);
-	Specular *= specular;
-	#ifdef USE_SPEC_MAP
-		Specular *= texture2D(specularMap,vecUVCoords);
+#else
+	#ifndef USE_VERTEXLIGHTING
+		highp float light_mod = 1.0;
 	#endif
-	Specular *= att;
-	#if defined USE_SPECULAR_BLIN || defined USE_SPECULAR_PHONG
-	gl_FragColor = Ambient + Lambert + Specular;
-	#else
-	gl_FragColor = Ambient + Lambert;
-	#endif
+#endif
+//Ambient
+lowp vec4 Ambient = color * vec4(0.3,0.3,0.3,1);
+//Lambert
+lowp vec4 Lambert = vec4(lightColor,1.0);
+Lambert*= color * vec4(light_mod,light_mod,light_mod,1.0);
+//Specular
+lowp vec4 Specular = vec4(lightColor,1.0);
+Specular *= specular;
+#ifdef USE_SPEC_MAP
+	Specular *= texture2D(specularMap,vecUVCoords);
+#endif
+Specular *= att;
+#if defined USE_SPECULAR_BLIN || defined USE_SPECULAR_PHONG
+gl_FragColor = Ambient + Lambert + Specular;
+#else
+gl_FragColor = Ambient + Lambert;
+#endif
+
 }

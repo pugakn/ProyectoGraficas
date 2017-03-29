@@ -9,43 +9,54 @@
 #include "Matrix4D.h"
 
 class Texture;
-struct TextureInfo
-{
-	std::vector <int> IdsTex;
-	std::vector <GLint> IdTexUniformLocs;
-};
 class ModelGL : public PrimitiveBase
 {
 private:
 	//GLuint	shaderID;
-	std::vector <GLuint>	shadersID;
-	std::vector <GLint>	vertexAttribLocs;
-	std::vector <GLint>	normalAttribLocs;
-	std::vector <GLint>	binormalAttribLocs;
-	std::vector <GLint>	tangentAttribLocs;
-	std::vector <GLint>	uvAttribLocs;
+	struct TextureInfo
+	{
+		std::vector <int> IdsTex;
+		std::vector <GLint> IdTexUniformLocs;
+	};
+	struct SubsetInfo
+	{
+		GLuint shadersID;
+		//Atributes
+		GLint	 vertexAttribLocs;
+		GLint	 normalAttribLocs;
+		GLint	 binormalAttribLocs;
+		GLint	 tangentAttribLocs;
+		GLint	 uvAttribLocs;
+		//Uniforms
+		GLint  matWorldViewProjUniformLoc;
+		GLint  matWorldUniformLoc;
 
-	GLint  matWorldViewProjUniformLoc;
-	GLint  matWorldUniformLoc;
-	GLint lightLoc;
-	GLint lightColLoc;
-	GLint camPosLoc;
-	GLint specExpLoc;
-	GLint attMaxLoc;
+		GLint lightLoc;
+		GLint lightColLoc;
+		GLint camPosLoc;
+		GLint specExpLoc;
+		GLint attMaxLoc;
 
+		//Index Bufer ID
+		GLuint	IB;
+
+		//Textures
+		TextureInfo textInfo;
+
+	};
+	struct MeshInfo
+	{
+		std::vector<SubsetInfo> subsetInfo;
+	};
+	
+	std::vector<MeshInfo> m_meshInfo;
 	Vector3D lightColor;
-
-	Matrix4D	transform;
-
-	GLuint					VB;
-	std::vector <GLuint>	IBs;
-
+	Matrix4D transform;
+	GLuint	 VB;
 	std::string m_fileName;
 
 
-	std::vector<TextureInfo> textureInfo;
 	std::vector<Texture*> Textures;
-	std::vector<Texture*> SpecularTextures;
 public:
 	void SetFileName(char* fileName);
 	void Create() override;

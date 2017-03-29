@@ -18,12 +18,10 @@ SamplerState Sspec;
 
 #ifdef USE_GLOSS_MAP
 Texture2D TextureGloss : register(t2);
-SamplerState Sgloss;
 #endif
 
 #ifdef USE_NORMAL_MAP
 Texture2D TextureNormal : register(t3);
-SamplerState Snor;
 #endif
 
 
@@ -62,7 +60,7 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
   	float3 binor = normalize(input.hbinormal.xyz);
   	#endif
   #ifdef USE_NORMAL_MAP
-  	float3 norm = TextureNormal.Sample( Snor, input.texture0 ).xyz * 2.0 - 1.0;
+  	float3 norm = TextureNormal.Sample( SS, input.texture0 ).xyz * 2.0 - 1.0;
   	norm.y = -norm.y;
   	float3x3 TBN = float3x3(tang,binor,normalize(input.hnormal.xyz));
   	norm = mul(norm ,TBN);
@@ -73,7 +71,7 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
   #endif
 
 //#ifdef USE_GLOSS_MAP
-//return TextureGloss.Sample( Sgloss, input.texture0 );
+//return float4(TextureGloss.Sample( Sgloss, input.texture0 ).r,0,0,1);
 //#endif
 
 #ifdef USE_TEXCOORD0
@@ -101,7 +99,7 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
   float3 RL = normalize(eyeDir+lightDir);
   float specular = dot(RL,norm) * 0.5 + 0.5;
   #ifdef USE_GLOSS_MAP
-      specular = pow( specular ,TextureGloss.Sample( Sgloss, input.texture0 ));
+      specular = pow( specular ,TextureGloss.Sample( SS, input.texture0 ).r);
       //specular = pow( specular ,specExp);
       #else
       specular = pow( specular ,10.0);
@@ -125,7 +123,7 @@ return color * 0.3 + color * input.light_mod * lightColor;
     Specular *= specular;
     Specular *= att;
     #ifdef USE_SPEC_MAP
-    Specular *= TextureSpecular.Sample( Sspec, input.texture0 );
+    Specular *= TextureSpecular.Sample( SS, input.texture0 );
     #endif
     return color * 0.3 + color * light_mod * lightColor + Specular;
     #else

@@ -589,7 +589,7 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		unsigned long long temp = std::stoul(numString);
 		float *fval = (float*)&temp;
-		m_vbo[declDataPos].tx = *fval;
+		m_vbo[declDataPos].bx = *fval;
 		//m_meshes.back().m_tangents[i].x = std::stof(numString);
 		numString.clear();
 		++m_pointer;
@@ -601,7 +601,7 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		temp = std::stoul(numString);
 		fval = (float*)&temp;
-		m_vbo[declDataPos].ty = *fval;
+		m_vbo[declDataPos].by = *fval;
 		//m_meshes.back().m_tangents[i].y = std::stof(numString);
 		numString.clear();
 		++m_pointer;
@@ -613,11 +613,11 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		temp = std::stoul(numString);
 		fval = (float*)&temp;
-		m_vbo[declDataPos].tz = *fval;
+		m_vbo[declDataPos].bz = *fval;
 	//	m_meshes.back().m_tangents[i].z = std::stof(numString);
 		numString.clear();
 		++m_pointer;
-		m_vbo[declDataPos].tw = 0;
+		m_vbo[declDataPos].bw = 0;
 
 		//++m_pointer;
 		while (!(*m_pointer == ','))
@@ -628,7 +628,7 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		temp = std::stoul(numString);
 		fval = (float*)&temp;
-		m_vbo[declDataPos].bx = *fval;
+		m_vbo[declDataPos].tx = *fval;
 		//m_meshes.back().m_binormals[i].x = std::stof(numString);
 		numString.clear();
 		++m_pointer;
@@ -640,7 +640,7 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		temp = std::stoul(numString);
 		fval = (float*)&temp;
-		m_vbo[declDataPos].by = *fval;
+		m_vbo[declDataPos].ty = *fval;
 		//m_meshes.back().m_binormals[i].y = std::stof(numString);
 		numString.clear();
 		++m_pointer;
@@ -655,10 +655,10 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		temp = std::stoul(numString);
 		fval = (float*)&temp;
-		m_vbo[declDataPos].bz = *fval;
+		m_vbo[declDataPos].tz = *fval;
 		//m_meshes.back().m_binormals[i].z = std::stof(numString);
 		numString.clear();
-		m_vbo[declDataPos].bw = 0;
+		m_vbo[declDataPos].tw = 0;
 		++m_pointer;
 	}
 
