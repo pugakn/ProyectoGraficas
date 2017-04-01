@@ -237,6 +237,17 @@ void TestApp::OnInput() {
 		SceneProp.attMax += 20000 * DtTimer.GetDTSecs();
 	}
 
+	//Render Mode
+	if (IManager.PressedKey(SDLK_i)) {
+		SceneProp.renderMode = RM::RenderMode::SOLID;
+	}
+	if (IManager.PressedKey(SDLK_o)) {
+		SceneProp.renderMode = RM::RenderMode::WIREFRAME;
+	}
+	if (IManager.PressedKey(SDLK_p)) {
+		SceneProp.renderMode = RM::RenderMode::SOLID_WIREFRAME;
+	}
+
 
 
 

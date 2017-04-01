@@ -94,7 +94,7 @@ void ModelGL::Create()
 			m_meshInfo.back().subsetInfo.back().specExpLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "specExp");
 			m_meshInfo.back().subsetInfo.back().attMaxLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "attMax");
 			//Cargar Texturas
-
+			//Difuse
 			bool found = false;
 			for (std::size_t f = 0; f<Textures.size(); f++) {
 				Texture *ttex = Textures[f];
@@ -119,6 +119,7 @@ void ModelGL::Create()
 					delete tex;
 				}
 			}
+			//Specular
 			if (subsetIt.m_effects.m_specularMap != "") {
 				found = false;
 				for (std::size_t f = 0; f< Textures.size(); f++) {
@@ -145,6 +146,7 @@ void ModelGL::Create()
 					}
 				}
 			}
+			//Gloss
 			if (subsetIt.m_effects.m_glossMap != "") {
 				found = false;
 				for (std::size_t f = 0; f<Textures.size(); f++) {
@@ -171,6 +173,7 @@ void ModelGL::Create()
 					}
 				}
 			}
+			//Normal
 			if (subsetIt.m_effects.m_normalMap != "") {
 				found = false;
 				for (std::size_t f = 0; f<Textures.size(); f++) {
@@ -215,6 +218,41 @@ void ModelGL::Create()
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	glBufferData(GL_ARRAY_BUFFER, parser.m_vertexSize * sizeof(vertexStruct), &parser.m_vbo[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//===================================Generar Wireframe==================================
+	//Shaders
+	char *vsSourceWire = file2string("Shaders/VS_Wire.glsl");
+	char *fsSourceWire = file2string("Shaders/FS_Wire.glsl");
+	GLuint vshaderWire_id = createShader(GL_VERTEX_SHADER, const_cast<char*>(vsSourceWire));
+	GLuint fshaderWire_id = createShader(GL_FRAGMENT_SHADER, const_cast<char*>(fsSourceWire));
+	delete[] vsSourceWire;
+	delete[] fsSourceWire;
+	//Attach Shaders
+	wire.ShaderID = glCreateProgram();
+	glAttachShader(wire.ShaderID, vshaderWire_id);
+	glAttachShader(wire.ShaderID, fshaderWire_id);
+
+	glLinkProgram(wire.ShaderID);
+	//glUseProgram(wire.ShaderID);
+
+	//Obtener locaciones de Attributes
+	wire.VertexAttribLoc = glGetAttribLocation(wire.ShaderID, "Vertex");
+
+	//Obtener locaciones de Uniforms
+	wire.MatWorldViewProjUniformLoc = glGetUniformLocation(wire.ShaderID, "WVP");
+	
+	std::vector<unsigned short> fullIndex;
+	for (auto &it : parser.m_vbo, parser.m_meshes)
+	{
+		fullIndex.insert(fullIndex.end(), it.m_indexBuffer.begin(), it.m_indexBuffer.end());
+	}
+	wireframe.CreateWireframe( fullIndex);
+	glGenBuffers(1, &wire.IB);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wire.IB);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, wireframe.m_indexBuffer.size() * sizeof(unsigned short), &(wireframe.m_indexBuffer[0]), GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+
 	//Liberar Memoria
 	parser.Deallocate();
 	transform = Identity();
@@ -233,87 +271,120 @@ void ModelGL::Draw(float *t)
 
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D WVP = transform*VP;
-
-	//Vector3D light = Vector3D(l);
 	//------------------------------------------------------------------//
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
-	for (size_t i = 0; i < parser.m_meshes.size(); i++)
+	switch (pScProp->renderMode)
 	{
-		for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
+	case RM::RenderMode::SOLID:
+	{
+		for (size_t i = 0; i < parser.m_meshes.size(); i++)
 		{
-			SubsetInfo* sIt = &m_meshInfo[i].subsetInfo[j];
-			//Set actual shader
-			glUseProgram(sIt->shadersID);
-			//Set Uniforms
-			glUniformMatrix4fv(sIt->matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
-			glUniformMatrix4fv(sIt->matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
-			if (sIt->lightLoc != -1)
-				glUniform3fv(sIt->lightLoc, 1, &pScProp->Lights[0].Position.x);
-			if (sIt->lightColLoc != -1)
-				glUniform3fv(sIt->lightColLoc, 1, &pScProp->Lights[0].Color.r);
-			if (sIt->camPosLoc != -1)
-				glUniform3fv(sIt->camPosLoc, 1, &pScProp->pCameras[0]->m_pos.x);
-			if (sIt->specExpLoc != -1)
-				glUniform1fv(sIt->specExpLoc, 1, &pScProp->specExp);
-			if (sIt->attMaxLoc != 1)
-				glUniform1fv(sIt->attMaxLoc, 1, &pScProp->attMax);
-			//Enable Attributes
-			glEnableVertexAttribArray(sIt->vertexAttribLocs);
-			if (sIt->normalAttribLocs != -1)
-				glEnableVertexAttribArray(sIt->normalAttribLocs);
-			if (sIt->binormalAttribLocs != -1)
-				glEnableVertexAttribArray(sIt->binormalAttribLocs);
-			if (sIt->tangentAttribLocs != -1)
-				glEnableVertexAttribArray(sIt->tangentAttribLocs);
-			if (sIt->uvAttribLocs != -1)
-				glEnableVertexAttribArray(sIt->uvAttribLocs);
-			//Specify Attributes location
-			glVertexAttribPointer(sIt->vertexAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(0));
-			if (sIt->normalAttribLocs != -1)
+			for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
 			{
-				glVertexAttribPointer(sIt->normalAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(16));
-			}
-			if (sIt->tangentAttribLocs != -1)
-			{
-				glVertexAttribPointer(sIt->tangentAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(32));
-			}
-			if (sIt->binormalAttribLocs != -1)
-			{
-				glVertexAttribPointer(sIt->binormalAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(48));
-			}
-			if (sIt->uvAttribLocs != -1)
-			{
-				glVertexAttribPointer(sIt->uvAttribLocs, 2, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(64));
-			}
-			//Bind Buffers
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sIt->IB);
-			for (size_t k = 0; k < sIt->textInfo.IdsTex.size(); k++)
-			{
-				glActiveTexture(GL_TEXTURE0 + k);//Set Active texture unit
-				glBindTexture(GL_TEXTURE_2D, sIt->textInfo.IdsTex[k]);
-				glUniform1i(sIt->textInfo.IdTexUniformLocs[k], k); //Specify location
-			}
+				SubsetInfo* sIt = &m_meshInfo[i].subsetInfo[j];
+				//Set actual shader
+				glUseProgram(sIt->shadersID);
+				//Set Uniforms
+				glUniformMatrix4fv(sIt->matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
+				glUniformMatrix4fv(sIt->matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
+				if (sIt->lightLoc != -1)
+					glUniform3fv(sIt->lightLoc, 1, &pScProp->Lights[0].Position.x);
+				if (sIt->lightColLoc != -1)
+					glUniform3fv(sIt->lightColLoc, 1, &pScProp->Lights[0].Color.r);
+				if (sIt->camPosLoc != -1)
+					glUniform3fv(sIt->camPosLoc, 1, &pScProp->pCameras[0]->m_pos.x);
+				if (sIt->specExpLoc != -1)
+					glUniform1fv(sIt->specExpLoc, 1, &pScProp->specExp);
+				if (sIt->attMaxLoc != 1)
+					glUniform1fv(sIt->attMaxLoc, 1, &pScProp->attMax);
+				//Enable Attributes
+				glEnableVertexAttribArray(sIt->vertexAttribLocs);
+				if (sIt->normalAttribLocs != -1)
+					glEnableVertexAttribArray(sIt->normalAttribLocs);
+				if (sIt->binormalAttribLocs != -1)
+					glEnableVertexAttribArray(sIt->binormalAttribLocs);
+				if (sIt->tangentAttribLocs != -1)
+					glEnableVertexAttribArray(sIt->tangentAttribLocs);
+				if (sIt->uvAttribLocs != -1)
+					glEnableVertexAttribArray(sIt->uvAttribLocs);
+				//Specify Attributes location
+				glVertexAttribPointer(sIt->vertexAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(0));
+				if (sIt->normalAttribLocs != -1)
+				{
+					glVertexAttribPointer(sIt->normalAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(16));
+				}
+				if (sIt->tangentAttribLocs != -1)
+				{
+					glVertexAttribPointer(sIt->tangentAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(32));
+				}
+				if (sIt->binormalAttribLocs != -1)
+				{
+					glVertexAttribPointer(sIt->binormalAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(48));
+				}
+				if (sIt->uvAttribLocs != -1)
+				{
+					glVertexAttribPointer(sIt->uvAttribLocs, 2, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(64));
+				}
+				//Bind Buffers
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sIt->IB);
+				for (size_t k = 0; k < sIt->textInfo.IdsTex.size(); k++)
+				{
+					glActiveTexture(GL_TEXTURE0 + k);//Set Active texture unit
+					glBindTexture(GL_TEXTURE_2D, sIt->textInfo.IdsTex[k]);
+					glUniform1i(sIt->textInfo.IdTexUniformLocs[k], k); //Specify location
+				}
 
 #if USING_32BIT_IB
-			glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
+				glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
 #else
-			glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_SHORT, 0);
+				glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_SHORT, 0);
 #endif // USING_32BIT_IB
 
-			if (sIt->normalAttribLocs != -1) {
-				glDisableVertexAttribArray(sIt->normalAttribLocs);
+				if (sIt->normalAttribLocs != -1) {
+					glDisableVertexAttribArray(sIt->normalAttribLocs);
+				}
+				if (sIt->uvAttribLocs != -1) {
+					glDisableVertexAttribArray(sIt->uvAttribLocs);
+				}
+				glDisableVertexAttribArray(sIt->vertexAttribLocs);
+				//Disable Shader
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+				glUseProgram(0);
 			}
-			if (sIt->uvAttribLocs != -1) {
-				glDisableVertexAttribArray(sIt->uvAttribLocs);
-			}
-			glDisableVertexAttribArray(sIt->vertexAttribLocs);
 		}
-
+		break;
+	}
+	case RM::RenderMode::WIREFRAME:
+	{
+		for (size_t i = 0; i < parser.m_meshes.size(); i++)
+		{
+			for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
+			{
+				//Set actual shader
+				glUseProgram(wire.ShaderID);
+				//Set Uniforms
+				glUniformMatrix4fv(wire.MatWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
+				//Enable Attributes
+				glEnableVertexAttribArray(wire.VertexAttribLoc);
+				//Specify Attributes location
+				glVertexAttribPointer(wire.VertexAttribLoc, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(0));
+				//Bind Buffers
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wire.IB);
+#if USING_32BIT_IB
+				glDrawElements(GL_LINES, wireframe.m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
+#else
+				glDrawElements(GL_LINES, wireframe.m_indexBuffer.size(), GL_UNSIGNED_SHORT, 0);
+#endif // USING_32BIT_IB
+				glDisableVertexAttribArray(wire.VertexAttribLoc);
+			}
+		}
 		//Disable Shader
-		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 		glUseProgram(0);
+		break;
+	}
+	case RM::RenderMode::SOLID_WIREFRAME:
+		break;
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//----------------------------------------------------------------//

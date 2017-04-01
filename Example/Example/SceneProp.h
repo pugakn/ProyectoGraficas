@@ -17,6 +17,15 @@
 #include "FPCamera.h"
 #include <vector>
 
+namespace RM {
+	enum RenderMode
+	{
+		WIREFRAME,
+		SOLID,
+		SOLID_WIREFRAME
+	};
+}
+
 struct Light{
 	Vector3D Position;
 	Vector3D Color;
@@ -25,7 +34,7 @@ struct Light{
 };
 
 struct SceneProps{
-	SceneProps() : ActiveCamera(0) , ActiveLights(0) {}
+	SceneProps() : ActiveCamera(0) , ActiveLights(0), renderMode(RM::SOLID) {}
 
 	void	AddLight(Vector3D Pos, Vector3D Color,bool enabled);
 	void	RemoveLight(unsigned int index);
@@ -45,6 +54,8 @@ struct SceneProps{
 
 	float specExp;
 	float attMax;
+
+	RM::RenderMode renderMode;
 };
 
 #endif

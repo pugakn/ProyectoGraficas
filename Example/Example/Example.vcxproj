@@ -45,6 +45,7 @@
     <ClInclude Include="Vector3D.h" />
     <ClInclude Include="Vector4D.h" />
     <ClInclude Include="Win32Framework.h" />
+    <ClInclude Include="Wireframe.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BMPParser.cpp" />
@@ -70,6 +71,7 @@
     <ClCompile Include="Vector3D.cpp" />
     <ClCompile Include="Vector4D.cpp" />
     <ClCompile Include="Win32Framework.cpp" />
+    <ClCompile Include="Wireframe.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{844841CA-54AA-45DF-AA7A-65C27F50FB75}</ProjectGuid>

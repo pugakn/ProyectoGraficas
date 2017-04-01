@@ -7,6 +7,7 @@
 #include <GLES2/gl2ext.h>
 #include "UtilsGL.h"
 #include "Matrix4D.h"
+#include "Wireframe.h"
 
 class Texture;
 class ModelGL : public PrimitiveBase
@@ -39,7 +40,6 @@ private:
 
 		//Index Bufer ID
 		GLuint	IB;
-
 		//Textures
 		TextureInfo textInfo;
 
@@ -47,6 +47,14 @@ private:
 	struct MeshInfo
 	{
 		std::vector<SubsetInfo> subsetInfo;
+	};
+
+	struct WireframeInfo
+	{
+		GLuint IB;
+		GLuint ShaderID;
+		GLint MatWorldViewProjUniformLoc;
+		GLint VertexAttribLoc;
 	};
 	
 	std::vector<MeshInfo> m_meshInfo;
@@ -57,6 +65,11 @@ private:
 
 
 	std::vector<Texture*> Textures;
+	Wireframe wireframe;
+	WireframeInfo wire;
+
+
+	
 public:
 	void SetFileName(char* fileName);
 	void Create() override;
