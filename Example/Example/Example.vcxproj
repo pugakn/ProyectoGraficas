@@ -23,7 +23,9 @@
     <ClInclude Include="BMPParser.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="D3DXDriver.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="FPCamera.h" />
+    <ClInclude Include="GLFont.h" />
     <ClInclude Include="MeshD3D.h" />
     <ClInclude Include="ModelGL.h" />
     <ClInclude Include="Core.h" />
@@ -50,7 +52,9 @@
   <ItemGroup>
     <ClCompile Include="BMPParser.cpp" />
     <ClCompile Include="D3DXDriver.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="FPCamera.cpp" />
+    <ClCompile Include="GLFont.cpp" />
     <ClCompile Include="MeshD3D.cpp" />
     <ClCompile Include="ModelGL.cpp" />
     <ClCompile Include="Core.cpp" />

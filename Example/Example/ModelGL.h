@@ -69,7 +69,8 @@ private:
 	WireframeInfo wire;
 
 
-	
+	inline void DrawMeshes(const Matrix4D &VP, const Matrix4D &WVP);
+	inline void DrawWireframe(const Matrix4D &VP, const Matrix4D &WVP);
 public:
 	void SetFileName(char* fileName);
 	void Create() override;

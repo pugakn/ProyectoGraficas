@@ -48,7 +48,7 @@ void main(){
 
 #ifdef USE_TEXCOORD0
 	vecUVCoords = UV;
-	vecUVCoords.y = vecUVCoords.y;
+	vecUVCoords.y = vecUVCoords.y;//?
 #endif
 
 	gl_Position = WVP*Vertex;

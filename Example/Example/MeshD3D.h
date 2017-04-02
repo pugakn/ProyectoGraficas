@@ -8,6 +8,7 @@
 
 #include "MeshParser.h"
 #include "Matrix4D.h"
+#include "Wireframe.h"
 
 #include <vector>
 
@@ -43,10 +44,29 @@ private:
 		std::vector<SubSetInfo>					m_subSets;
 	};
 
+	struct WireframeInfo
+	{
+		ComPtr<ID3D11Buffer> IB;
+		ComPtr<ID3D11VertexShader>  pVS;
+		ComPtr<ID3D11PixelShader>   pFS;
+		ComPtr<ID3DBlob>            VS_blob;
+		ComPtr<ID3DBlob>            FS_blob;
+		ComPtr<ID3D11InputLayout>   Layout;
+		std::vector<D3D11_INPUT_ELEMENT_DESC>	VertexDecl;
+		ComPtr<ID3D11Buffer>        ConstantBuffer;
+		Matrix4D WVP;
+	};
+
 	ComPtr<ID3D11Buffer>  m_VB;
 	std::string			  m_fileName;
 	std::vector<Texture*> m_Textures;
 	Matrix4D			  m_transform;
+
+	Wireframe wireframe;
+	WireframeInfo wire;
+
+	inline void DrawMeshes(const Matrix4D& VP, const Matrix4D& WVP);
+	inline void DrawWireframe(const Matrix4D& VP, const Matrix4D& WVP);
 
 public:
 	void SetFileName(char* fileName);

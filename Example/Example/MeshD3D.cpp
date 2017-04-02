@@ -313,6 +313,102 @@ void MeshD3D::Create()
 	}
 	delete[] vsSourceP;
 	delete[] fsSourceP;
+
+	// ================================================== Wireframe =============================================
+	char *vsSourceWire = file2string("Shaders/VS_Wire.hlsl");
+	char *fsSourceWire = file2string("Shaders/FS_Wire.hlsl");
+	std::string vstrWire = std::string(vsSourceWire);
+	std::string fstrWire = std::string(fsSourceWire);
+	delete[] vsSourceWire;
+	delete[] fsSourceWire;
+	if (!vsSourceWire || !fsSourceWire)
+		return;
+	//==================== compile VS =====================
+	wire.VS_blob = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	if (D3DCompile(vstrWire.c_str(), vstrWire.size(), 0, 0, 0, "VS", "vs_5_0", 0, 0, &wire.VS_blob, &errorBlob) != S_OK) {
+		if (errorBlob) {
+			std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
+			return;
+		}
+		if (wire.VS_blob) {
+			return;
+		}
+	}
+	//=========== Create VS ============
+	if (D3D11Device->CreateVertexShader(wire.VS_blob->GetBufferPointer(), wire.VS_blob->GetBufferSize(), 0, &wire.pVS) != S_OK) {
+		std::cout << "Error Creatong Vertex Shader" << std::endl;
+
+		return;
+	}
+	//==================== compile PS =====================
+	wire.FS_blob = nullptr;
+	errorBlob.Reset();
+	if (D3DCompile(fstrWire.c_str(), fstrWire.size(), 0, 0, 0, "FS", "ps_5_0", 0, 0, &wire.FS_blob, &errorBlob) != S_OK) {
+		if (errorBlob) {
+			std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
+			return;
+		}
+
+		if (wire.FS_blob) {
+			return;
+		}
+	}
+	//=========== Create PS ==============
+	if (D3D11Device->CreatePixelShader(wire.FS_blob->GetBufferPointer(), wire.FS_blob->GetBufferSize(), 0, &wire.pFS) != S_OK) {
+		std::cout << "Error Creating Pixel Shader" << std::endl;
+		return;
+	}
+
+	//==================== Create Decl Data =====================
+	D3D11_INPUT_ELEMENT_DESC elementDesc;
+	elementDesc.SemanticName = "POSITION";
+	elementDesc.SemanticIndex = 0;
+	elementDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	elementDesc.InputSlot = 0;
+	elementDesc.AlignedByteOffset = 0;
+	elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	elementDesc.InstanceDataStepRate = 0;
+	wire.VertexDecl.push_back(elementDesc);
+
+
+	//==================== Create Input Layout =====================
+	if (D3D11Device->CreateInputLayout(&wire.VertexDecl[0], wire.VertexDecl.size(), wire.VS_blob->GetBufferPointer(), wire.VS_blob->GetBufferSize(), &wire.Layout) != S_OK) {
+		std::cout << "Error Creating Input Layout" << std::endl;
+		return;
+	}
+	D3D11DeviceContext->IASetInputLayout(wire.Layout.Get());
+
+	//==================== Create Buffer Layout =====================
+	bdesc = { 0 };
+	bdesc.Usage = D3D11_USAGE_DEFAULT;
+	bdesc.ByteWidth = sizeof(MeshD3D::ConstBuffer);
+	bdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	if (D3D11Device->CreateBuffer(&bdesc, 0, wire.ConstantBuffer.GetAddressOf()) != S_OK) {
+		std::cout << "Error Creating Buffer Layout" << std::endl;
+		return;
+	}
+
+	//==================== Create Index Buffer =====================
+	std::vector<unsigned short> fullIndex;
+	for (auto &it : m_parser.m_vbo, m_parser.m_meshes)
+	{
+		fullIndex.insert(fullIndex.end(), it.m_indexBuffer.begin(), it.m_indexBuffer.end());
+	}
+	wireframe.CreateWireframe(fullIndex);
+	bdesc = { 0 };
+	bdesc.ByteWidth = wireframe.m_indexBuffer.size() * sizeof(USHORT);
+	bdesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	subData = { &wireframe.m_indexBuffer[0], 0, 0 };
+
+	if (D3D11Device->CreateBuffer(&bdesc, &subData, &wire.IB) != S_OK) {
+		std::cout << "Error Creating IB" << std::endl;
+		return;
+	}
+
+
+
 }
 
 void MeshD3D::Transform(float * t)
@@ -326,14 +422,34 @@ void MeshD3D::Draw(float * t)
 		m_transform = t;
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D WVP = m_transform*VP;
-	Vector4D lightDir = Vector4D(Vector3D(pScProp->Lights[0].Position),0);
-	Vector4D lightCol = Vector4D(Vector3D(pScProp->Lights[0].Color), 1);
-	Vector4D camPos = Vector4D(Vector3D(pScProp->pCameras[0]->m_pos), 0);
+
 	//==================== Set VB =====================
 	UINT stride = sizeof(vertexStruct);
 	UINT offset = 0;
 	D3D11DeviceContext->IASetVertexBuffers(0, 1, m_VB.GetAddressOf(), &stride, &offset);
+	switch (pScProp->renderMode)
+	{
+	case RM::RenderMode::SOLID:
+	{
+		DrawMeshes(VP, WVP);
+		break;
+	}
+	case RM::RenderMode::WIREFRAME:
+		DrawWireframe(VP, WVP);
+		break;
+	case RM::RenderMode::SOLID_WIREFRAME:
+		DrawMeshes(VP, WVP);
+		DrawWireframe(VP, WVP);
+		break;
+	}
+}
 
+
+inline void MeshD3D::DrawMeshes(const Matrix4D& VP, const Matrix4D & WVP)
+{
+	Vector4D lightDir = Vector4D(Vector3D(pScProp->Lights[0].Position), 0);
+	Vector4D lightCol = Vector4D(Vector3D(pScProp->Lights[0].Color), 1);
+	Vector4D camPos = Vector4D(Vector3D(pScProp->pCameras[0]->m_pos), 0);
 	for (size_t i = 0; i < m_parser.m_meshes.size(); i++)
 	{
 		for (std::size_t k = 0; k < m_meshInfo[i].m_subSets.size(); k++) {
@@ -389,6 +505,27 @@ void MeshD3D::Draw(float * t)
 	}
 }
 
+inline void MeshD3D::DrawWireframe(const Matrix4D& VP, const Matrix4D & WVP)
+{
+	//==================== Set Constant Buffer info =====================
+	wire.WVP = WVP;
+	//==================== Set Shaders =====================
+	D3D11DeviceContext->VSSetShader(wire.pVS.Get(), 0, 0);
+	D3D11DeviceContext->PSSetShader(wire.pFS.Get(), 0, 0);
+	//==================== Set Input Layout (describe the input-buffer data) =====================
+	D3D11DeviceContext->IASetInputLayout(wire.Layout.Get());
+	//==================== Update Constant Buffers =====================
+	D3D11DeviceContext->UpdateSubresource(wire.ConstantBuffer.Get(), 0, 0, &wire.WVP, 0, 0);
+	D3D11DeviceContext->VSSetConstantBuffers(0, 1, wire.ConstantBuffer.GetAddressOf());
+	D3D11DeviceContext->PSSetConstantBuffers(0, 1, wire.ConstantBuffer.GetAddressOf());
+
+	//==================== Set IB =====================
+	D3D11DeviceContext->IASetIndexBuffer(wire.IB.Get(), DXGI_FORMAT_R16_UINT, 0);
+
+	//==================== Draw =====================
+	D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	D3D11DeviceContext->DrawIndexed(wireframe.m_indexBuffer.size(), 0, 0);
+}
 void MeshD3D::Destroy()
 {
 
