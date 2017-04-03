@@ -4,7 +4,7 @@ class Font
 {
 	struct CharInfo
 	{
-		uint32_t id;
+		char32_t id;
 		uint16_t x;
 		uint16_t y;
 		uint16_t width;
@@ -19,7 +19,8 @@ private:
 	char* info;
 public:
 	bool LoadFile(const char * fileName);
-	CharInfo* m_charInfo;
+	//CharInfo* m_charInfo;
+	std::vector<CharInfo> m_charInfo;
 	void Delete();
 
 	Font();

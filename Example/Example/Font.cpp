@@ -8,20 +8,30 @@ bool Font::LoadFile(const char * fileName)
 		info = const_cast<char*>(file.data());
 		//Leer Bloques
 		uint32_t nextBlock = 4;
-		uint32_t blockSize = *reinterpret_cast<uint32_t*>(&info[nextBlock+1]);
+		nextBlock +=  1;
+		uint32_t blockSize = *reinterpret_cast<uint32_t*>(&info[nextBlock]);
+		nextBlock += 4;
 		//Cargar Info
-		nextBlock += blockSize;
-		blockSize = *reinterpret_cast<uint32_t*>(&info[nextBlock + 1]);
+		//nextBlock += blockSize + 1;
+		//blockSize = *reinterpret_cast<uint32_t*>(&info[nextBlock]) ;
+		//nextBlock += 4;
 		//Cargar Common
-		nextBlock += blockSize;
-		blockSize = *reinterpret_cast<uint32_t*>(&info[nextBlock + 1]);
+		nextBlock += blockSize + 1;
+		blockSize = *reinterpret_cast<uint32_t*>(&info[nextBlock]) ;
+		nextBlock += 4;
 		//Cargar nombre
-		nextBlock += blockSize;
-		blockSize = *reinterpret_cast<uint32_t*>(&info[nextBlock + 1]);
+		nextBlock += blockSize + 1;
+		blockSize = *reinterpret_cast<uint32_t*>(&info[nextBlock]) ;
+		nextBlock += 4;
 		//Cargar informacion de caracteres
-		int CharInfoSize = blockSize / 20;
-		CharInfo* buffer = new CharInfo[CharInfoSize];
-		buffer = reinterpret_cast<CharInfo*>(&info[nextBlock + 2]);
+		nextBlock += blockSize + 1;
+		blockSize = *reinterpret_cast<uint32_t*>(&info[nextBlock]);
+		nextBlock += 4;
+		int CharInfoSize = blockSize / sizeof(CharInfo);
+		//m_charInfo = new CharInfo[CharInfoSize];
+		//m_charInfo.resize(CharInfoSize);
+
+		m_charInfo.assign (reinterpret_cast<CharInfo*>(&info[nextBlock]), reinterpret_cast<CharInfo*>(&info[nextBlock])+CharInfoSize);
 		//Cargar Kerning
 
 
@@ -33,7 +43,7 @@ bool Font::LoadFile(const char * fileName)
 
 void Font::Delete()
 {
-	delete[] m_charInfo;
+	//delete[] m_charInfo;
 }
 
 

@@ -5,7 +5,8 @@
 #include "UtilsGL.h"
 #include "Font.h"
 #include "PrimitiveBase.h"
-class GLFont : public PrimitiveBase
+#include <string>
+class GLFont 
 {
 	struct fontVertex
 	{
@@ -17,22 +18,38 @@ private:
 	GLint vertexAttribLoc;
 	GLint uvAttribLoc;
 	GLint matWorldViewProjUniformLoc;
+	GLint matWorldUniformLoc;
+	GLint xOffsetLoc;
+	GLint yOffsetLoc;
+	GLint xSeparationLoc;
+	GLint ySeparationLoc;
 
 	Matrix4D transform;
 	Font font;
 
 	fontVertex m_VBO[4];
-	unsigned int m_indexBuffer[6];
+	unsigned short m_indexBuffer[6];
 	GLuint	IB;
 	GLuint	VB;
 
 	int IdTex;
 	GLint IdTexUniformLoc;
+
+	float textureWidth;
+
+
+	//================
+	Matrix4D		Position;
+	Matrix4D		Scale;
 public:
-	void Create() override;
-	void Transform(float *t) override;
-	void Draw(float *t) override;
-	void Destroy() override;
+	std::string m_text;
+	void Update();
+	void TranslateAbsolute(float x, float y, float z);
+
+	void Create() ;
+	void Transform(float *t) ;
+	void Draw() ;
+	void Destroy() ;
 	GLFont();
 	~GLFont();
 };

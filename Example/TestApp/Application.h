@@ -7,6 +7,8 @@
 #include "FPCamera.h"
 #include <vector>
 
+#include "GLFont.h"
+
 #include <SceneProp.h>
 class TestApp : public AppBase {
 public:
@@ -27,6 +29,8 @@ public:
 	PrimitiveManager PrimitiveMgr;
 	std::vector<PrimitiveInst>	Models;
 	PrimitiveInst lightPrimitive;
+
+	GLFont textFPS;
 
 
 	FPCamera cam;

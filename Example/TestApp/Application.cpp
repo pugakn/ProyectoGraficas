@@ -140,12 +140,18 @@ void TestApp::CreateAssets() {
 	Models.back().RotateYAbsolute(90);
 	Models.back().Update();
 
+	textFPS.Create();
+	textFPS.TranslateAbsolute(-0.98,0.9,0);
+	textFPS.Update();
+
+
 	index = PrimitiveMgr.CreateModel("Models/CerdoNuevo.X");
 	lightPrimitive.CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	lightPrimitive.ScaleAbsolute(3);
 	lightPrimitive.RotateXAbsolute(90);
 	lightPrimitive.RotateZAbsolute(-30);
 	lightPrimitive.Update();
+
 
 
 	PrimitiveMgr.SetSceneProps(&SceneProp);
@@ -161,6 +167,8 @@ void TestApp::OnUpdate() {
 	OnInput();
 	lightPrimitive.TranslateAbsolute(SceneProp.Lights[0].Position.x, SceneProp.Lights[0].Position.y, SceneProp.Lights[0].Position.z);
 	lightPrimitive.Update();
+
+	textFPS.m_text = "FPS: " + std::to_string( static_cast<int>(1 / DtTimer.GetDTSecs()));
 	OnDraw();
 }
 
@@ -170,8 +178,8 @@ void TestApp::OnDraw() {
 	for (auto &it : Models)
 		it.Draw();
 
-	lightPrimitive.Draw();
-
+	//lightPrimitive.Draw();
+	textFPS.Draw();
 	pFramework->pVideoDriver->SwapBuffers();
 }
 

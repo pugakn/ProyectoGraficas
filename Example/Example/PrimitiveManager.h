@@ -18,6 +18,7 @@ public:
 	int  CreateTriangle();
 	int	 CreateCube();
 	int CreateModel(char * fileName);
+	int CreateText();
 
 	void DrawPrimitives();
 	void DestroyPrimitives();
