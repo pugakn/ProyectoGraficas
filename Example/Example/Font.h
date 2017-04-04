@@ -19,9 +19,7 @@ private:
 	char* info;
 public:
 	bool LoadFile(const char * fileName);
-	//CharInfo* m_charInfo;
 	std::vector<CharInfo> m_charInfo;
-	void Delete();
 
 	Font();
 	~Font();

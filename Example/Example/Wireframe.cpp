@@ -14,6 +14,7 @@ void Wireframe::CreateWireframe( std::vector<unsigned short> indexBuffer)
 		m_indexBuffer.push_back(indexBuffer[i + 1]);
 		m_indexBuffer.push_back(indexBuffer[i + 2]);
 	}
+
 }
 
 Wireframe::Wireframe()

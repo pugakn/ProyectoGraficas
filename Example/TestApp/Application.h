@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "GLFont.h"
+#include "TextMeshD3D.h"
 
 #include <SceneProp.h>
 class TestApp : public AppBase {
@@ -30,7 +31,7 @@ public:
 	std::vector<PrimitiveInst>	Models;
 	PrimitiveInst lightPrimitive;
 
-	GLFont textFPS;
+	TextMesh* textFPS;
 
 
 	FPCamera cam;

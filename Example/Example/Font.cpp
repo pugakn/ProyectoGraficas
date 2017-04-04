@@ -41,12 +41,6 @@ bool Font::LoadFile(const char * fileName)
 
 }
 
-void Font::Delete()
-{
-	//delete[] m_charInfo;
-}
-
-
 Font::Font()
 {
 }

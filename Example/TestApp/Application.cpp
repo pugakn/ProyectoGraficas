@@ -2,6 +2,7 @@
 #include <iostream>
 #include "MeshD3D.h"
 #include "ModelGL.h"
+#include "TextMeshD3D.h"
 
 
 void TestApp::InitVars() {
@@ -14,6 +15,16 @@ void TestApp::InitVars() {
 	SceneProp.specExp = 14.0f;
 	SceneProp.attMax = 12000.0f;
 	//SceneProp.AmbientColor = Vector3D(0.15f, 0.15f, 0.15f);
+
+#ifdef USING_OPENGL_ES
+	textFPS = new GLFont();
+#elif defined(USING_D3D11)
+	//textFPS = new TextMeshD3D();
+
+#endif
+
+	//textFPS->Create();
+	
 
 }
 
@@ -140,9 +151,9 @@ void TestApp::CreateAssets() {
 	Models.back().RotateYAbsolute(90);
 	Models.back().Update();
 
-	textFPS.Create();
-	textFPS.TranslateAbsolute(-0.98,0.9,0);
-	textFPS.Update();
+	textFPS->Create();
+	textFPS->TranslateAbsolute(-0.98,0.9,0);
+	textFPS->Update();
 
 
 	index = PrimitiveMgr.CreateModel("Models/CerdoNuevo.X");
@@ -167,8 +178,15 @@ void TestApp::OnUpdate() {
 	OnInput();
 	lightPrimitive.TranslateAbsolute(SceneProp.Lights[0].Position.x, SceneProp.Lights[0].Position.y, SceneProp.Lights[0].Position.z);
 	lightPrimitive.Update();
+	static float count = 0;
+	count += DtTimer.GetDTSecs();
+	if (count > 0.2f)
+	{
+		count = 0.0f;
+		textFPS->m_text = "FPS: " + std::to_string(static_cast<int>(1 / DtTimer.GetDTSecs()));
+		//std::cout << std::to_string(static_cast<int>(1 / DtTimer.GetDTSecs())) << std::endl;
 
-	textFPS.m_text = "FPS: " + std::to_string( static_cast<int>(1 / DtTimer.GetDTSecs()));
+	}
 	OnDraw();
 }
 
@@ -178,8 +196,8 @@ void TestApp::OnDraw() {
 	for (auto &it : Models)
 		it.Draw();
 
-	//lightPrimitive.Draw();
-	textFPS.Draw();
+	lightPrimitive.Draw();
+	textFPS->Draw();
 	pFramework->pVideoDriver->SwapBuffers();
 }
 
