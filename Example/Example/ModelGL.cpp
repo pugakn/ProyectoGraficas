@@ -121,6 +121,9 @@ void ModelGL::Create()
 					delete tex;
 				}
 			}
+			/*m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(Utils::textureChekerID);
+			Textures.push_back(Utils::textureCheker);
+			m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "diffuse"));*/
 			//Specular
 			if (subsetIt.m_effects.m_specularMap != "") {
 				found = false;
@@ -223,16 +226,8 @@ void ModelGL::Create()
 
 	//===================================Generar Wireframe==================================
 	//Shaders
-	char *vsSourceWire = file2string("Shaders/VS_Wire.glsl");
-	char *fsSourceWire = file2string("Shaders/FS_Wire.glsl");
-	GLuint vshaderWire_id = createShader(GL_VERTEX_SHADER, const_cast<char*>(vsSourceWire));
-	GLuint fshaderWire_id = createShader(GL_FRAGMENT_SHADER, const_cast<char*>(fsSourceWire));
-	delete[] vsSourceWire;
-	delete[] fsSourceWire;
 	//Attach Shaders
-	wire.ShaderID = glCreateProgram();
-	glAttachShader(wire.ShaderID, vshaderWire_id);
-	glAttachShader(wire.ShaderID, fshaderWire_id);
+	wire.ShaderID = Utils::DefaultShaderID;
 
 	glLinkProgram(wire.ShaderID);
 	//glUseProgram(wire.ShaderID);

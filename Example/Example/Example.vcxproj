@@ -44,6 +44,7 @@
     <ClInclude Include="TextMesh.h" />
     <ClInclude Include="TextMeshD3D.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureCheker.h" />
     <ClInclude Include="TextureD3D.h" />
     <ClInclude Include="TextureGL.h" />
     <ClInclude Include="Timer.h" />

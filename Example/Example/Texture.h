@@ -48,8 +48,9 @@ public:
 	}
 
 	int				LoadTexture(char *fn);
+	int			LoadDefaultTxture();
 
-	virtual void	LoadAPITexture(unsigned char* buffer) = 0;
+	virtual void	LoadAPITexture(const unsigned char* buffer) = 0;
 	virtual void	LoadAPITextureCompressed(unsigned char* buffer) = 0;
 
 	virtual void	SetTextureParams(unsigned int &target) = 0;

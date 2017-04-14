@@ -58,7 +58,7 @@ void	TextureD3D::GetFormatBpp(unsigned int &props, unsigned int &Format, unsigne
 
 }
 
-void	TextureD3D::LoadAPITexture(unsigned char* buffer){
+void	TextureD3D::LoadAPITexture(const unsigned char* buffer){
 	D3D11_TEXTURE2D_DESC desc = { 0 };
 	desc.Width = this->x;
 	desc.Height = this->y;

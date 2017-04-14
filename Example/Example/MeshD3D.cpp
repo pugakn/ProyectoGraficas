@@ -315,50 +315,10 @@ void MeshD3D::Create()
 	delete[] fsSourceP;
 
 	// ================================================== Wireframe =============================================
-	char *vsSourceWire = file2string("Shaders/VS_Wire.hlsl");
-	char *fsSourceWire = file2string("Shaders/FS_Wire.hlsl");
-	std::string vstrWire = std::string(vsSourceWire);
-	std::string fstrWire = std::string(fsSourceWire);
-	delete[] vsSourceWire;
-	delete[] fsSourceWire;
-	if (!vsSourceWire || !fsSourceWire)
-		return;
-	//==================== compile VS =====================
-	wire.VS_blob = nullptr;
-	ComPtr<ID3DBlob> errorBlob = nullptr;
-	if (D3DCompile(vstrWire.c_str(), vstrWire.size(), 0, 0, 0, "VS", "vs_5_0", 0, 0, &wire.VS_blob, &errorBlob) != S_OK) {
-		if (errorBlob) {
-			std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
-			return;
-		}
-		if (wire.VS_blob) {
-			return;
-		}
-	}
-	//=========== Create VS ============
-	if (D3D11Device->CreateVertexShader(wire.VS_blob->GetBufferPointer(), wire.VS_blob->GetBufferSize(), 0, &wire.pVS) != S_OK) {
-		std::cout << "Error Creatong Vertex Shader" << std::endl;
-
-		return;
-	}
-	//==================== compile PS =====================
-	wire.FS_blob = nullptr;
-	errorBlob.Reset();
-	if (D3DCompile(fstrWire.c_str(), fstrWire.size(), 0, 0, 0, "FS", "ps_5_0", 0, 0, &wire.FS_blob, &errorBlob) != S_OK) {
-		if (errorBlob) {
-			std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
-			return;
-		}
-
-		if (wire.FS_blob) {
-			return;
-		}
-	}
-	//=========== Create PS ==============
-	if (D3D11Device->CreatePixelShader(wire.FS_blob->GetBufferPointer(), wire.FS_blob->GetBufferSize(), 0, &wire.pFS) != S_OK) {
-		std::cout << "Error Creating Pixel Shader" << std::endl;
-		return;
-	}
+	wire.pVS = Utils::pDefaultVS;
+	wire.pFS = Utils::pDefaultFS;
+	wire.VS_blob = Utils::DefaultVS_blob;
+	wire.FS_blob = Utils::DefaultFS_blob;
 
 	//==================== Create Decl Data =====================
 	D3D11_INPUT_ELEMENT_DESC elementDesc;

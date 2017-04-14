@@ -14,12 +14,25 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <string>
+#include <fstream>
 
 int		Texture::LoadTexture(char *fn) {
 	std::string path = "Textures/";
 	path += std::string(fn);
 	int x = 0, y = 0, channels = 0;
 	unsigned char *buffer = stbi_load(path.c_str(), &x, &y, &channels, 0);
+	//std::ofstream myfile;
+	//myfile.open("cheker2.txt");
+	//myfile << "[";
+	//for (size_t i = 0; i < x*y*channels; i++)
+	//{
+	//	myfile << (int)buffer[i] <<",";
+	//	
+	//}
+	//myfile << "];";
+	//myfile.close();
+
+
 
 	if (!buffer)
 		return -1;
@@ -50,3 +63,24 @@ int		Texture::LoadTexture(char *fn) {
 	stbi_image_free(buffer);
 	return id;
 }
+#include "TextureCheker.h"
+int Texture::LoadDefaultTxture()
+{
+	//Cheker Texture
+		static const unsigned char buffer [] {TEXTURE_CHEKER};
+
+	size = 256*256*3;
+	bounded = 1;
+	this->x = 256;
+	this->y = 256;
+	mipmaps = 1;
+	this->params = params;
+	props |= TEXT_BASIC_FORMAT::CH_RGB;
+
+	LoadAPITexture(buffer);
+	return id;
+}
+
+
+
+

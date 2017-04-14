@@ -24,7 +24,7 @@ public:
 	void	SetTextureParams(unsigned int &target);
 	void	GetFormatBpp(unsigned int &props, unsigned int &glFormat, unsigned int &bpp);
 
-	void	LoadAPITexture(unsigned char* buffer);
+	void	LoadAPITexture(const unsigned char* buffer);
 	void	LoadAPITextureCompressed(unsigned char* buffer);
 };
 

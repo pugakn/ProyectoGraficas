@@ -19,12 +19,38 @@
 #ifdef USING_OPENGL_ES
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
+#include "TextureGL.h"
 
 void checkcompilederrors(GLuint shader, GLenum type);
 GLuint createShader(GLenum type, char* pSource);
+#elif defined USING_D3D11
+#include "TextureD3D.h"
+#include <D3Dcompiler.h>
 #endif
 
 char *file2string(const char *path);
+
+
+class Utils
+{
+#ifdef USING_OPENGL_ES
+public:
+	static GLuint DefaultShaderID;
+	static Texture* textureCheker;
+	static int textureChekerID;
+#elif defined USING_D3D11
+public:
+	static ComPtr<ID3D11VertexShader>  pDefaultVS;
+	static ComPtr<ID3D11PixelShader>   pDefaultFS;
+	static ComPtr<ID3DBlob>  DefaultVS_blob;
+	static 	ComPtr<ID3DBlob> DefaultFS_blob;
+#endif
+	Utils() {};
+	~Utils() {};
+	static void Init();
+	static char* getTextureChecker();
+
+};
 
 
 #endif

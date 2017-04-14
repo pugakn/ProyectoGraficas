@@ -8,6 +8,7 @@
 
 
 void TestApp::InitVars() {
+	Utils::Init();
 	DtTimer.Init();
 
 	cam.Init();

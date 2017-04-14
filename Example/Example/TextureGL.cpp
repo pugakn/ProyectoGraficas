@@ -51,7 +51,7 @@ void TextureGL::GetFormatBpp(unsigned int &props, unsigned int &glFormat, unsign
 
 }
 
-void TextureGL::LoadAPITexture(unsigned char* buffer) {
+void TextureGL::LoadAPITexture(const unsigned char* buffer) {
 	unsigned int id;
 	unsigned int glFormat = 0;
 	unsigned int glChannel = GL_UNSIGNED_BYTE;
