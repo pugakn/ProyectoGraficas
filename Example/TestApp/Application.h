@@ -11,6 +11,8 @@
 #include "TextMeshD3D.h"
 
 #include <SceneProp.h>
+
+#include "Sprite.h"
 class TestApp : public AppBase {
 public:
 	TestApp() : AppBase() {}
@@ -39,6 +41,9 @@ public:
 	Timer			DtTimer;
 
 	SceneProps		SceneProp;
+
+	Sprite* dot;
+	Sprite* sprite;
 
 
 };

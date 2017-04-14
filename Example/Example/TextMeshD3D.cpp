@@ -11,18 +11,18 @@ void TextMeshD3D::Create()
 	Position = Identity();
 	m_text = "Inserte Texto 'XD";
 
-	char *vsSourceWire = file2string("Shaders/VS_Font.hlsl");
-	char *fsSourceWire = file2string("Shaders/FS_Font.hlsl");
-	std::string vstrWire = std::string(vsSourceWire);
-	std::string fstrWire = std::string(fsSourceWire);
-	delete[] vsSourceWire;
-	delete[] fsSourceWire;
-	if (!vsSourceWire || !fsSourceWire)
+	char *vsSource = file2string("Shaders/VS_Font.hlsl");
+	char *fsSource = file2string("Shaders/FS_Font.hlsl");
+	std::string vstr = std::string(vsSource);
+	std::string fstr = std::string(fsSource);
+	delete[] vsSource;
+	delete[] fsSource;
+	if (!vsSource || !fsSource)
 		return;
 	//==================== compile VS =====================
 	VS_blob = nullptr;
 	ComPtr<ID3DBlob> errorBlob = nullptr;
-	if (D3DCompile(vstrWire.c_str(), vstrWire.size(), 0, 0, 0, "VS", "vs_5_0", 0, 0, &VS_blob, &errorBlob) != S_OK) {
+	if (D3DCompile(vstr.c_str(), vstr.size(), 0, 0, 0, "VS", "vs_5_0", 0, 0, &VS_blob, &errorBlob) != S_OK) {
 		if (errorBlob) {
 			std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
 			return;
@@ -40,7 +40,7 @@ void TextMeshD3D::Create()
 	//==================== compile PS =====================
 	FS_blob = nullptr;
 	errorBlob.Reset();
-	if (D3DCompile(fstrWire.c_str(), fstrWire.size(), 0, 0, 0, "FS", "ps_5_0", 0, 0, &FS_blob, &errorBlob) != S_OK) {
+	if (D3DCompile(fstr.c_str(), fstr.size(), 0, 0, 0, "FS", "ps_5_0", 0, 0, &FS_blob, &errorBlob) != S_OK) {
 		if (errorBlob) {
 			std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
 			return;
@@ -57,11 +57,12 @@ void TextMeshD3D::Create()
 	}
 
 
+
 	//Cargar propiedades de fuente
 	font.LoadFile("Fonts/ArialFont.fnt");
 	//=========================== Create Textures ===============================
 	Texture *tex = new TextureD3D;
-	int textureID = tex->LoadTexture(const_cast<char*>("ArialFont_0.tga"));
+	int textureID = tex->LoadTexture("ArialFont_t0.tga");
 	if (textureID != -1) {
 		difuseText = tex;
 	}
@@ -114,7 +115,7 @@ void TextMeshD3D::Create()
 
 	m_indexBuffer[0] = 2;
 	m_indexBuffer[1] = 1;
-	m_indexBuffer[2] = 2;
+	m_indexBuffer[2] = 0;
 	m_indexBuffer[3] = 3;
 	m_indexBuffer[4] = 2;
 	m_indexBuffer[5] = 0;
@@ -129,7 +130,10 @@ void TextMeshD3D::Create()
 		return;
 	}
 
+
+
 	//==================== Create Vertex Buffer =====================
+
 	m_VBO[0] = { 0.0f,  1.0f, 0.0f ,1.0f,  0.0f, 0.0f };//Left Top
 	m_VBO[1] = { 0.0f,  0.0f, 0.0f ,1.0f,  0.0f, 1.0f };//Left Bot
 	m_VBO[2] = { 1.0f,  0.0f, 0.0f ,1.0f,  1.0f, 1.0f };//Right Bot
@@ -138,6 +142,8 @@ void TextMeshD3D::Create()
 	bdesc = { 0 };
 	bdesc.ByteWidth = 4 * sizeof(fontVertex);
 	bdesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bdesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bdesc.Usage = D3D11_USAGE_DYNAMIC;
 	subData = { &m_VBO[0], 0, 0 };
 
 	if (D3D11Device->CreateBuffer(&bdesc, &subData, &m_VB) != S_OK) {
@@ -162,10 +168,14 @@ void TextMeshD3D::Draw()
 		newVBO[2] = { width ,  0.0f,  0.0f ,1.0f,	width, height };//Right Bot
 		newVBO[3] = { width,  height, 0.0f ,1.0f,   width, 0.0f };//Right Top
 
-		//if (D3D11DeviceContext->UpdateSubresource(&newVBO[0]) != S_OK) {
-		//	std::cout << "Error Creating VB" << std::endl;
-		//	return;
-		//}
+		D3D11_MAPPED_SUBRESOURCE resource;
+		ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+		D3D11DeviceContext->Map(m_VB.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+		memcpy(resource.pData, newVBO, sizeof(newVBO));
+		D3D11DeviceContext->Unmap(m_VB.Get(), 0);
+
+	
+
 		
 		xSeparation += font.m_charInfo[x].xoffset / textureWidth;
 		float ySeparation = 0;//TODO:
@@ -181,10 +191,13 @@ void TextMeshD3D::Draw()
 		//==================== Set Input Layout (describe the input-buffer data) =====================
 		D3D11DeviceContext->IASetInputLayout(Layout.Get());
 		//==================== Update Constant Buffers =====================
-		D3D11DeviceContext->UpdateSubresource(ConstantBuffer.Get(), 0, 0, &CnstBuffer.matWorld, 0, 0);
+		D3D11DeviceContext->UpdateSubresource(ConstantBuffer.Get(), 0, 0, &CnstBuffer, 0, 0);
 		D3D11DeviceContext->VSSetConstantBuffers(0, 1, ConstantBuffer.GetAddressOf());
 		D3D11DeviceContext->PSSetConstantBuffers(0, 1, ConstantBuffer.GetAddressOf());
-
+		//=================== Set VB ===================
+		UINT stride = sizeof(fontVertex);
+		UINT offset = 0;
+		D3D11DeviceContext->IASetVertexBuffers(0, 1, m_VB.GetAddressOf(), &stride, &offset);
 		//==================== Set IB =====================
 		D3D11DeviceContext->IASetIndexBuffer(IB.Get(), DXGI_FORMAT_R16_UINT, 0);
 		//==================== Set Texture =====================
@@ -193,7 +206,7 @@ void TextMeshD3D::Draw()
 		D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
 		D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
 		//==================== Draw =====================
-		D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		D3D11DeviceContext->DrawIndexed(6, 0, 0);
 
 		xSeparation += font.m_charInfo[x].xadvance / textureWidth;

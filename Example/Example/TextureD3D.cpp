@@ -96,6 +96,9 @@ void	TextureD3D::LoadAPITexture(unsigned char* buffer){
 	static int texid = 0;
 	this->id = texid;
 	texid++;
+
+
+
 }
 
 void	TextureD3D::LoadAPITextureCompressed(unsigned char* buffer){

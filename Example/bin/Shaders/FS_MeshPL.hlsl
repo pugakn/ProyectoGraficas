@@ -125,9 +125,13 @@ return color * 0.3 + color * input.light_mod * lightColor;
     #ifdef USE_SPEC_MAP
     Specular *= TextureSpecular.Sample( SS, input.texture0 );
     #endif
-    return color * 0.3 + color * light_mod * lightColor + Specular;
+    float4 rc = color * 0.3 + color * light_mod * lightColor + Specular;
+    rc.w = 1.0;
+    return rc;
     #else
-    return color * 0.3 + color * light_mod * lightColor;
+    float4 rc =  color * 0.3 + color * light_mod * lightColor;
+    rc.w = 1.0;
+    return rc;
     #endif
   #endif
 }

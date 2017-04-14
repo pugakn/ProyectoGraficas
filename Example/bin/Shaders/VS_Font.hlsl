@@ -19,7 +19,7 @@ struct VS_OUTPUT{
 VS_OUTPUT VS( VS_INPUT input ){
     VS_OUTPUT OUT;
     OUT.texture0 = input.texture0;
-    OUT.hposition = World*input.position;
+    OUT.hposition = mul(World,input.position);
     OUT.hposition.x += xSeparation;
     OUT.hposition.y -= ySeparation;
     return OUT;

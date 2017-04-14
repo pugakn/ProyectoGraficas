@@ -109,6 +109,25 @@ void D3DXDriver::InitDriver(){
 	viewport.MaxDepth = 1;
 
 	D3D11DeviceContext->RSSetViewports(1, &viewport);
+
+	//Transparencia
+	ID3D11BlendState* d3dBlendState;
+	D3D11_BLEND_DESC omDesc;
+	ZeroMemory(&omDesc, sizeof(D3D11_BLEND_DESC));
+
+	omDesc.RenderTarget[0].BlendEnable = true;
+	omDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	omDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	omDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	omDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	omDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	omDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	omDesc.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+
+
+	if (FAILED(D3D11Device->CreateBlendState(&omDesc, &d3dBlendState)))
+		exit(-1);
+	D3D11DeviceContext->OMSetBlendState(d3dBlendState, 0, 0xffffffff);
 }
 
 void D3DXDriver::CreateSurfaces(){

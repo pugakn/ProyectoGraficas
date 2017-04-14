@@ -3,6 +3,8 @@
 #include "MeshD3D.h"
 #include "ModelGL.h"
 #include "TextMeshD3D.h"
+#include "SpriteGL.h"
+#include"SpriteD3D.h"
 
 
 void TestApp::InitVars() {
@@ -16,14 +18,37 @@ void TestApp::InitVars() {
 	SceneProp.attMax = 12000.0f;
 	//SceneProp.AmbientColor = Vector3D(0.15f, 0.15f, 0.15f);
 
+
+	Matrix4D Projection = PerspectiveFOVRH(ToRadian(45.f), 1280.0f / 720.0f, 5.f, 1000.0f);
+	Vector3D pos(0, 0, 5);
+	Vector3D target(0, 0, 0);
+	Vector3D up(0, 1, 0);
+	Matrix4D View = LookAtRH(pos, target, up);
+	Matrix4D VP = View* Projection;
+
 #ifdef USING_OPENGL_ES
 	textFPS = new GLFont();
+	sprite = new SpriteGL();
+	dot = new SpriteGL();
 #elif defined(USING_D3D11)
-	//textFPS = new TextMeshD3D();
+	textFPS = new TextMeshD3D();
+	sprite = new SpriteD3D();
+	dot = new SpriteD3D();
 
 #endif
 
-	//textFPS->Create();
+	sprite->SetTexture("radar.tga");
+	sprite->Create(VP);//
+	sprite->ScaleAbsolute(1);
+	sprite->TranslateAbsolute(2, 1, 0);
+	sprite->Update();
+
+	dot->SetTexture("dot.tga");
+	dot->Create(VP);//
+	dot->ScaleAbsolute(0.05);
+	dot->TranslateAbsolute(2.5, 1.5, 0);
+	dot->Update();
+
 	
 
 }
@@ -174,6 +199,9 @@ void TestApp::DestroyAssets() {
 
 void TestApp::OnUpdate() {
 	DtTimer.Update();
+	Vector3D campos = cam.m_pos / 1500.f;
+	dot->TranslateAbsolute(2.44-campos.z,1.45-campos.x,0);
+	dot->Update();
 
 	OnInput();
 	lightPrimitive.TranslateAbsolute(SceneProp.Lights[0].Position.x, SceneProp.Lights[0].Position.y, SceneProp.Lights[0].Position.z);
@@ -185,7 +213,6 @@ void TestApp::OnUpdate() {
 		count = 0.0f;
 		textFPS->m_text = "FPS: " + std::to_string(static_cast<int>(1 / DtTimer.GetDTSecs()));
 		//std::cout << std::to_string(static_cast<int>(1 / DtTimer.GetDTSecs())) << std::endl;
-
 	}
 	OnDraw();
 }
@@ -198,6 +225,8 @@ void TestApp::OnDraw() {
 
 	lightPrimitive.Draw();
 	textFPS->Draw();
+	dot->Draw();
+	sprite->Draw();
 	pFramework->pVideoDriver->SwapBuffers();
 }
 

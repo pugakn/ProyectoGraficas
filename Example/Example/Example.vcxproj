@@ -38,6 +38,9 @@
     <ClInclude Include="PrimitiveInstance.h" />
     <ClInclude Include="PrimitiveManager.h" />
     <ClInclude Include="SceneProp.h" />
+    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SpriteD3D.h" />
+    <ClInclude Include="SpriteGL.h" />
     <ClInclude Include="TextMesh.h" />
     <ClInclude Include="TextMeshD3D.h" />
     <ClInclude Include="Texture.h" />
@@ -68,6 +71,9 @@
     <ClCompile Include="PrimitiveInstance.cpp" />
     <ClCompile Include="PrimitiveManager.cpp" />
     <ClCompile Include="SceneProp.cpp" />
+    <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="SpriteD3D.cpp" />
+    <ClCompile Include="SpriteGL.cpp" />
     <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="TextMeshD3D.cpp" />
     <ClCompile Include="Texture.cpp" />
