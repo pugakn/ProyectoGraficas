@@ -12,9 +12,16 @@
 
 #include "TextureGL.h"
 
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+#ifdef USING_OPENGL_ES20
+#include <GLES2\gl2.h>
+#include <GLES2\gl2ext.h>
+#elif defined(USING_OPENGL_ES30)
+#include <GLES3\gl31.h>
+#elif defined(USING_OPENGL)
+#include <GL\glew.h>
+#endif
 
+#ifdef USING_GL_COMMON
 void	TextureGL::SetTextureParams(unsigned int &target) {
 
 	glBindTexture(GL_TEXTURE_2D, target);
@@ -40,9 +47,11 @@ void	TextureGL::SetTextureParams(unsigned int &target) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glWrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glWrap);
 
+#if defined(USING_OPENGL_ES20) || defined(USING_OPENGL)
 	int Max = 1;
 	glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &Max);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, Max);
+#endif
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -85,3 +94,4 @@ void TextureGL::LoadAPITexture(const unsigned char* buffer) {
 void TextureGL::LoadAPITextureCompressed(unsigned char* buffer) {
 	
 }
+#endif

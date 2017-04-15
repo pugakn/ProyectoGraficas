@@ -13,7 +13,23 @@
 #include "GLDriver.h"
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 
+#if defined(USING_OPENGL_ES20)
+#pragma comment(lib,"libEGL.lib")
+#pragma comment(lib,"libGLESv2.lib")
+#elif defined (USING_OPENGL_ES30)
+#pragma comment(lib,"libEGL.lib")
+#pragma comment(lib,"libGLESv2.lib")
+#elif defined(USING_OPENGL)
+#pragma comment(lib,"glew.lib")
+#pragma comment(lib,"OpenGL32.Lib")
+#endif
+
+#if defined(USING_OPENGL_ES20) || defined(USING_OPENGL_ES30)
 void EGLError(const char* c_ptr) {
 	EGLint iErr = eglGetError();
 	if (iErr != EGL_SUCCESS) {
@@ -26,8 +42,10 @@ bool OpenNativeDisplay(EGLNativeDisplayType* nativedisp_out)
 	*nativedisp_out = (EGLNativeDisplayType)NULL;
 	return true;
 }
+#endif
 
 void	GLDriver::InitDriver() {
+#if defined(USING_OPENGL_ES20) || defined(USING_OPENGL_ES30)
 	EGLint numConfigs, w, h;
 
 	EGLNativeDisplayType nativeDisplay;
@@ -80,11 +98,32 @@ void	GLDriver::InitDriver() {
 
 	eglQuerySurface(eglDisplay, eglSurface, EGL_WIDTH, &w);
 	eglQuerySurface(eglDisplay, eglSurface, EGL_HEIGHT, &h);
-
+#elif defined(USING_OPENGL)
+	GLenum err = glewInit();
+	if (GLEW_OK != err) {
+		printf("Error: %s\n", glewGetErrorString(err));
+	}
+	else {
+		printf("GLEW OK\n");
+	}
+	SDL_Surface *sur = SDL_GetVideoSurface();
+	width = sur->w;
+	height = sur->h;
+#endif
 	std::string GL_Version = std::string((const char*)glGetString(GL_VERSION));
 	std::string GL_Extensions = std::string((const char*)glGetString(GL_EXTENSIONS));
-	std::cout << "GL Version: " << GL_Version << "\n\nExtensions\n\n" << GL_Extensions << std::endl;
 
+	std::istringstream iss(GL_Extensions);
+	std::vector<std::string> tokens{ std::istream_iterator<std::string>{iss},
+		std::istream_iterator<std::string>{} };
+
+	ExtensionsTok = tokens;
+	Extensions = GL_Extensions;
+
+	std::cout << "GL Version: " << GL_Version << "\n\nExtensions\n\n" << GL_Extensions << std::endl;
+	for (unsigned int i = 0; i < ExtensionsTok.size(); i++) {
+		printf("[%s]\n", ExtensionsTok[i].c_str());
+	}
 	glEnable(GL_DEPTH_TEST);
 	glClearDepthf(1.0f);
 	glEnable(GL_CULL_FACE);
@@ -92,6 +131,13 @@ void	GLDriver::InitDriver() {
 	//Alpha
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &CurrentFBO);
+#if defined(USING_OPENGL) || defined(USING_OPENGL_ES30)
+	for (int i = 0; i < 16; i++) {
+		DrawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+	}
+#endif
 }
 
 void	GLDriver::CreateSurfaces() {
@@ -107,13 +153,17 @@ void	GLDriver::Update() {
 }
 
 void	GLDriver::DestroyDriver() {
+#if defined(USING_OPENGL_ES20) || defined(USING_OPENGL_ES30)
 	eglDestroySurface(eglDisplay, eglSurface);
 	eglDestroyContext(eglDisplay, eglContext);
 	eglTerminate(eglDisplay);
+#endif
 }
 
 void	GLDriver::SetWindow(void *window) {
+#if defined(USING_OPENGL_ES20) || defined(USING_OPENGL_ES30)
 	eglWindow = GetActiveWindow();
+#endif
 }
 
 void	GLDriver::SetDimensions(int w, int h) {
@@ -127,5 +177,9 @@ void	GLDriver::Clear() {
 }
 
 void	GLDriver::SwapBuffers() {
+#if defined(USING_OPENGL_ES20) || defined(USING_OPENGL_ES30)
 	eglSwapBuffers(eglDisplay, eglSurface);
+#elif defined(USING_OPENGL)
+	SDL_GL_SwapBuffers();
+#endif
 }

@@ -17,10 +17,21 @@
 
 #include "BaseDriver.h"
 
+#if defined(USING_OPENGL_ES20)
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
-
+#elif defined(USING_OPENGL_ES30)
+#include <EGL/egl.h>
+#include <GLES3/gl31.h>
+#elif defined(USING_OPENGL)
+#include <GL/glew.h>
+#include <SDL/SDL.h>
+#else
+#include <GL/glew.h>
+#include <SDL/SDL.h>
+#endif
+#include <vector>
 class GLDriver : public BaseDriver {
 public:
 	GLDriver() {  }
@@ -34,14 +45,21 @@ public:
 
 	void	Clear();
 	void	SwapBuffers();
-
+#if defined(USING_OPENGL_ES20) || defined(USING_OPENGL_ES30)
 	EGLDisplay			eglDisplay;
 	EGLConfig			eglConfig;
 	EGLSurface			eglSurface;
 	EGLContext			eglContext;
 
 	EGLNativeWindowType	eglWindow;
-
+#endif
+	GLint				CurrentFBO;
+#if defined(USING_OPENGL) || defined(USING_OPENGL_ES30)
+	GLenum				DrawBuffers[16];
+#endif
+	int	width, height;
+	std::vector<std::string>	ExtensionsTok;
+	std::string					Extensions;
 };
 
 #endif

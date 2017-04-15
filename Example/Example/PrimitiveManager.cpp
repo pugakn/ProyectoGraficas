@@ -1,6 +1,6 @@
 
 #include "PrimitiveManager.h"
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 #include "TriangleGL.h"
 #include "CubeGL.h"
 #include "ModelGL.h"
@@ -16,7 +16,7 @@ PrimitiveBase*	PrimitiveManager::GetPrimitive(unsigned int index) {
 }
 
 int  PrimitiveManager::CreateTriangle() {
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 	PrimitiveBase *primitive = new TrangleGL();
 //
 	primitive->Create();
@@ -27,7 +27,7 @@ int  PrimitiveManager::CreateTriangle() {
 }
 
 int	 PrimitiveManager::CreateCube(){
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 	PrimitiveBase *primitive = new CubeGL();
 	primitive->Create();
 	primitives.push_back(primitive);
@@ -37,7 +37,7 @@ int	 PrimitiveManager::CreateCube(){
 }
 
 int	 PrimitiveManager::CreateModel(char * fileName) {
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 	PrimitiveBase *primitive = new ModelGL();
 	dynamic_cast<ModelGL*>(primitive)->SetFileName(fileName);
 	dynamic_cast<ModelGL*>(primitive)->Create();

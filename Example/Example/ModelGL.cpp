@@ -1,5 +1,5 @@
 #include "ModelGL.h"
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 #include "Timer.h"
 #include <iostream>

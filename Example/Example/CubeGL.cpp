@@ -1,5 +1,5 @@
 #include "CubeGL.h"
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 void CubeGL::Create() {

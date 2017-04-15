@@ -12,7 +12,7 @@
 *********************************************************/
 
 #include "Win32Framework.h"
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 #include "GLDriver.h"
 #elif defined(USING_D3D11)
 #include "D3DXDriver.h"
@@ -29,15 +29,23 @@ void Win32Framework::InitGlobalVars() {
 }
 
 void Win32Framework::OnCreateApplication() {
-	SDL_Init(SDL_INIT_VIDEO);
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		printf("Video initialization failed: %s\n", SDL_GetError());
+	}
 	SDL_WM_SetCaption("UAD Framework Daniel", 0);
 	int flags = SDL_HWSURFACE;
+#if defined(USING_OPENGL)
+	flags = flags | SDL_OPENGL;
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+#endif
 	//flags |= SDL_FULLSCREEN;
 	//flags |= SDL_RESIZABLE;
 	int width = 1280;
 	int height = 720;
-	SDL_SetVideoMode(width, height, 32, flags);
-#ifdef USING_OPENGL_ES
+	if (SDL_SetVideoMode(width, height, 32, flags) == 0) {
+		printf("Video mode set failed: %s\n", SDL_GetError());
+	}
+#ifdef USING_GL_COMMON
 	pVideoDriver = new GLDriver;
 #elif defined(USING_D3D11)
 	pVideoDriver = new D3DXDriver;
@@ -49,8 +57,6 @@ void Win32Framework::OnCreateApplication() {
 	pBaseApp->InitVars();
 	pBaseApp->CreateAssets();
 	SDL_WarpMouse(1280 / 2, 720 / 2);
-
-
 }
 void Win32Framework::OnDestroyApplication() {
 	pBaseApp->DestroyAssets();

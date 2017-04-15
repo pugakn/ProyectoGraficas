@@ -1,5 +1,5 @@
 #include "SpriteGL.h"
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 #include "TextureGL.h"
 #include <iostream>
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))

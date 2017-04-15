@@ -16,9 +16,16 @@
 #include "Config.h"
 #include <stdio.h>
 
-#ifdef USING_OPENGL_ES
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+#ifdef USING_GL_COMMON
+#ifdef USING_OPENGL_ES20
+#include <GLES2\gl2.h>
+#include <GLES2\gl2ext.h>
+#elif defined(USING_OPENGL_ES30)
+#include <GLES3\gl31.h>
+#elif defined(USING_OPENGL)
+#include <GL\glew.h>
+#endif
+
 #include "TextureGL.h"
 
 bool checkcompilederrors(GLuint shader, GLenum type);
@@ -35,7 +42,7 @@ class Utils
 {
 public:
 	static Texture* textureCheker;
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 public:
 	static GLuint DefaultShaderID;
 	static int textureChekerID;

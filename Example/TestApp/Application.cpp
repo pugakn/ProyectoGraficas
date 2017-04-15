@@ -27,7 +27,7 @@ void TestApp::InitVars() {
 	Matrix4D View = LookAtRH(pos, target, up);
 	Matrix4D VP = View* Projection;
 
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 	textFPS = new GLFont();
 	sprite = new SpriteGL();
 	dot = new SpriteGL();

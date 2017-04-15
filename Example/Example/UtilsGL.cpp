@@ -16,7 +16,7 @@
 #include <string>
 #include <iostream>
 
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 bool checkcompilederrors(GLuint shader, GLenum type) {
 	GLint bShaderCompiled;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &bShaderCompiled);
@@ -75,7 +75,7 @@ char *file2string(const char *path) {
 
 
 Texture* Utils::textureCheker = nullptr;
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 GLuint Utils::DefaultShaderID = 0;
 int Utils::textureChekerID = -1;
 

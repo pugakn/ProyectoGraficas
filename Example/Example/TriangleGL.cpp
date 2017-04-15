@@ -1,5 +1,5 @@
 #include "TriangleGL.h"
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
 
 
 

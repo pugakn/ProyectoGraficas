@@ -1,13 +1,17 @@
 #ifndef UAD_TRIANGLEGL_H
 #define UAD_TRIANGLEGL_H
 #include "Config.h"
-#ifdef USING_OPENGL_ES
+#ifdef USING_GL_COMMON
+#ifdef USING_OPENGL_ES20
+#include <GLES2\gl2.h>
+#include <GLES2\gl2ext.h>
+#elif defined(USING_OPENGL_ES30)
+#include <GLES3\gl31.h>
+#elif defined(USING_OPENGL)
+#include <GL\glew.h>
+#endif
 
-
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
 #include <d3dx9math.h>
-
 #include "PrimitiveBase.h"
 #include "UtilsGL.h"
 

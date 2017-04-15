@@ -69,13 +69,13 @@ int Texture::LoadDefaultTxture()
 	//Cheker Texture
 		static const unsigned char buffer [] {TEXTURE_CHEKER};
 
-	size = 256*256*3;
+	size = 256*256*4;
 	bounded = 1;
 	this->x = 256;
 	this->y = 256;
 	mipmaps = 1;
 	this->params = params;
-	props |= TEXT_BASIC_FORMAT::CH_RGB;
+	props |= TEXT_BASIC_FORMAT::CH_RGBA;
 
 	LoadAPITexture(buffer);
 	return id;
