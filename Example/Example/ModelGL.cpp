@@ -12,7 +12,6 @@ void ModelGL::SetFileName(char * fileName)
 }
 void ModelGL::Create()
 {
-	lightColor = Vector3D(1, 0.2, 0.2);
 	//------------------------------------------------------------------------//
 	//Leer Archivo .X
 	Timer timer;
@@ -27,8 +26,14 @@ void ModelGL::Create()
 	//-------------------------------------------------------------------------//
 	char *vsSourceP = file2string("Shaders/VS_MeshPL.glsl");
 	char *fsSourceP = file2string("Shaders/FS_MeshPL.glsl");
-	std::string vstr = std::string(vsSourceP);
-	std::string fstr = std::string(fsSourceP);
+	std::string vstr;
+	std::string fstr;
+	if (vsSourceP && fsSourceP)
+	{
+		vstr = std::string(vsSourceP);
+		fstr = std::string(fsSourceP);
+	}
+
 	delete[] vsSourceP;
 	delete[] fsSourceP;
 
@@ -71,140 +76,154 @@ void ModelGL::Create()
 
 			GLuint vshader_id = createShader(GL_VERTEX_SHADER, const_cast<char*>(vstr.c_str()));
 			GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, const_cast<char*>(fstr.c_str()));
+			if (vshader_id == 0 || fshader_id == 0)
+			{
+				m_meshInfo.back().subsetInfo.back().shadersID = Utils::DefaultShaderID;
+				glLinkProgram(m_meshInfo.back().subsetInfo.back().shadersID);
+				glUseProgram(m_meshInfo.back().subsetInfo.back().shadersID);
 
-			//Attach Shaders
-			m_meshInfo.back().subsetInfo.back().shadersID = glCreateProgram();
-			glAttachShader(m_meshInfo.back().subsetInfo.back().shadersID, vshader_id);
-			glAttachShader(m_meshInfo.back().subsetInfo.back().shadersID, fshader_id);
-
-			glLinkProgram(m_meshInfo.back().subsetInfo.back().shadersID);
-			glUseProgram(m_meshInfo.back().subsetInfo.back().shadersID);
-
-			//Obtener locaciones de Attributes
-			m_meshInfo.back().subsetInfo.back().vertexAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Vertex");
-			m_meshInfo.back().subsetInfo.back().normalAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Normal");
-			m_meshInfo.back().subsetInfo.back().binormalAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Binormal");
-			m_meshInfo.back().subsetInfo.back().tangentAttribLocs  = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Tangent");
-			m_meshInfo.back().subsetInfo.back().uvAttribLocs       = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "UV");
-
-			//Obtener locaciones de Uniforms
-			m_meshInfo.back().subsetInfo.back().matWorldViewProjUniformLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "WVP");
-			m_meshInfo.back().subsetInfo.back().matWorldUniformLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "World");
-			m_meshInfo.back().subsetInfo.back().lightLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "light");
-			m_meshInfo.back().subsetInfo.back().lightColLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "lightColor");
-			m_meshInfo.back().subsetInfo.back().camPosLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "camPos");
-			m_meshInfo.back().subsetInfo.back().specExpLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "specExp");
-			m_meshInfo.back().subsetInfo.back().attMaxLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "attMax");
-			//Cargar Texturas
-			//Difuse
-			bool found = false;
-			for (std::size_t f = 0; f<Textures.size(); f++) {
-				Texture *ttex = Textures[f];
-				std::string ttstr = std::string(ttex->optname);
-				if (ttstr == subsetIt.m_effects.m_difusePath.c_str()) {
-					m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
-					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "diffuse"));
-					found = true;
-					break;
-				}
+				m_meshInfo.back().subsetInfo.back().vertexAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Vertex");
+				m_meshInfo.back().subsetInfo.back().matWorldViewProjUniformLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "WVP");
 			}
-			if (!found) {
-				Texture *tex = new TextureGL;
-				int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_difusePath.c_str()));
-				if (textureID != -1) {
-					Textures.push_back(tex);
-					m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
-					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "diffuse"));
-				}
-				else {
-					std::cout << "Texture not Found" << std::endl;
-					delete tex;
-				}
-			}
-			/*m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(Utils::textureChekerID);
-			Textures.push_back(Utils::textureCheker);
-			m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "diffuse"));*/
-			//Specular
-			if (subsetIt.m_effects.m_specularMap != "") {
-				found = false;
-				for (std::size_t f = 0; f< Textures.size(); f++) {
-					Texture *ttex = Textures[f];
-					std::string ttstr = std::string(ttex->optname);
-					if (ttstr == subsetIt.m_effects.m_specularMap.c_str()) {
-						m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
-						m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "specularMap"));
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					Texture *tex = new TextureGL;
-					int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_specularMap.c_str()));
-					if (textureID != -1) {
-						Textures.push_back(tex);
-						m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
-						m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "specularMap"));
-					}
-					else {
-						std::cout << "Texture not Found" << std::endl;
-						delete tex;
-					}
-				}
-			}
-			//Gloss
-			if (subsetIt.m_effects.m_glossMap != "") {
-				found = false;
+			else
+			{
+				//Attach Shaders
+				m_meshInfo.back().subsetInfo.back().shadersID = glCreateProgram();
+				glAttachShader(m_meshInfo.back().subsetInfo.back().shadersID, vshader_id);
+				glAttachShader(m_meshInfo.back().subsetInfo.back().shadersID, fshader_id);
+
+				glLinkProgram(m_meshInfo.back().subsetInfo.back().shadersID);
+				glUseProgram(m_meshInfo.back().subsetInfo.back().shadersID);
+
+				//Obtener locaciones de Attributes
+				m_meshInfo.back().subsetInfo.back().vertexAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Vertex");
+				m_meshInfo.back().subsetInfo.back().normalAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Normal");
+				m_meshInfo.back().subsetInfo.back().binormalAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Binormal");
+				m_meshInfo.back().subsetInfo.back().tangentAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Tangent");
+				m_meshInfo.back().subsetInfo.back().uvAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "UV");
+
+				//Obtener locaciones de Uniforms
+				m_meshInfo.back().subsetInfo.back().matWorldViewProjUniformLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "WVP");
+				m_meshInfo.back().subsetInfo.back().matWorldUniformLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "World");
+				m_meshInfo.back().subsetInfo.back().lightLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "light");
+				m_meshInfo.back().subsetInfo.back().lightColLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "lightColor");
+				m_meshInfo.back().subsetInfo.back().camPosLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "camPos");
+				m_meshInfo.back().subsetInfo.back().specExpLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "specExp");
+				m_meshInfo.back().subsetInfo.back().attMaxLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "attMax");
+				//Cargar Texturas
+				//Difuse
+				bool found = false;
+				m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "diffuse"));
 				for (std::size_t f = 0; f<Textures.size(); f++) {
 					Texture *ttex = Textures[f];
 					std::string ttstr = std::string(ttex->optname);
-					if (ttstr == subsetIt.m_effects.m_glossMap.c_str()) {
+					if (ttstr == subsetIt.m_effects.m_difusePath.c_str()) {
 						m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
-						m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "glossMap"));
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
 					Texture *tex = new TextureGL;
-					int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_glossMap.c_str()));
+					int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_difusePath.c_str()));
 					if (textureID != -1) {
 						Textures.push_back(tex);
 						m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
-						m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "glossMap"));
 					}
 					else {
 						std::cout << "Texture not Found" << std::endl;
+						m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(Utils::textureChekerID);
+						Textures.push_back(Utils::textureCheker);
 						delete tex;
 					}
 				}
-			}
-			//Normal
-			if (subsetIt.m_effects.m_normalMap != "") {
-				found = false;
-				for (std::size_t f = 0; f<Textures.size(); f++) {
-					Texture *ttex = Textures[f];
-					std::string ttstr = std::string(ttex->optname);
-					if (ttstr == subsetIt.m_effects.m_normalMap.c_str()) {
-						m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
-						m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "normalMap"));
-						found = true;
-						break;
+				//Specular
+
+				if (subsetIt.m_effects.m_specularMap != "") {
+					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "specularMap"));
+					found = false;
+					for (std::size_t f = 0; f< Textures.size(); f++) {
+						Texture *ttex = Textures[f];
+						std::string ttstr = std::string(ttex->optname);
+						if (ttstr == subsetIt.m_effects.m_specularMap.c_str()) {
+							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						Texture *tex = new TextureGL;
+						int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_specularMap.c_str()));
+						if (textureID != -1) {
+							Textures.push_back(tex);
+							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
+						}
+						else {
+							std::cout << "Texture not Found" << std::endl;
+							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(Utils::textureChekerID);
+							Textures.push_back(Utils::textureCheker);
+							delete tex;
+						}
 					}
 				}
-				if (!found) {
-					Texture *tex = new TextureGL;
-					int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_normalMap.c_str()));
-					if (textureID != -1) {
-						Textures.push_back(tex);
-						m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
-						m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "normalMap"));
+				//Gloss
+				if (subsetIt.m_effects.m_glossMap != "") {
+					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "glossMap"));
+					found = false;
+					for (std::size_t f = 0; f<Textures.size(); f++) {
+						Texture *ttex = Textures[f];
+						std::string ttstr = std::string(ttex->optname);
+						if (ttstr == subsetIt.m_effects.m_glossMap.c_str()) {
+							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
+							found = true;
+							break;
+						}
 					}
-					else {
-						std::cout << "Texture not Found" << std::endl;
-						delete tex;
+					if (!found) {
+						Texture *tex = new TextureGL;
+						int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_glossMap.c_str()));
+						if (textureID != -1) {
+							Textures.push_back(tex);
+							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
+						}
+						else {
+							std::cout << "Texture not Found" << std::endl;
+							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(Utils::textureChekerID);
+							Textures.push_back(Utils::textureCheker);
+							delete tex;
+						}
+					}
+				}
+				//Normal
+				if (subsetIt.m_effects.m_normalMap != "") {
+					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "normalMap"));
+					found = false;
+					for (std::size_t f = 0; f<Textures.size(); f++) {
+						Texture *ttex = Textures[f];
+						std::string ttstr = std::string(ttex->optname);
+						if (ttstr == subsetIt.m_effects.m_normalMap.c_str()) {
+							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						Texture *tex = new TextureGL;
+						int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_normalMap.c_str()));
+						if (textureID != -1) {
+							Textures.push_back(tex);
+							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
+						}
+						else {
+							std::cout << "Texture not Found" << std::endl;
+							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(Utils::textureChekerID);
+							Textures.push_back(Utils::textureCheker);
+							delete tex;
+						}
 					}
 				}
 			}
+			
 
 			//Generar buffer de Indices
 			glGenBuffers(1, &m_meshInfo.back().subsetInfo.back().IB);
@@ -248,8 +267,6 @@ void ModelGL::Create()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wire.IB);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, wireframe.m_indexBuffer.size() * sizeof(unsigned short), &(wireframe.m_indexBuffer[0]), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
 	//Liberar Memoria
 	parser.Deallocate();
 	transform = Identity();
@@ -299,8 +316,9 @@ inline void ModelGL::DrawMeshes(const Matrix4D & VP, const Matrix4D & WVP)
 			//Set actual shader
 			glUseProgram(sIt->shadersID);
 			//Set Uniforms
-			glUniformMatrix4fv(sIt->matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
 			glUniformMatrix4fv(sIt->matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
+			if (sIt->matWorldUniformLoc != -1)
+				glUniformMatrix4fv(sIt->matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
 			if (sIt->lightLoc != -1)
 				glUniform3fv(sIt->lightLoc, 1, &pScProp->Lights[0].Position.x);
 			if (sIt->lightColLoc != -1)

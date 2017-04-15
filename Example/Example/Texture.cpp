@@ -14,7 +14,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <string>
-#include <fstream>
+//#include <fstream>
 
 int		Texture::LoadTexture(char *fn) {
 	std::string path = "Textures/";
@@ -22,7 +22,7 @@ int		Texture::LoadTexture(char *fn) {
 	int x = 0, y = 0, channels = 0;
 	unsigned char *buffer = stbi_load(path.c_str(), &x, &y, &channels, 0);
 	//std::ofstream myfile;
-	//myfile.open("cheker2.txt");
+	//myfile.open("cheker3.txt");
 	//myfile << "[";
 	//for (size_t i = 0; i < x*y*channels; i++)
 	//{

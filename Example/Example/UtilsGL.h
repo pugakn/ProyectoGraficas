@@ -21,7 +21,7 @@
 #include <GLES2/gl2ext.h>
 #include "TextureGL.h"
 
-void checkcompilederrors(GLuint shader, GLenum type);
+bool checkcompilederrors(GLuint shader, GLenum type);
 GLuint createShader(GLenum type, char* pSource);
 #elif defined USING_D3D11
 #include "TextureD3D.h"
@@ -33,10 +33,11 @@ char *file2string(const char *path);
 
 class Utils
 {
+public:
+	static Texture* textureCheker;
 #ifdef USING_OPENGL_ES
 public:
 	static GLuint DefaultShaderID;
-	static Texture* textureCheker;
 	static int textureChekerID;
 #elif defined USING_D3D11
 public:
@@ -48,7 +49,6 @@ public:
 	Utils() {};
 	~Utils() {};
 	static void Init();
-	static char* getTextureChecker();
 
 };
 

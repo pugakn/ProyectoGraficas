@@ -17,7 +17,7 @@
 #include <iostream>
 
 #ifdef USING_OPENGL_ES
-void checkcompilederrors(GLuint shader, GLenum type) {
+bool checkcompilederrors(GLuint shader, GLenum type) {
 	GLint bShaderCompiled;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &bShaderCompiled);
 	if (!bShaderCompiled) {
@@ -39,14 +39,17 @@ void checkcompilederrors(GLuint shader, GLenum type) {
 		printf("%s", pszMsg);
 		delete[] pszMsg;
 		delete[] pszInfoLog;
+		return false;
 	}
+	return true;
 }
 
 GLuint createShader(GLenum type, char* pSource) {
 	GLuint shader = glCreateShader(type);
 	glShaderSource(shader, 1, (const char**)&pSource, NULL);
 	glCompileShader(shader);
-	checkcompilederrors(shader, type);
+	if (!checkcompilederrors(shader, type))
+		return 0;
 	return shader;
 }
 #endif
@@ -71,10 +74,9 @@ char *file2string(const char *path) {
 
 
 
-
+Texture* Utils::textureCheker = nullptr;
 #ifdef USING_OPENGL_ES
 GLuint Utils::DefaultShaderID = 0;
-Texture* Utils::textureCheker = nullptr;
 int Utils::textureChekerID = -1;
 
 void Utils::Init()
@@ -91,11 +93,6 @@ void Utils::Init()
 	textureChekerID = textureCheker->LoadDefaultTxture();
 }
 
-
-char * Utils::getTextureChecker()
-{
-	return nullptr;
-}
 #elif defined USING_D3D11
 extern ComPtr<ID3D11Device>            D3D11Device;
 extern ComPtr<ID3D11DeviceContext>     D3D11DeviceContext;
@@ -106,7 +103,8 @@ ComPtr<ID3DBlob>  Utils::DefaultVS_blob = nullptr;
 ComPtr<ID3DBlob> Utils::DefaultFS_blob = nullptr;
 void Utils::Init()
 {
-
+	textureCheker = new TextureD3D;
+	textureCheker->LoadDefaultTxture();
 	char *vsSourceWire = "cbuffer ConstantBuffer{float4x4 WVP;}struct VS_INPUT {float4 position : POSITION;};struct VS_OUTPUT {float4 hposition : SV_POSITION;};VS_OUTPUT VS(VS_INPUT input) {VS_OUTPUT OUT;OUT.hposition = mul(WVP, input.position);return OUT;}";
 	char *fsSourceWire = "cbuffer ConstantBuffer{float4x4 WVP;}struct VS_OUTPUT {float4 hposition : SV_POSITION;};float4 FS(VS_OUTPUT input) : SV_TARGET{return float4(1,0,1,1);}";
 	std::string vstrWire = std::string(vsSourceWire);
@@ -149,9 +147,6 @@ void Utils::Init()
 		return;
 	}
 }
-char * Utils::getTextureChecker()
-{
-	return nullptr;
-}
+
 
 #endif

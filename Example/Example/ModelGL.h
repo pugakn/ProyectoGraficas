@@ -42,6 +42,21 @@ private:
 		GLuint	IB;
 		//Textures
 		TextureInfo textInfo;
+		SubsetInfo() {
+			vertexAttribLocs = -1;
+			normalAttribLocs = -1;
+			binormalAttribLocs = -1;
+			tangentAttribLocs = -1;
+			uvAttribLocs = -1;
+			matWorldViewProjUniformLoc = -1;
+			matWorldUniformLoc = -1;
+
+			lightLoc = -1;
+			lightColLoc = -1;
+			camPosLoc = -1;
+			specExpLoc = -1;
+			attMaxLoc = -1;
+		}
 
 	};
 	struct MeshInfo
