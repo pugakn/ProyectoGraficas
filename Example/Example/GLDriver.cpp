@@ -98,6 +98,8 @@ void	GLDriver::InitDriver() {
 
 	eglQuerySurface(eglDisplay, eglSurface, EGL_WIDTH, &w);
 	eglQuerySurface(eglDisplay, eglSurface, EGL_HEIGHT, &h);
+	width = w;
+	height = h;
 #elif defined(USING_OPENGL)
 	GLenum err = glewInit();
 	if (GLEW_OK != err) {
@@ -128,6 +130,7 @@ void	GLDriver::InitDriver() {
 	glClearDepthf(1.0f);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
+
 	//Alpha
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -182,4 +185,9 @@ void	GLDriver::SwapBuffers() {
 #elif defined(USING_OPENGL)
 	SDL_GL_SwapBuffers();
 #endif
+}
+
+void GLDriver::SetCullFace(CULLMODE mode)
+{
+	glCullFace(mode == CULLMODE::BACK ? GL_BACK : GL_FRONT);
 }

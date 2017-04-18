@@ -19,6 +19,7 @@ public:
 	int	 CreateCube();
 	int CreateModel(char * fileName);
 	int CreateText();
+	int CreatePlane();
 
 	void DrawPrimitives();
 	void DestroyPrimitives();

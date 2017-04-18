@@ -50,6 +50,14 @@ int	 PrimitiveManager::CreateModel(char * fileName) {
 	primitives.push_back(primitive);
 	return (int)(primitives.size() - 1);
 }
+#include "Plane.h"
+int PrimitiveManager::CreatePlane()
+{
+	PrimitiveBase *primitive = new Plane();
+	primitive->Create();
+	primitives.push_back(primitive);
+	return (int)(primitives.size() - 1);
+}
 
 void PrimitiveManager::DrawPrimitives() {
 	for(unsigned int i=0;i<primitives.size();i++){

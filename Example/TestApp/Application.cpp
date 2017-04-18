@@ -5,12 +5,13 @@
 #include "TextMeshD3D.h"
 #include "SpriteGL.h"
 #include"SpriteD3D.h"
-
+#include "Plane.h"
+#include "BaseRT.h"
 
 void TestApp::InitVars() {
-	Utils::Init();
+	Tools::Init(pFramework->pVideoDriver);
+	Tools::CreateRT(1);
 	DtTimer.Init();
-
 	cam.Init();
 
 	SceneProp.AddCamera(&cam);
@@ -38,17 +39,17 @@ void TestApp::InitVars() {
 
 #endif
 
-	sprite->SetTexture("radar.tga");
-	sprite->Create(VP);//
-	sprite->ScaleAbsolute(1);
-	sprite->TranslateAbsolute(2, 1, 0);
-	sprite->Update();
+	//sprite->SetTexture("radar.tga");
+	//sprite->Create(VP);//
+	//sprite->ScaleAbsolute(1);
+	//sprite->TranslateAbsolute(2, 1, 0);
+	//sprite->Update();
 
-	dot->SetTexture("dot.tga");
-	dot->Create(VP);//
-	dot->ScaleAbsolute(0.05);
-	dot->TranslateAbsolute(2.5, 1.5, 0);
-	dot->Update();
+	//dot->SetTexture("dot.tga");
+	//dot->Create(VP);//
+	//dot->ScaleAbsolute(0.05);
+	//dot->TranslateAbsolute(2.5, 1.5, 0);
+	//dot->Update();
 
 	
 
@@ -61,7 +62,7 @@ void TestApp::CreateAssets() {
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 
 
-	index = PrimitiveMgr.CreateModel("Models/House.X");
+	/*index = PrimitiveMgr.CreateModel("Models/House.X");
 
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
@@ -161,7 +162,7 @@ void TestApp::CreateAssets() {
 	Models.back().RotateZAbsolute(-30);
 	Models.back().TranslateAbsolute(200, 25, 220);
 	Models.back().Update();
-
+*/
 	index = PrimitiveMgr.CreateModel("Models/NuBatman.X");
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
@@ -176,6 +177,16 @@ void TestApp::CreateAssets() {
 	Models.back().TranslateAbsolute(200, 0, 90);
 	Models.back().RotateYAbsolute(90);
 	Models.back().Update();
+	//==================== Reflejo ===========================
+	index = PrimitiveMgr.CreatePlane();
+	dynamic_cast<Plane*>(PrimitiveMgr.primitives[index])->tex = Tools::RTs[0]->vColorTextures[0];
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(0, 1, 200);
+	Models.back().RotateXAbsolute(90);
+	Models.back().ScaleAbsolute(300);
+	Models.back().Update();
+	//==========================================================
 
 	textFPS->Create();
 	textFPS->TranslateAbsolute(-0.98,0.9,0);
@@ -219,6 +230,22 @@ void TestApp::OnUpdate() {
 }
 
 void TestApp::OnDraw() {
+	// ====================== RTs========================
+	Tools::PushRT(0);
+	pFramework->pVideoDriver->SetCullFace(BaseDriver::BACK);
+
+	for (int i = 0; i < 3; i++) {
+		Matrix4D temp = Models[i].Scale;
+		Models[i].Scale = Models[i].Scale * Scaling(1,-1,1);
+		Models[i].Update();
+		Models[i].Draw();
+		Models[i].Scale = temp;
+		Models[i].Update();
+
+	}
+	pFramework->pVideoDriver->SetCullFace(BaseDriver::FRONT);
+	Tools::PopRT();
+	//====================================================
 	pFramework->pVideoDriver->Clear();
 	
 	for (auto &it : Models)
@@ -226,8 +253,8 @@ void TestApp::OnDraw() {
 
 	lightPrimitive.Draw();
 	textFPS->Draw();
-	dot->Draw();
-	sprite->Draw();
+	//dot->Draw();
+	//sprite->Draw();
 	pFramework->pVideoDriver->SwapBuffers();
 }
 

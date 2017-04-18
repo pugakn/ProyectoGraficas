@@ -10,20 +10,26 @@
 * ** Enjoy, learn and share.
 *********************************************************/
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-#include "CubeGL.h"
+#include "Plane.h"
 
 #ifdef USING_D3D11
 extern ComPtr<ID3D11Device>            D3D11Device;
 extern ComPtr<ID3D11DeviceContext>     D3D11DeviceContext;
 #endif
 
-void CubeGL::Create() {
+void Plane::Create() {
+#ifdef USING_GL_COMMON
+	TexId = Tools::textureChekerID;
+#elif defined(USING_D3D11)
 	tex = Tools::textureCheker;
+#endif
+
+
 #ifdef USING_GL_COMMON
 	shaderID = glCreateProgram();
 
-	char *vsSourceP = file2string("Shaders/VS.glsl");
-	char *fsSourceP = file2string("Shaders/FS.glsl");
+	char *vsSourceP = file2string("Shaders/VS_Water.glsl");
+	char *fsSourceP = file2string("Shaders/FS_Water.glsl");
 
 	std::string vsrc = std::string(vsSourceP);
 	std::string fsrc = std::string(fsSourceP);
@@ -46,16 +52,13 @@ void CubeGL::Create() {
 	glUseProgram(shaderID);
 
 	vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
-	normalAttribLoc = glGetAttribLocation(shaderID, "Normal");
-	uvAttribLoc = glGetAttribLocation(shaderID, "UV");
 
 	matWorldViewProjUniformLoc = glGetUniformLocation(shaderID, "WVP");
-	matWorldUniformLoc = glGetUniformLocation(shaderID, "World");
 
 	diffuseLoc = glGetUniformLocation(shaderID, "diffuse");
 #elif defined(USING_D3D11)
-	char *vsSourceP = file2string("Shaders/VS.hlsl");
-	char *fsSourceP = file2string("Shaders/FS.hlsl");
+	char *vsSourceP = file2string("Shaders/VS_Water.hlsl");
+	char *fsSourceP = file2string("Shaders/FS_Water.hlsl");
 
 	if (!vsSourceP || !fsSourceP)
 		exit(32);
@@ -83,7 +86,6 @@ void CubeGL::Create() {
 			return;
 		}
 	}
-
 	{
 		FS_blob = nullptr;
 		ComPtr<ID3DBlob> errorBlob = nullptr;
@@ -110,115 +112,34 @@ void CubeGL::Create() {
 	free(fsSourceP);
 #endif
 
-	// +Y SIDE
-	vertices[0] = { -1.0f,  1.0f, -1.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 1.0f };
-	vertices[1] = { 1.0f,  1.0f, -1.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f };
-	vertices[2] = { -1.0f,  1.0f,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 0.0f };
-	vertices[3] = { 1.0f,  1.0f,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  1.0f, 0.0f };
+	vertices[0] = { 0.0f,  1.0f, 0.0f , 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 0.0f };
+	vertices[1] = { 0.0f,  0.0f, 0.0f , 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 1.0f };
+	vertices[2] = { 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f };
+	vertices[3] = { 1.0f,  1.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f };
 
-	// -Y SIDE
-	vertices[4] = { -1.0f,  -1.0f, -1.0f, 1.0f,  0.0f, -1.0f, 0.0f, 1.0f,  1.0f, 0.0f };
-	vertices[5] = { 1.0f,  -1.0f, -1.0f, 1.0f,  0.0f, -1.0f, 0.0f, 1.0f,  0.0f, 0.0f };
-	vertices[6] = { -1.0f,  -1.0f,  1.0f, 1.0f,  0.0f, -1.0f, 0.0f, 1.0f,  1.0f, 1.0f };
-	vertices[7] = { 1.0f,  -1.0f,  1.0f, 1.0f,  0.0f, -1.0f, 0.0f, 1.0f,  0.0f, 1.0f };
-
-	// +X SIDE
-	vertices[8] = { 1.0f,  1.0f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f };
-	vertices[9] = { 1.0f,  1.0f, -1.0f, 1.0f,  1.0f, 0.0f, 0.0f, 1.0f,  0.0f, 0.0f };
-	vertices[10] = { 1.0f, -1.0f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 1.0f };
-	vertices[11] = { 1.0f, -1.0f, -1.0f, 1.0f,  1.0f, 0.0f, 0.0f, 1.0f,  0.0f, 1.0f };
-
-	// -X SIDE
-	vertices[12] = { -1.0f,  1.0f,  1.0f, 1.0f,  -1.0f, 0.0f, 0.0f, 1.0f,  0.0f, 0.0f };
-	vertices[13] = { -1.0f,  1.0f, -1.0f, 1.0f,  -1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f };
-	vertices[14] = { -1.0f, -1.0f,  1.0f, 1.0f,  -1.0f, 0.0f, 0.0f, 1.0f,  0.0f, 1.0f };
-	vertices[15] = { -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 1.0f };
-
-	// +Z SIDE
-	vertices[16] = { -1.0f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f,  1.0f, 0.0f };
-	vertices[17] = { 1.0f,  1.0f, 1.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f,  0.0f, 0.0f };
-	vertices[18] = { -1.0f, -1.0f, 1.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f };
-	vertices[19] = { 1.0f, -1.0f, 1.0f, 1.0f,  0.0f, 0.0f, 1.0f, 1.0f,  0.0f, 1.0f };
-
-	// -Z SIDE
-	vertices[20] = { -1.0f,  1.0f, -1.0f, 1.0f,  0.0f, 0.0f, -1.0f, 1.0f,  0.0f, 0.0f };
-	vertices[21] = { 1.0f,  1.0f, -1.0f, 1.0f,  0.0f, 0.0f, -1.0f, 1.0f,  1.0f, 0.0f };
-	vertices[22] = { -1.0f, -1.0f, -1.0f, 1.0f,  0.0f, 0.0f, -1.0f, 1.0f,  0.0f, 1.0f };
-	vertices[23] = { 1.0f, -1.0f, -1.0f, 1.0f,  0.0f, 0.0f, -1.0f, 1.0f,  1.0f, 1.0f };
-
-	// +X
-	indices[0] = 8;
-	indices[1] = 9;
-	indices[2] = 10;
-	indices[3] = 9;
-	indices[4] = 11;
-	indices[5] = 10;
-
-	// -X
-	indices[6] = 14;
-	indices[7] = 13;
-	indices[8] = 12;
-	indices[9] = 14;
-	indices[10] = 15;
-	indices[11] = 13;
-
-	// +Y
-	indices[12] = 1;
-	indices[13] = 2;
-	indices[14] = 0;
-	indices[15] = 3;
-	indices[16] = 2;
-	indices[17] = 1;
-
-	// -Y
-	indices[18] = 4;
-	indices[19] = 6;
-	indices[20] = 5;
-	indices[21] = 5;
-	indices[22] = 6;
-	indices[23] = 7;
-
-	// +Z
-	indices[24] = 17;
-	indices[25] = 18;
-	indices[26] = 16;
-	indices[27] = 19;
-	indices[28] = 18;
-	indices[29] = 17;
-
-	// -Z
-	indices[30] = 20;
-	indices[31] = 22;
-	indices[32] = 21;
-	indices[33] = 21;
-	indices[34] = 22;
-	indices[35] = 23;
-
-	for (int i = 0; i < 36; i += 3) {
-		int id0 = indices[i];
-		int id2 = indices[i + 2];
-		indices[i] = id2;
-		indices[i + 2] = id0;
-	}
+	indices[0] = 2;
+	indices[1] = 1;
+	indices[2] = 0;
+	indices[3] = 3;
+	indices[4] = 2;
+	indices[5] = 0;
 
 #ifdef USING_GL_COMMON
 	glGenBuffers(1, &VB);
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
-	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(CVertex), &vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(CVertex), &vertices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &IB);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned short), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned short), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 #elif defined(USING_D3D11)
 	D3D11DeviceContext->VSSetShader(pVS.Get(), 0, 0);
 	D3D11DeviceContext->PSSetShader(pFS.Get(), 0, 0);
 
 	D3D11_INPUT_ELEMENT_DESC vertexDeclaration[] = {
-		{ "POSITION" , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL"   , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD" , 0, DXGI_FORMAT_R32G32_FLOAT,       0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "POSITION" , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	hr = D3D11Device->CreateInputLayout(vertexDeclaration, ARRAYSIZE(vertexDeclaration), VS_blob->GetBufferPointer(), VS_blob->GetBufferSize(), &Layout);
@@ -230,7 +151,7 @@ void CubeGL::Create() {
 
 	D3D11_BUFFER_DESC bdesc = { 0 };
 	bdesc.Usage = D3D11_USAGE_DEFAULT;
-	bdesc.ByteWidth = sizeof(CubeGL::CBuffer);
+	bdesc.ByteWidth = sizeof(Plane::CBuffer);
 	bdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	hr = D3D11Device->CreateBuffer(&bdesc, 0, pd3dConstantBuffer.GetAddressOf());
@@ -249,7 +170,7 @@ void CubeGL::Create() {
 
 
 	bdesc = { 0 };
-	bdesc.ByteWidth = sizeof(CVertex) * 24;
+	bdesc.ByteWidth = sizeof(CVertex) * 4;
 	bdesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA subData = { vertices, 0, 0 };
 
@@ -260,7 +181,7 @@ void CubeGL::Create() {
 	}
 
 	bdesc = { 0 };
-	bdesc.ByteWidth = 36 * sizeof(USHORT);
+	bdesc.ByteWidth = 6 * sizeof(USHORT);
 	bdesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
 	subData = { indices, 0, 0 };
@@ -275,11 +196,11 @@ void CubeGL::Create() {
 	transform = Identity();
 }
 
-void CubeGL::Transform(float *t) {
+void Plane::Transform(float *t) {
 	transform = t;
 }
 
-void CubeGL::Draw(float *t) {
+void Plane::Draw(float *t) {
 #ifdef USING_GL_COMMON
 	glUseProgram(shaderID);
 
@@ -289,7 +210,6 @@ void CubeGL::Draw(float *t) {
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D WVP = transform*VP;
 
-	glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
 	glUniformMatrix4fv(matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
@@ -297,38 +217,19 @@ void CubeGL::Draw(float *t) {
 
 	glEnableVertexAttribArray(vertexAttribLoc);
 
-	if (normalAttribLoc != -1)
-		glEnableVertexAttribArray(normalAttribLoc);
-
-	if (uvAttribLoc != -1)
-		glEnableVertexAttribArray(uvAttribLoc);
-
 	glVertexAttribPointer(vertexAttribLoc, 4, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(0));
-
-	if (normalAttribLoc != -1)
-		glVertexAttribPointer(normalAttribLoc, 4, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(16));
-
-	if (uvAttribLoc != -1)
-		glVertexAttribPointer(uvAttribLoc, 2, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(32));
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex->id);
 	glUniform1i(diffuseLoc, 0);
 
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glDisableVertexAttribArray(vertexAttribLoc);
 
-	if (normalAttribLoc != -1) {
-		glDisableVertexAttribArray(normalAttribLoc);
-	}
-
-	if (uvAttribLoc != -1) {
-		glDisableVertexAttribArray(uvAttribLoc);
-	}
 
 	glUseProgram(0);
 #elif defined(USING_D3D11)
@@ -338,7 +239,6 @@ void CubeGL::Draw(float *t) {
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D WVP = transform*VP;
 	CnstBuffer.WVP = WVP;
-	CnstBuffer.World = transform;
 
 	UINT stride = sizeof(CVertex);
 	UINT offset = 0;
@@ -347,10 +247,9 @@ void CubeGL::Draw(float *t) {
 
 	D3D11DeviceContext->IASetInputLayout(Layout.Get());
 
-	D3D11DeviceContext->UpdateSubresource(pd3dConstantBuffer.Get(), 0, 0, &CnstBuffer, 0, 0);
+	D3D11DeviceContext->UpdateSubresource(pd3dConstantBuffer.Get(), 0, 0, &CnstBuffer.WVP.m[0][0], 0, 0);
 
 	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(tex);
-	//	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(tex);
 	D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
 	D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
 
@@ -361,11 +260,11 @@ void CubeGL::Draw(float *t) {
 	D3D11DeviceContext->IASetIndexBuffer(IB.Get(), DXGI_FORMAT_R16_UINT, 0);
 
 	D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	D3D11DeviceContext->DrawIndexed(36, 0, 0);
+	D3D11DeviceContext->DrawIndexed(6, 0, 0);
 #endif
 }
 
-void CubeGL::Destroy() {
+void Plane::Destroy() {
 #ifdef USING_GL_COMMON
 	glDeleteProgram(shaderID);
 #elif defined(USING_D3D11)

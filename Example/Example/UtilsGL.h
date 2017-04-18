@@ -27,35 +27,51 @@
 #endif
 
 #include "TextureGL.h"
-
+class GLDriver;
 bool checkcompilederrors(GLuint shader, GLenum type);
 GLuint createShader(GLenum type, char* pSource);
 #elif defined USING_D3D11
+class D3DXDriver;
 #include "TextureD3D.h"
 #include <D3Dcompiler.h>
 #endif
+#include <vector>
+class BaseRT;
+class BaseDriver;
 
 char *file2string(const char *path);
-
-
-class Utils
+class Tools
 {
+private:
+	static std::vector<Texture*> m_textures;
 public:
+	static int CreateRT(int numRT, int colorf, int depthf, int w, int h);
+	static int CreateRT(int numRT);
+	static void PushRT(int id);
+	static void PopRT();
+	static void DestroyRTs();
 	static Texture* textureCheker;
+	static std::vector<BaseRT*> RTs;
 #ifdef USING_GL_COMMON
+private:
+	static GLDriver* pVideoDriver;
 public:
 	static GLuint DefaultShaderID;
 	static int textureChekerID;
 #elif defined USING_D3D11
+private:
+	static D3DXDriver* pVideoDriver;
 public:
 	static ComPtr<ID3D11VertexShader>  pDefaultVS;
 	static ComPtr<ID3D11PixelShader>   pDefaultFS;
 	static ComPtr<ID3DBlob>  DefaultVS_blob;
-	static 	ComPtr<ID3DBlob> DefaultFS_blob;
+	static ComPtr<ID3DBlob> DefaultFS_blob;
 #endif
-	Utils() {};
-	~Utils() {};
-	static void Init();
+	static int LoadTexture(const char* path);
+	static Texture* GetTexture(int id);
+	Tools() {};
+	~Tools() {};
+	static void Init(BaseDriver* driver);
 
 };
 

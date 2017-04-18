@@ -15,6 +15,30 @@
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{ccdbfde6-7c30-4432-a782-98cb8a277da2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Video">
+      <UniqueIdentifier>{54b27227-77d9-4f01-a812-c6525814fa1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Video\D3D">
+      <UniqueIdentifier>{e9ecd738-4f9a-4006-9d7f-418c795b6397}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Video\Base">
+      <UniqueIdentifier>{a73bcaa0-2ff4-4fb9-8526-9643a934ad7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Video\GL">
+      <UniqueIdentifier>{a7439ce0-6d23-43be-8a82-ddeb7ae57cfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Video">
+      <UniqueIdentifier>{c3316d7e-418a-4fdd-b247-ae254ee1c868}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Video\D3D">
+      <UniqueIdentifier>{9a7ff515-8980-4a6c-9748-31fdc15cf6f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Video\Base">
+      <UniqueIdentifier>{0246bd5d-fe20-4069-8889-1d31253b1f3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Video\GL">
+      <UniqueIdentifier>{d0b39b27-0bfd-45dd-99f5-44adafa904d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDriver.h">
@@ -122,6 +146,18 @@
     <ClInclude Include="TextureCheker.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="BaseRT.h">
+      <Filter>Header Files\Video\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="GLRT.h">
+      <Filter>Header Files\Video\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DRT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">
@@ -216,6 +252,18 @@
     </ClCompile>
     <ClCompile Include="UtilsGL.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRT.cpp">
+      <Filter>Source Files\Video\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="GLRT.cpp">
+      <Filter>Source Files\Video\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DRT.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

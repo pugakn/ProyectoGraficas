@@ -26,6 +26,9 @@
 using namespace Microsoft::WRL;
 
 class D3DXDriver : public BaseDriver {
+private:
+	ID3D11RasterizerState * rasterStateCull_front;
+	ID3D11RasterizerState * rasterStateCull_back;
 public:
 	D3DXDriver() {  }
 	void	InitDriver();
@@ -38,6 +41,7 @@ public:
 
 	void	Clear();
 	void	SwapBuffers();
+	void SetCullFace(CULLMODE mode) override;
 
 	int		Width;
 	int		Height;

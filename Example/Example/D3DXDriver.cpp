@@ -128,6 +128,29 @@ void D3DXDriver::InitDriver(){
 	if (FAILED(D3D11Device->CreateBlendState(&omDesc, &d3dBlendState)))
 		exit(-1);
 	D3D11DeviceContext->OMSetBlendState(d3dBlendState, 0, 0xffffffff);
+
+
+	D3D11_RASTERIZER_DESC rasterizerState;
+	rasterizerState.FillMode = D3D11_FILL_SOLID;
+	rasterizerState.CullMode = D3D11_CULL_BACK;
+	rasterizerState.FrontCounterClockwise = true;
+	rasterizerState.DepthBias = false;
+	rasterizerState.DepthBiasClamp = 0;
+	rasterizerState.SlopeScaledDepthBias = 0;
+	rasterizerState.DepthClipEnable = true;
+	rasterizerState.ScissorEnable = true;
+	rasterizerState.MultisampleEnable = false;
+	rasterizerState.AntialiasedLineEnable = false;
+	HRESULT result = D3D11Device->CreateRasterizerState(&rasterizerState, &rasterStateCull_back);
+	if (FAILED(result)) return;
+
+	rasterizerState.CullMode = D3D11_CULL_FRONT;
+	rasterizerState.FrontCounterClockwise = true;
+	result = D3D11Device->CreateRasterizerState(&rasterizerState, &rasterStateCull_front);
+	if (FAILED(result)) return;
+
+	D3D11DeviceContext->RSSetState(rasterStateCull_front);
+
 }
 
 void D3DXDriver::CreateSurfaces(){
@@ -171,4 +194,9 @@ void D3DXDriver::Clear(){
 void D3DXDriver::SwapBuffers(){
 	// Swap between back and front buffer
 	DXGISwapchain->Present(0, 0);
+}
+
+void D3DXDriver::SetCullFace(CULLMODE mode)
+{
+	D3D11DeviceContext->RSSetState(mode == CULLMODE::FRONT ? rasterStateCull_front : rasterStateCull_back);
 }

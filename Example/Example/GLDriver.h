@@ -45,6 +45,7 @@ public:
 
 	void	Clear();
 	void	SwapBuffers();
+	void SetCullFace(CULLMODE mode) override;
 #if defined(USING_OPENGL_ES20) || defined(USING_OPENGL_ES30)
 	EGLDisplay			eglDisplay;
 	EGLConfig			eglConfig;

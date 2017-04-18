@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 #ifdef USING_GL_COMMON
 bool checkcompilederrors(GLuint shader, GLenum type) {
@@ -74,13 +75,103 @@ char *file2string(const char *path) {
 
 
 
-Texture* Utils::textureCheker = nullptr;
-#ifdef USING_GL_COMMON
-GLuint Utils::DefaultShaderID = 0;
-int Utils::textureChekerID = -1;
-
-void Utils::Init()
+Texture* Tools::textureCheker = nullptr;
+std::vector<Texture*> Tools::m_textures;
+std::vector<BaseRT*> Tools::RTs;
+int Tools::LoadTexture(const char * path)
 {
+	for (auto &it : m_textures) {
+		std::string ttstr = std::string(it->optname);
+		if (ttstr == path) {
+			return it->id;
+		}
+	}
+#ifdef USING_GL_COMMON
+	Texture *tex = new TextureGL;
+#elif defined USING_D3D11
+	Texture *tex = new TextureD3D;
+#endif
+	int textureID = tex->LoadTexture(const_cast<char*>(path));
+	if (textureID != -1) {
+		m_textures.push_back(tex);
+		return textureID;
+	}
+	std::cout << "File not Found" << std::endl;
+	delete tex;
+	return -1;
+}
+Texture * Tools::GetTexture(int id)
+{
+	if (id == -1)
+		return textureCheker;
+	return *std::find_if(m_textures.begin(), m_textures.end(), [&id](const Texture* p) { return p->id == id; });;
+}
+#ifdef USING_GL_COMMON
+#include "GLRT.h"
+#include "GLDriver.h"
+GLuint Tools::DefaultShaderID = 0;
+int Tools::textureChekerID = -1;
+GLDriver* Tools::pVideoDriver;
+//===================== Render Targets ================================
+int Tools::CreateRT(int numRT, int colorf, int depthf, int w, int h)
+{
+	GLRT	*pRT = new GLRT;
+	if (w == 0)
+		w = pVideoDriver->width;
+	if (h == 0)
+		h = pVideoDriver->height;
+	if (pRT->Load(numRT, colorf, depthf, w, h)) {
+		RTs.push_back(pRT);
+		return (RTs.size() - 1);
+	}
+	else {
+		delete pRT;
+	}
+	return -1;
+}
+int Tools::CreateRT(int numRT)
+{
+	GLRT	*pRT = new GLRT;
+	if (pRT->Load(numRT, 0, 0, pVideoDriver->width, pVideoDriver->height)) {
+		RTs.push_back(pRT);
+		return (RTs.size() - 1);
+	}
+	else {
+		delete pRT;
+	}
+	return -1;
+}
+
+void Tools::PushRT(int id) {
+	if (id < 0 || id >= (int)RTs.size())
+		return;
+
+	GLRT *pRT = dynamic_cast<GLRT*>(RTs[id]);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, pRT->vFrameBuffers[0]);
+
+#if defined(USING_OPENGL) || defined(USING_OPENGL_ES30)
+	glDrawBuffers(pRT->number_RT, pVideoDriver->DrawBuffers);
+#endif
+
+	glClearColor(0.5, 0.5, 0.5, 1.0);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Tools::PopRT() {
+	glBindFramebuffer(GL_FRAMEBUFFER, pVideoDriver->CurrentFBO);
+}
+
+void Tools::DestroyRTs() {
+	for (unsigned int i = 0; i < RTs.size(); i++) {
+		GLRT *pRT = dynamic_cast<GLRT*>(RTs[i]);
+		delete pRT;
+	}
+}
+void Tools::Init(BaseDriver* driver)
+{
+	pVideoDriver = dynamic_cast<GLDriver*>(driver);
 	char *vsSourceWire = "attribute highp vec4 Vertex;uniform highp mat4 WVP;void main() {gl_Position = WVP*Vertex;}";
 	char *fsSourceWire = "void main() {gl_FragColor = vec4(1, 0, 1, 1);}";
 	GLuint vshaderWire_id = createShader(GL_VERTEX_SHADER, const_cast<char*>(vsSourceWire));
@@ -94,15 +185,89 @@ void Utils::Init()
 }
 
 #elif defined USING_D3D11
+#include "D3DXDriver.h"
+#include "D3DRT.h"
 extern ComPtr<ID3D11Device>            D3D11Device;
 extern ComPtr<ID3D11DeviceContext>     D3D11DeviceContext;
 
-ComPtr<ID3D11VertexShader> Utils::pDefaultVS;
-ComPtr<ID3D11PixelShader>  Utils::pDefaultFS;
-ComPtr<ID3DBlob>  Utils::DefaultVS_blob = nullptr;
-ComPtr<ID3DBlob> Utils::DefaultFS_blob = nullptr;
-void Utils::Init()
+extern ComPtr<ID3D11RenderTargetView>  D3D11RenderTargetView;  
+extern ComPtr<ID3D11DepthStencilView>  D3D11DepthStencilTargetView;
+
+ComPtr<ID3D11VertexShader> Tools::pDefaultVS;
+ComPtr<ID3D11PixelShader>  Tools::pDefaultFS;
+ComPtr<ID3DBlob>  Tools::DefaultVS_blob = nullptr;
+ComPtr<ID3DBlob> Tools::DefaultFS_blob = nullptr;
+D3DXDriver* Tools::pVideoDriver;
+
+//===================== Render Targets ================================
+int Tools::CreateRT(int numRT, int colorf, int depthf, int w, int h)
 {
+	D3DRT	*pRT = new D3DRT;
+	if (w == 0)
+		w = pVideoDriver->Width;
+	if (h == 0)
+		h = pVideoDriver->Height;
+	if (pRT->Load(numRT, colorf, depthf, w, h)) {
+		RTs.push_back(pRT);
+		return (RTs.size() - 1);
+	}
+	else {
+		delete pRT;
+	}
+	return -1;
+}
+int Tools::CreateRT(int numRT)
+{
+	D3DRT	*pRT = new D3DRT;
+	if (pRT->Load(numRT, 0, 0, pVideoDriver->Width, pVideoDriver->Height)) {
+		RTs.push_back(pRT);
+		return (RTs.size() - 1);
+	}
+	else {
+		delete pRT;
+	}
+	return -1;
+}
+
+void Tools::PushRT(int id) {
+	if (id < 0 || id >= (int)RTs.size())
+		return;
+
+	D3DRT *pRT = dynamic_cast<D3DRT*>(RTs[id]);
+
+	std::vector<ID3D11RenderTargetView**> RTVA;
+	for (int i = 0; i < pRT->number_RT; i++) {
+		RTVA.push_back(pRT->vD3D11RenderTargetView[i].GetAddressOf());
+	}
+
+	D3D11DeviceContext->OMSetRenderTargets(pRT->number_RT, &RTVA[0][0], pRT->D3D11DepthStencilTargetView.Get());
+
+	float rgba[4];
+	rgba[0] = 0.5f;
+	rgba[1] = 0.5f;
+	rgba[2] = 0.5f;
+	rgba[3] = 1.0f;
+
+	for (int i = 0; i < pRT->number_RT; i++) {
+		D3D11DeviceContext->ClearRenderTargetView(pRT->vD3D11RenderTargetView[i].Get(), rgba);
+	}
+
+	D3D11DeviceContext->ClearDepthStencilView(pRT->D3D11DepthStencilTargetView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+}
+
+void Tools::PopRT() {
+	D3D11DeviceContext->OMSetRenderTargets(1, D3D11RenderTargetView.GetAddressOf(), D3D11DepthStencilTargetView.Get());
+}
+
+void Tools::DestroyRTs() {
+	for (unsigned int i = 0; i < RTs.size(); i++) {
+		D3DRT *pRT = dynamic_cast<D3DRT*>(RTs[i]);
+		delete pRT;
+	}
+}
+void Tools::Init(BaseDriver* driver)
+{
+	pVideoDriver = dynamic_cast<D3DXDriver*>(driver);
 	textureCheker = new TextureD3D;
 	textureCheker->LoadDefaultTxture();
 	char *vsSourceWire = "cbuffer ConstantBuffer{float4x4 WVP;}struct VS_INPUT {float4 position : POSITION;};struct VS_OUTPUT {float4 hposition : SV_POSITION;};VS_OUTPUT VS(VS_INPUT input) {VS_OUTPUT OUT;OUT.hposition = mul(WVP, input.position);return OUT;}";

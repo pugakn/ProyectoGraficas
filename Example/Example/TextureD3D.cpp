@@ -26,9 +26,13 @@ void	TextureD3D::SetTextureParams(unsigned int &target){
 		sdesc.MaxAnisotropy = 16;
 	}
 
-	sdesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sdesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sdesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	//sdesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	//sdesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	//sdesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+
+	sdesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+	sdesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+	sdesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
 
 	if (params & TEXT_BASIC_PARAMS::CLAMP_TO_EDGE) {
 		sdesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;

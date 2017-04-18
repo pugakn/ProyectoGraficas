@@ -78,7 +78,7 @@ void ModelGL::Create()
 			GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, const_cast<char*>(fstr.c_str()));
 			if (vshader_id == 0 || fshader_id == 0)
 			{
-				m_meshInfo.back().subsetInfo.back().shadersID = Utils::DefaultShaderID;
+				m_meshInfo.back().subsetInfo.back().shadersID = Tools::DefaultShaderID;
 				glLinkProgram(m_meshInfo.back().subsetInfo.back().shadersID);
 				glUseProgram(m_meshInfo.back().subsetInfo.back().shadersID);
 
@@ -110,121 +110,30 @@ void ModelGL::Create()
 				m_meshInfo.back().subsetInfo.back().camPosLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "camPos");
 				m_meshInfo.back().subsetInfo.back().specExpLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "specExp");
 				m_meshInfo.back().subsetInfo.back().attMaxLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "attMax");
-				//Cargar Texturas
-				//Difuse
-				bool found = false;
+				
+				//=========================== Create Textures ===============================
 				m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "diffuse"));
-				for (std::size_t f = 0; f<Textures.size(); f++) {
-					Texture *ttex = Textures[f];
-					std::string ttstr = std::string(ttex->optname);
-					if (ttstr == subsetIt.m_effects.m_difusePath.c_str()) {
-						m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					Texture *tex = new TextureGL;
-					int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_difusePath.c_str()));
-					if (textureID != -1) {
-						Textures.push_back(tex);
-						m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
-					}
-					else {
-						std::cout << "Texture not Found" << std::endl;
-						m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(Utils::textureChekerID);
-						Textures.push_back(Utils::textureCheker);
-						delete tex;
-					}
-				}
-				//Specular
-
-				if (subsetIt.m_effects.m_specularMap != "") {
+				int textureID = Tools::LoadTexture(subsetIt.m_effects.m_difusePath.c_str());
+				m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
+				if (subsetIt.m_effects.m_specularMap != "")
+				{
 					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "specularMap"));
-					found = false;
-					for (std::size_t f = 0; f< Textures.size(); f++) {
-						Texture *ttex = Textures[f];
-						std::string ttstr = std::string(ttex->optname);
-						if (ttstr == subsetIt.m_effects.m_specularMap.c_str()) {
-							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
-							found = true;
-							break;
-						}
-					}
-					if (!found) {
-						Texture *tex = new TextureGL;
-						int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_specularMap.c_str()));
-						if (textureID != -1) {
-							Textures.push_back(tex);
-							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
-						}
-						else {
-							std::cout << "Texture not Found" << std::endl;
-							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(Utils::textureChekerID);
-							Textures.push_back(Utils::textureCheker);
-							delete tex;
-						}
-					}
+					textureID = Tools::LoadTexture(subsetIt.m_effects.m_specularMap.c_str());
+					m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
 				}
-				//Gloss
-				if (subsetIt.m_effects.m_glossMap != "") {
+				if (subsetIt.m_effects.m_glossMap != "")
+				{
 					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "glossMap"));
-					found = false;
-					for (std::size_t f = 0; f<Textures.size(); f++) {
-						Texture *ttex = Textures[f];
-						std::string ttstr = std::string(ttex->optname);
-						if (ttstr == subsetIt.m_effects.m_glossMap.c_str()) {
-							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
-							found = true;
-							break;
-						}
-					}
-					if (!found) {
-						Texture *tex = new TextureGL;
-						int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_glossMap.c_str()));
-						if (textureID != -1) {
-							Textures.push_back(tex);
-							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
-						}
-						else {
-							std::cout << "Texture not Found" << std::endl;
-							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(Utils::textureChekerID);
-							Textures.push_back(Utils::textureCheker);
-							delete tex;
-						}
-					}
+					textureID = Tools::LoadTexture(subsetIt.m_effects.m_glossMap.c_str());
+					m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
 				}
-				//Normal
-				if (subsetIt.m_effects.m_normalMap != "") {
+				if (subsetIt.m_effects.m_normalMap != "")
+				{
 					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "normalMap"));
-					found = false;
-					for (std::size_t f = 0; f<Textures.size(); f++) {
-						Texture *ttex = Textures[f];
-						std::string ttstr = std::string(ttex->optname);
-						if (ttstr == subsetIt.m_effects.m_normalMap.c_str()) {
-							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(ttex->id);
-							found = true;
-							break;
-						}
-					}
-					if (!found) {
-						Texture *tex = new TextureGL;
-						int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_normalMap.c_str()));
-						if (textureID != -1) {
-							Textures.push_back(tex);
-							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
-						}
-						else {
-							std::cout << "Texture not Found" << std::endl;
-							m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(Utils::textureChekerID);
-							Textures.push_back(Utils::textureCheker);
-							delete tex;
-						}
-					}
+					textureID = Tools::LoadTexture(subsetIt.m_effects.m_normalMap.c_str());
+					m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
 				}
 			}
-			
-
 			//Generar buffer de Indices
 			glGenBuffers(1, &m_meshInfo.back().subsetInfo.back().IB);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_meshInfo.back().subsetInfo.back().IB);
@@ -246,7 +155,7 @@ void ModelGL::Create()
 	//===================================Generar Wireframe==================================
 	//Shaders
 	//Attach Shaders
-	wire.ShaderID = Utils::DefaultShaderID;
+	wire.ShaderID = Tools::DefaultShaderID;
 
 	glLinkProgram(wire.ShaderID);
 	//glUseProgram(wire.ShaderID);
@@ -365,7 +274,6 @@ inline void ModelGL::DrawMeshes(const Matrix4D & VP, const Matrix4D & WVP)
 				glBindTexture(GL_TEXTURE_2D, sIt->textInfo.IdsTex[k]);
 				glUniform1i(sIt->textInfo.IdTexUniformLocs[k], k); //Specify location
 			}
-
 #if USING_32BIT_IB
 			glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
 #else

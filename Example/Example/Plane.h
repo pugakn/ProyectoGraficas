@@ -1,3 +1,5 @@
+#pragma once
+#include "PrimitiveBase.h"
 /*********************************************************
 * Copyright (C) 2017 Daniel Enriquez (camus_mm@hotmail.com)
 * All Rights Reserved
@@ -9,9 +11,6 @@
 * ** I do not and will not provide support, this software is "as is"
 * ** Enjoy, learn and share.
 *********************************************************/
-
-#ifndef T800_CUBE_GL_H
-#define T800_CUBE_GL_H
 
 #include "Config.h"
 
@@ -34,9 +33,9 @@
 
 #include "Matrix4D.h"
 #include "PrimitiveBase.h"
-class CubeGL : public PrimitiveBase {
+class Plane : public PrimitiveBase {
 public:
-	CubeGL()
+	Plane()
 #ifdef USING_GL_COMMON
 		: shaderID(0)
 #endif
@@ -45,7 +44,6 @@ public:
 #ifdef USING_D3D11
 	struct CBuffer {
 		Matrix4D WVP;
-		Matrix4D World;
 	};
 #endif
 
@@ -58,13 +56,10 @@ public:
 #ifdef USING_GL_COMMON
 	GLuint	shaderID;
 	GLint	vertexAttribLoc;
-	GLint	normalAttribLoc;
-	GLint	uvAttribLoc;
 	GLint	diffuseLoc;
 
 
 	GLint  matWorldViewProjUniformLoc;
-	GLint  matWorldUniformLoc;
 
 	GLuint			VB;
 	GLuint			IB;
@@ -78,15 +73,14 @@ public:
 	ComPtr<ID3D11InputLayout>   Layout;
 	ComPtr<ID3D11Buffer>        pd3dConstantBuffer;
 
-	CubeGL::CBuffer	CnstBuffer;
+	Plane::CBuffer	CnstBuffer;
 #endif
 
 	int		TexId;
-	CVertex			vertices[24];
-	unsigned short	indices[36];
+	CVertex			vertices[4];
+	unsigned short	indices[6];
 	Matrix4D	transform;
 	Texture		*tex;
 };
 
 
-#endif

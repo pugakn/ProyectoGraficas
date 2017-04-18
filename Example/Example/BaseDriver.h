@@ -17,6 +17,11 @@
 
 class BaseDriver {
 public:
+	enum CULLMODE
+	{
+		FRONT,
+		BACK
+	};
 	BaseDriver() {  }
 	virtual	void	InitDriver() = 0;
 	virtual void	CreateSurfaces() = 0;
@@ -27,6 +32,7 @@ public:
 	virtual void	SetDimensions(int, int) = 0;
 	virtual void	Clear() = 0;
 	virtual void	SwapBuffers() = 0;
+	virtual void	SetCullFace(CULLMODE mode) = 0;
 };
 
 #endif

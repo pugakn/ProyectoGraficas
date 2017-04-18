@@ -108,113 +108,30 @@ void MeshD3D::Create()
 			if (errorShader)
 			{
 				meshIt.m_vertexAttributes = 0;
-				it_subsetinfo->VS_blob = Utils::DefaultVS_blob;
-				it_subsetinfo->pVS = Utils::pDefaultVS;
-				it_subsetinfo->FS_blob = Utils::DefaultFS_blob;
-				it_subsetinfo->pFS = Utils::pDefaultFS;
+				it_subsetinfo->VS_blob = Tools::DefaultVS_blob;
+				it_subsetinfo->pVS = Tools::pDefaultVS;
+				it_subsetinfo->FS_blob = Tools::DefaultFS_blob;
+				it_subsetinfo->pFS = Tools::pDefaultFS;
 			}
 			else
 			{
 				//=========================== Create Textures ===============================
-				bool found = false;
-				for (std::size_t f = 0; f < m_Textures.size(); f++) {
-					Texture *ttex = m_Textures[f];
-					std::string ttstr = std::string(ttex->optname);
-					if (ttstr == subsetIt.m_effects.m_difusePath.c_str()) {
-						it_subsetinfo->difuseText = ttex;
-						found = true;
-						break;
-					}
+				int textureID = Tools::LoadTexture(subsetIt.m_effects.m_difusePath.c_str());
+				it_subsetinfo->difuseText = Tools::GetTexture(textureID);
+				if (subsetIt.m_effects.m_specularMap != "")
+				{
+					textureID = Tools::LoadTexture(subsetIt.m_effects.m_specularMap.c_str());
+					it_subsetinfo->specularText = Tools::GetTexture(textureID);
 				}
-				if (!found) {
-					Texture *tex = new TextureD3D;
-					int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_difusePath.c_str()));
-					if (textureID != -1) {
-						m_Textures.push_back(tex);
-						it_subsetinfo->difuseText = tex;
-					}
-					else {
-						std::cout << "Texture not Found" << std::endl;
-						it_subsetinfo->difuseText = Utils::textureCheker;
-						delete tex;
-					}
+				if (subsetIt.m_effects.m_glossMap != "")
+				{
+					textureID = Tools::LoadTexture(subsetIt.m_effects.m_glossMap.c_str());
+					it_subsetinfo->glossText = Tools::GetTexture(textureID);
 				}
-
-
-				if (subsetIt.m_effects.m_specularMap != "") {
-					bool SpecFound = false;
-					for (std::size_t f = 0; f < m_Textures.size(); f++) {
-						Texture *ttex = m_Textures[f];
-						std::string ttstr = std::string(ttex->optname);
-						if (ttstr == subsetIt.m_effects.m_specularMap.c_str()) {
-							it_subsetinfo->specularText = ttex;
-							SpecFound = true;
-							break;
-						}
-					}
-					if (!SpecFound) {
-						Texture *tex = new TextureD3D;
-						int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_specularMap.c_str()));
-						if (textureID != -1) {
-							m_Textures.push_back(tex);
-							it_subsetinfo->specularText = tex;
-						}
-						else {
-							std::cout << "Texture not Found" << std::endl;
-							it_subsetinfo->difuseText = Utils::textureCheker;
-							delete tex;
-						}
-					}
-				}
-				if (subsetIt.m_effects.m_glossMap != "") {
-					bool GlossFound = false;
-					for (std::size_t f = 0; f < m_Textures.size(); f++) {
-						Texture *ttex = m_Textures[f];
-						std::string ttstr = std::string(ttex->optname);
-						if (ttstr == subsetIt.m_effects.m_glossMap.c_str()) {
-							it_subsetinfo->glossText = ttex;
-							GlossFound = true;
-							break;
-						}
-					}
-					if (!GlossFound) {
-						Texture *tex = new TextureD3D;
-						int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_glossMap.c_str()));
-						if (textureID != -1) {
-							m_Textures.push_back(tex);
-							it_subsetinfo->glossText = tex;
-						}
-						else {
-							std::cout << "Texture not Found" << std::endl;
-							it_subsetinfo->difuseText = Utils::textureCheker;
-							delete tex;
-						}
-					}
-				}
-				if (subsetIt.m_effects.m_normalMap != "") {
-					bool NormalFound = false;
-					for (std::size_t f = 0; f < m_Textures.size(); f++) {
-						Texture *ttex = m_Textures[f];
-						std::string ttstr = std::string(ttex->optname);
-						if (ttstr == subsetIt.m_effects.m_normalMap.c_str()) {
-							it_subsetinfo->normalText = ttex;
-							NormalFound = true;
-							break;
-						}
-					}
-					if (!NormalFound) {
-						Texture *tex = new TextureD3D;
-						int textureID = tex->LoadTexture(const_cast<char*>(subsetIt.m_effects.m_normalMap.c_str()));
-						if (textureID != -1) {
-							m_Textures.push_back(tex);
-							it_subsetinfo->normalText = tex;
-						}
-						else {
-							std::cout << "Texture not Found" << std::endl;
-							it_subsetinfo->difuseText = Utils::textureCheker;
-							delete tex;
-						}
-					}
+				if (subsetIt.m_effects.m_normalMap != "")
+				{
+					textureID = Tools::LoadTexture(subsetIt.m_effects.m_normalMap.c_str());
+					it_subsetinfo->normalText = Tools::GetTexture(textureID);
 				}
 			}
 			//==================== Create Decl Data =====================
@@ -323,10 +240,10 @@ void MeshD3D::Create()
 	delete[] fsSourceP;
 
 	// ================================================== Wireframe =============================================
-	wire.pVS = Utils::pDefaultVS;
-	wire.pFS = Utils::pDefaultFS;
-	wire.VS_blob = Utils::DefaultVS_blob;
-	wire.FS_blob = Utils::DefaultFS_blob;
+	wire.pVS = Tools::pDefaultVS;
+	wire.pFS = Tools::pDefaultFS;
+	wire.VS_blob = Tools::DefaultVS_blob;
+	wire.FS_blob = Tools::DefaultFS_blob;
 
 	//==================== Create Decl Data =====================
 	D3D11_INPUT_ELEMENT_DESC elementDesc;
