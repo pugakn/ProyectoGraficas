@@ -25,7 +25,7 @@ void PhysXManager::Init()
 		exit(-1);
 
 	PxSceneDesc scDesc(g_Physics->getTolerancesScale());
-	scDesc.gravity = PxVec3(0.0f, -30.81f, 0.0f);
+	scDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	scDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
 	scDesc.filterShader = PxDefaultSimulationFilterShader;
 

@@ -3,7 +3,7 @@
 class PhysXManager
 {
 	float m_fAccumulator;
-	const float STEP_TIME = 1.0f / 120.0f;
+	const float STEP_TIME = 1.0f / 60.0f;
 public:
 	PhysXManager(){ 
 		m_fAccumulator = 0.0f; 

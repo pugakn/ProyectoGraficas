@@ -31,7 +31,7 @@ void TestApp::InitVars() {
 	cam.Init();
 
 	SceneProp.AddCamera(&cam);
-	SceneProp.AddLight(Vector3D(250, 25.0f, 120), Vector3D(1.0f, 0.8f, 0.8f), true);
+	SceneProp.AddLight(Vector3D(0, 25.0f, -270), Vector3D(1.0f, 0.8f, 0.8f), true);
 	SceneProp.specExp = 14.0f;
 	SceneProp.attMax = 12000.0f;
 	//SceneProp.AmbientColor = Vector3D(0.15f, 0.15f, 0.15f);
@@ -188,6 +188,36 @@ void TestApp::CreateAssets() {
 	////Models.back().RotateYAbsolute(90);
 	//Models.back().Update();
 
+	for (size_t k = 0; k < 4; k++)
+	{
+		for (size_t i = 0; i < 4; i++)
+		{
+			for (size_t j = 0; j < 4; j++)
+			{
+				Cubes.push_back(new PxCube());
+				Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 1);
+				Cubes.back()->Traslate(Vector3D( i * 4 , 300 + j * 4 , k * 4 ));
+				Cubes.back()->body->setMass(20.0f);
+				//Cubes.back()->body->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+				//Cubes.back()->body->setAngularVelocity(PxVec3(0.f, 2.f, 0.0));
+				//Cubes.back()->body->setMassSpaceInertiaTensor(PxVec3(7.f, 7.f, 7.f));
+			}
+		}
+	}
+
+	for (size_t k = 0; k < 4; k++)
+	{
+		for (size_t i = 0; i < 4; i++)
+		{
+			for (size_t j = 0; j < 4; j++)
+			{
+				Cubes.push_back(new PxCube());
+				Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 1);
+				Cubes.back()->Traslate(Vector3D(i * 4, 100 + j * 4, k * 4));
+				Cubes.back()->body->setMass(20.0f);
+			}
+		}
+	}
 	for (size_t k = 0; k < 5; k++)
 	{
 		for (size_t i = 0; i < 5; i++)
@@ -195,13 +225,9 @@ void TestApp::CreateAssets() {
 			for (size_t j = 0; j < 5; j++)
 			{
 				Cubes.push_back(new PxCube());
-				Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 10);
-				Cubes.back()->Traslate(Vector3D(i * 40 , 200 + j * 40 , k * 40 ));
-				//Cubes.back()->body->setMass(50.0f);
-				//Cubes.back()->body->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-				//Cubes.back()->body->setAngularVelocity(PxVec3(0.f, 2.f, 0.0));
-				//Cubes.back()->body->setMass(0.f);
-				//Cubes.back()->body->setMassSpaceInertiaTensor(PxVec3(0.f, 0.f, 10.f));
+				Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 1);
+				Cubes.back()->Traslate(Vector3D(i * 4, 5 + j * 4, k * 4));
+				Cubes.back()->body->setMass(5.0f);
 			}
 		}
 	}
@@ -212,17 +238,16 @@ void TestApp::CreateAssets() {
 	index = PrimitiveMgr.CreateModel("Models/NuBatman.X");
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(3);
-	Models.back().TranslateAbsolute(200, 0, 140);
-	Models.back().RotateYAbsolute(90);
+	Models.back().ScaleAbsolute(0.5);
+	Models.back().TranslateAbsolute(0, 0, -360);
 	Models.back().Update();
 
 
 	index = PrimitiveMgr.CreateModel("Models/NuVenomJok.X");
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().TranslateAbsolute(200, 0, 90);
-	Models.back().RotateYAbsolute(90);
+	Models.back().ScaleAbsolute(0.5);
+	Models.back().TranslateAbsolute(50, 0, -360);
 	Models.back().Update();
 
 
@@ -231,9 +256,37 @@ void TestApp::CreateAssets() {
 	dynamic_cast<Plane*>(PrimitiveMgr.primitives[index])->tex = Tools::RTs[0]->vColorTextures[0];
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().TranslateAbsolute(250, 1, 250);
+	Models.back().TranslateAbsolute(-1500, 1, -400);
 	Models.back().RotateXAbsolute(90);
-	Models.back().ScaleAbsolute(300);
+	Models.back().Update();
+
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(-1500, 1, -380);
+	Models.back().RotateXAbsolute(90);
+	Models.back().ScaleAbsolute(3000);
+	Models.back().Update();
+
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(-1500, 1, 3380);
+	Models.back().RotateXAbsolute(90);
+	Models.back().ScaleAbsolute(3000);
+	Models.back().Update();
+
+	//dynamic_cast<Plane*>(PrimitiveMgr.primitives[index])->tex = Tools::RTs[0]->vColorTextures[0];
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(380, 1, 1500);
+	Models.back().RotateXAbsolute(90);
+	Models.back().ScaleAbsolute(3000);
+	Models.back().Update();
+
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(-3380, 1, 1500);
+	Models.back().RotateXAbsolute(90);
+	Models.back().ScaleAbsolute(3000);
 	Models.back().Update();
 	//==========================================================
 
@@ -334,19 +387,19 @@ void TestApp::OnDraw() {
 void TestApp::OnInput() {
 	//cam.OnInput(DtTimer.GetDTSecs());
 	if (IManager.PressedKey(SDLK_w)) {
-		cam.TraslateFront(-100.0f*DtTimer.GetDTSecs());
+		cam.TraslateFront(-40.0f*DtTimer.GetDTSecs());
 	}
 
 	if (IManager.PressedKey(SDLK_s)) {
-		cam.TraslateFront(100.0f*DtTimer.GetDTSecs());
+		cam.TraslateFront(40.0f*DtTimer.GetDTSecs());
 	}
 
 	if (IManager.PressedKey(SDLK_d)) {
-		cam.TraslateSide(100.0f*DtTimer.GetDTSecs());
+		cam.TraslateSide(40.0f*DtTimer.GetDTSecs());
 	}
 
 	if (IManager.PressedKey(SDLK_a)) {
-		cam.TraslateSide(-100.0f*DtTimer.GetDTSecs());
+		cam.TraslateSide(-40.0f*DtTimer.GetDTSecs());
 	}
 
 	if (IManager.PressedKey(SDLK_r)) {

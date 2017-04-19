@@ -9,13 +9,12 @@ void PxCube::Create(PrimitiveBase* prm, float scale)
 
 	//PhysX
 	//Material
-	PxMaterial* material2 = g_Physics->createMaterial(0.5, 0.5, 0.0);
+	PxMaterial* material2 = g_Physics->createMaterial(0.2, 0.2, 0.2);
 	//Box
 	PxTransform boxPos(PxVec3(0, 0, 0));
 	PxBoxGeometry boxGeo(PxVec3(scale, scale, scale));
 	body = PxCreateDynamic(*g_Physics, boxPos, boxGeo, *material2, 1.0f);
 
-	body->setAngularDamping(0.f);
 
 	g_scene->addActor(*body);
 	primitive = new PrimitiveInst();
