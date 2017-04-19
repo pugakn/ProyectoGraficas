@@ -13,6 +13,8 @@
 #include <SceneProp.h>
 
 #include "Sprite.h"
+#include "PhysXManager.h"
+#include "PxCube.h"
 class TestApp : public AppBase {
 public:
 	TestApp() : AppBase() {}
@@ -45,5 +47,10 @@ public:
 	Sprite* dot;
 	Sprite* sprite;
 
+	std::vector<PxInstance*> Cubes;
 
+	PhysXManager physxManager;
+	//physx::PxFoundation *mFoundation;
+	//physx::PxPhysics* mPhysics;
+	//physx::PxScene *m_scene;
 };

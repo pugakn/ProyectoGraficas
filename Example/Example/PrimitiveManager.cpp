@@ -2,12 +2,11 @@
 #include "PrimitiveManager.h"
 #ifdef USING_GL_COMMON
 #include "TriangleGL.h"
-#include "CubeGL.h"
 #include "ModelGL.h"
 #elif defined(USING_D3D11)
 #include "MeshD3D.h"
 #endif
-
+#include "CubeGL.h"
 PrimitiveBase*	PrimitiveManager::GetPrimitive(unsigned int index) {
 	if (index >= primitives.size())
 		return 0;
@@ -27,13 +26,12 @@ int  PrimitiveManager::CreateTriangle() {
 }
 
 int	 PrimitiveManager::CreateCube(){
-#ifdef USING_GL_COMMON
+
 	PrimitiveBase *primitive = new CubeGL();
 	primitive->Create();
 	primitives.push_back(primitive);
 	return (int)(primitives.size() - 1);
-#endif;
-	return -1;
+
 }
 
 int	 PrimitiveManager::CreateModel(char * fileName) {

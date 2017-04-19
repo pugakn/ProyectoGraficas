@@ -43,26 +43,26 @@ uniform highp mat4 WVP;
 uniform highp mat4 World;
 
 void main(){
+	highp mat3 m3World = mat3(World);
 	pixelPos	= (World*Vertex).xyz;
 
 
 #ifdef USE_TEXCOORD0
 	vecUVCoords = UV;
-	vecUVCoords.y = vecUVCoords.y;//?
 #endif
 
 	gl_Position = WVP*Vertex;
 #ifdef USE_NORMALS
-	normalTransformed = normalize(mat3(World)*Normal.rgb);
+	normalTransformed = normalize(m3World*Normal.rgb);
 #endif
 #ifdef USE_TANGENTS
-	tangentTransformed = normalize(mat3(World)*Tangent.rgb);
+	tangentTransformed = normalize(m3World*Tangent.rgb);
 #endif
 #ifdef USE_BINORMALS
-	binormalTransformed = normalize(mat3(World)*Binormal.rgb);
+	binormalTransformed = normalize(m3World*Binormal.rgb);
 #endif
 #ifdef USE_VERTEXLIGHTING
-	highp vec3 norm = normalize(mat3(World)*Normal.rgb);
+	highp vec3 norm = normalize(m3World*Normal.rgb);
 	highp vec3 lightDir = normalize(light - (World*Vertex).xyz);
 	highp float lightDist = length((World*Vertex).xyz - light);
 	light_mod = clamp(dot(norm,lightDir),0.0,1.0);

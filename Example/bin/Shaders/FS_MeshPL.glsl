@@ -39,6 +39,12 @@ varying highp vec3 binormalTransformed;
 //
 
 void main(){
+	//float clipPos = dot (pixelPos, vec3(0,1,0)) + w;
+	  //  if (clipPos < 0.0) {
+	   //     discard;
+	  //  }
+
+
 	lowp vec4 color = vec4(0.0,0.0,0.0,1.0);
 #ifdef USE_TEXCOORD0
 		#ifdef USE_TANGENTS

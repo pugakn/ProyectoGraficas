@@ -34,6 +34,7 @@
 
 #include "Matrix4D.h"
 #include "PrimitiveBase.h"
+
 class CubeGL : public PrimitiveBase {
 public:
 	CubeGL()
@@ -50,7 +51,6 @@ public:
 #endif
 
 	void Create();
-	void Create(char *) {}
 	void Transform(float *t);
 	void Draw(float *t) override;
 	void Destroy();

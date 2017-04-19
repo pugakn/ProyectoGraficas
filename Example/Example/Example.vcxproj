@@ -37,10 +37,13 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Matrix4D.h" />
     <ClInclude Include="MeshParser.h" />
+    <ClInclude Include="PhysXManager.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="PrimitiveBase.h" />
     <ClInclude Include="PrimitiveInstance.h" />
     <ClInclude Include="PrimitiveManager.h" />
+    <ClInclude Include="PxCube.h" />
+    <ClInclude Include="PxInstance.h" />
     <ClInclude Include="SceneProp.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteD3D.h" />
@@ -76,9 +79,12 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Matrix4D.cpp" />
     <ClCompile Include="MeshParser.cpp" />
+    <ClCompile Include="PhysXManager.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="PrimitiveInstance.cpp" />
     <ClCompile Include="PrimitiveManager.cpp" />
+    <ClCompile Include="PxCube.cpp" />
+    <ClCompile Include="PxInstance.cpp" />
     <ClCompile Include="SceneProp.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteD3D.cpp" />
@@ -157,7 +163,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Librerias\glew-2.0.0\include;$(SolutionDir)Librerias\stb\include;$(SolutionDir)Librerias\boost_1_63_0;$(SolutionDir)Librerias\SDL-1.2.14\include;$(SolutionDir)Librerias\OGLES2\pvr\include;$(SolutionDir)Librerias\DXMath\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Librerias\PhysX\Include;$(SolutionDir)Librerias\glew-2.0.0\include;$(SolutionDir)Librerias\stb\include;$(SolutionDir)Librerias\boost_1_63_0;$(SolutionDir)Librerias\SDL-1.2.14\include;$(SolutionDir)Librerias\OGLES2\pvr\include;$(SolutionDir)Librerias\DXMath\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
