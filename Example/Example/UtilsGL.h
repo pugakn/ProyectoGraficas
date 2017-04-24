@@ -51,13 +51,13 @@ public:
 	static void PopRT();
 	static void DestroyRTs();
 	static Texture* textureCheker;
+	static int textureChekerID;
 	static std::vector<BaseRT*> RTs;
 #ifdef USING_GL_COMMON
 private:
 	static GLDriver* pVideoDriver;
 public:
 	static GLuint DefaultShaderID;
-	static int textureChekerID;
 #elif defined USING_D3D11
 private:
 	static D3DXDriver* pVideoDriver;

@@ -19,7 +19,7 @@
 
 #ifdef USING_GL_COMMON
 bool checkcompilederrors(GLuint shader, GLenum type) {
-	GLint bShaderCompiled;
+	GLint bShaderCompiled = 0;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &bShaderCompiled);
 	if (!bShaderCompiled) {
 		int i32InfoLogLength, i32CharsWritten;
@@ -46,6 +46,8 @@ bool checkcompilederrors(GLuint shader, GLenum type) {
 }
 
 GLuint createShader(GLenum type, char* pSource) {
+	if (!strcmp(pSource, ""))
+		return 0;
 	GLuint shader = glCreateShader(type);
 	glShaderSource(shader, 1, (const char**)&pSource, NULL);
 	glCompileShader(shader);
@@ -78,6 +80,7 @@ char *file2string(const char *path) {
 Texture* Tools::textureCheker = nullptr;
 std::vector<Texture*> Tools::m_textures;
 std::vector<BaseRT*> Tools::RTs;
+int Tools::textureChekerID = -1;
 int Tools::LoadTexture(const char * path)
 {
 	for (auto &it : m_textures) {
@@ -112,7 +115,6 @@ Texture * Tools::GetTexture(int id)
 #include "GLRT.h"
 #include "GLDriver.h"
 GLuint Tools::DefaultShaderID = 0;
-int Tools::textureChekerID = -1;
 GLDriver* Tools::pVideoDriver;
 //===================== Render Targets ================================
 int Tools::CreateRT(int numRT, int colorf, int depthf, int w, int h)
@@ -281,7 +283,7 @@ void Tools::Init(BaseDriver* driver)
 {
 	pVideoDriver = dynamic_cast<D3DXDriver*>(driver);
 	textureCheker = new TextureD3D;
-	textureCheker->LoadDefaultTxture();
+	textureChekerID = textureCheker->LoadDefaultTxture();
 	char *vsSourceWire = "cbuffer ConstantBuffer{float4x4 WVP;}struct VS_INPUT {float4 position : POSITION;};struct VS_OUTPUT {float4 hposition : SV_POSITION;};VS_OUTPUT VS(VS_INPUT input) {VS_OUTPUT OUT;OUT.hposition = mul(WVP, input.position);return OUT;}";
 	char *fsSourceWire = "cbuffer ConstantBuffer{float4x4 WVP;}struct VS_OUTPUT {float4 hposition : SV_POSITION;};float4 FS(VS_OUTPUT input) : SV_TARGET{return float4(1,0,1,1);}";
 	std::string vstrWire = std::string(vsSourceWire);

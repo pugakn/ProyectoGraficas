@@ -50,6 +50,7 @@ public:
 	std::vector<PxInstance*> Cubes;
 
 	PhysXManager physxManager;
+	bool usePhysX;
 	//physx::PxFoundation *mFoundation;
 	//physx::PxPhysics* mPhysics;
 	//physx::PxScene *m_scene;

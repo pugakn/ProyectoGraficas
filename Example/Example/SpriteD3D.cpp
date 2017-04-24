@@ -6,6 +6,7 @@ extern ComPtr<ID3D11DeviceContext>     D3D11DeviceContext;
 
 void SpriteD3D::Create(Matrix4D & VP)
 {
+	difuseText = NULL;
 	bool errorShader = false;
 	m_VP = VP;
 	transform = Identity();
@@ -168,14 +169,16 @@ void SpriteD3D::Draw()
 	//=================== Set VB ===================
 	UINT stride = sizeof(spriteVertex);
 	UINT offset = 0;
-	D3D11DeviceContext->IASetVertexBuffers(0,1, m_VB.GetAddressOf(),&stride,&offset);
+	D3D11DeviceContext->IASetVertexBuffers(0, 1, m_VB.GetAddressOf(), &stride, &offset);
 	//==================== Set IB =====================
 	D3D11DeviceContext->IASetIndexBuffer(IB.Get(), DXGI_FORMAT_R16_UINT, 0);
 	//==================== Set Texture =====================
-
-	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(difuseText);
-	D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
-	D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
+	if (difuseText != NULL)
+	{
+		TextureD3D *texd3d = dynamic_cast<TextureD3D*>(difuseText);
+		D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
+		D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
+	}
 	//==================== Draw =====================
 	D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	D3D11DeviceContext->DrawIndexed(6, 0, 0);

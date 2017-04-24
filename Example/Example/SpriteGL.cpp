@@ -23,9 +23,12 @@ void SpriteGL::Create(Matrix4D &VP)
 	}
 	std::string Defines;
 #ifdef USING_OPENGL
-	Defines += "#define lowp\n\n";
-	Defines += "#define mediump\n\n";
-	Defines += "#define highp\n\n";
+	if (vsSourceP != NULL && fsSourceP != NULL)
+	{
+		Defines += "#define lowp\n\n";
+		Defines += "#define mediump\n\n";
+		Defines += "#define highp\n\n";
+	}
 #endif // USING_OPENGL
 	vsrc = Defines + vsrc;
 	fsrc = Defines + fsrc;

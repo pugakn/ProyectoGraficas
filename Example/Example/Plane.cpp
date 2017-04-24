@@ -31,87 +31,107 @@ void Plane::Create() {
 	char *vsSourceP = file2string("Shaders/VS_Water.glsl");
 	char *fsSourceP = file2string("Shaders/FS_Water.glsl");
 
-	std::string vsrc = std::string(vsSourceP);
-	std::string fsrc = std::string(fsSourceP);
+	std::string vsrc;
+	std::string fsrc;
+	if (vsSourceP && fsSourceP)
+	{
+		vsrc = std::string(vsSourceP);
+		fsrc = std::string(fsSourceP);
+	}
 
 	free(vsSourceP);
 	free(fsSourceP);
 
 	std::string Defines;
 #ifdef USING_OPENGL
-	Defines += "#define lowp\n\n";
-	Defines += "#define mediump\n\n";
-	Defines += "#define highp\n\n";
+	if (vsSourceP != NULL && fsSourceP != NULL)
+	{
+		Defines += "#define lowp\n\n";
+		Defines += "#define mediump\n\n";
+		Defines += "#define highp\n\n";
+	}
 #endif // USING_OPENGL
 	vsrc = Defines + vsrc;
 	fsrc = Defines + fsrc;
 
 	GLuint vshader_id = createShader(GL_VERTEX_SHADER, (char*)vsrc.c_str());
 	GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, (char*)fsrc.c_str());
+	if (vshader_id == 0 || fshader_id == 0)
+	{
+		shaderID = Tools::DefaultShaderID;
+		glLinkProgram(shaderID);
+		glUseProgram(shaderID);
 
-	glAttachShader(shaderID, vshader_id);
-	glAttachShader(shaderID, fshader_id);
+		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
+		matWorldViewProjUniformLoc = glGetUniformLocation(shaderID, "WVP");
+	}
+	else
+	{
+		glAttachShader(shaderID, vshader_id);
+		glAttachShader(shaderID, fshader_id);
 
-	glLinkProgram(shaderID);
-	glUseProgram(shaderID);
+		glLinkProgram(shaderID);
+		glUseProgram(shaderID);
 
-	vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
+		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
 
-	matWorldViewProjUniformLoc = glGetUniformLocation(shaderID, "WVP");
+		matWorldViewProjUniformLoc = glGetUniformLocation(shaderID, "WVP");
 
-	diffuseLoc = glGetUniformLocation(shaderID, "diffuse");
+		diffuseLoc = glGetUniformLocation(shaderID, "diffuse");
+	}
 #elif defined(USING_D3D11)
+	bool errorShader = false;
 	char *vsSourceP = file2string("Shaders/VS_Water.hlsl");
 	char *fsSourceP = file2string("Shaders/FS_Water.hlsl");
 
 	if (!vsSourceP || !fsSourceP)
-		exit(32);
-
+		errorShader = true;
 	HRESULT hr;
+	if (!errorShader)
 	{
-		VS_blob = nullptr;
-		ComPtr<ID3DBlob> errorBlob = nullptr;
-		hr = D3DCompile(vsSourceP, (UINT)strlen(vsSourceP), 0, 0, 0, "VS", "vs_5_0", 0, 0, &VS_blob, &errorBlob);
-		if (hr != S_OK) {
+		{
+			VS_blob = nullptr;
+			ComPtr<ID3DBlob> errorBlob = nullptr;
+			hr = D3DCompile(vsSourceP, (UINT)strlen(vsSourceP), 0, 0, 0, "VS", "vs_5_0", 0, 0, &VS_blob, &errorBlob);
+			if (hr != S_OK) {
 
-			if (errorBlob) {
-				printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
-				return;
+				if (errorBlob) {
+					printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
+				}
+				errorShader = true;
 			}
 
-			if (VS_blob) {
-				return;
+			hr = D3D11Device->CreateVertexShader(VS_blob->GetBufferPointer(), VS_blob->GetBufferSize(), 0, &pVS);
+			if (hr != S_OK) {
+				printf("Error Creating Vertex Shader\n");
+				errorShader = true;
 			}
 		}
+		{
+			FS_blob = nullptr;
+			ComPtr<ID3DBlob> errorBlob = nullptr;
+			hr = D3DCompile(fsSourceP, (UINT)strlen(fsSourceP), 0, 0, 0, "FS", "ps_5_0", 0, 0, &FS_blob, &errorBlob);
+			if (hr != S_OK) {
+				if (errorBlob) {
+					printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
+				}
+				errorShader = true;
+			}
 
-		hr = D3D11Device->CreateVertexShader(VS_blob->GetBufferPointer(), VS_blob->GetBufferSize(), 0, &pVS);
-		if (hr != S_OK) {
-			printf("Error Creating Vertex Shader\n");
-			return;
+			hr = D3D11Device->CreatePixelShader(FS_blob->GetBufferPointer(), FS_blob->GetBufferSize(), 0, &pFS);
+			if (hr != S_OK) {
+				printf("Error Creating Pixel Shader\n");
+				errorShader = true;
+			}
 		}
 	}
+	if (errorShader)
 	{
-		FS_blob = nullptr;
-		ComPtr<ID3DBlob> errorBlob = nullptr;
-		hr = D3DCompile(fsSourceP, (UINT)strlen(fsSourceP), 0, 0, 0, "FS", "ps_5_0", 0, 0, &FS_blob, &errorBlob);
-		if (hr != S_OK) {
-			if (errorBlob) {
-				printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
-				return;
-			}
-
-			if (FS_blob) {
-				return;
-			}
-		}
-
-		hr = D3D11Device->CreatePixelShader(FS_blob->GetBufferPointer(), FS_blob->GetBufferSize(), 0, &pFS);
-		if (hr != S_OK) {
-			printf("Error Creating Pixel Shader\n");
-			return;
-		}
+		VS_blob = Tools::DefaultVS_blob;
+		pVS = Tools::pDefaultVS;
+		FS_blob = Tools::DefaultFS_blob;
+		pFS = Tools::pDefaultFS;
 	}
-
 	free(vsSourceP);
 	free(fsSourceP);
 #endif
@@ -155,7 +175,7 @@ void Plane::Create() {
 
 	D3D11_BUFFER_DESC bdesc = { 0 };
 	bdesc.Usage = D3D11_USAGE_DEFAULT;
-	bdesc.ByteWidth = sizeof(Plane::CBuffer);
+	bdesc.ByteWidth = errorShader ? sizeof(Matrix4D) : sizeof(Plane::CBuffer);
 	bdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	hr = D3D11Device->CreateBuffer(&bdesc, 0, pd3dConstantBuffer.GetAddressOf());
@@ -222,10 +242,12 @@ void Plane::Draw(float *t) {
 	glEnableVertexAttribArray(vertexAttribLoc);
 
 	glVertexAttribPointer(vertexAttribLoc, 4, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(0));
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex->id);
-	glUniform1i(diffuseLoc, 0);
+	if (shaderID != Tools::DefaultShaderID)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex->id);
+		glUniform1i(diffuseLoc, 0);
+	}
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 

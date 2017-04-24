@@ -47,35 +47,40 @@ void ModelGL::Create()
 			m_meshInfo.back().subsetInfo.push_back(SubsetInfo());
 			//Crear shaders
 			std::string Defines = "";
-			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_NORMAL)
-				Defines += "#define USE_NORMALS\n\n";
-			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD0)
-				Defines += "#define USE_TEXCOORD0\n\n";
-			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD1)
-				Defines += "#define USE_TEXCOORD1\n\n";
-			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TANGENT)
-				Defines += "#define USE_TANGENTS\n\n";
-			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_BINORMAL)
-				Defines += "#define USE_BINORMALS\n\n";
+			if (vsSourceP != NULL && fsSourceP != NULL)
+			{
+				if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_NORMAL)
+					Defines += "#define USE_NORMALS\n\n";
+				if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD0)
+					Defines += "#define USE_TEXCOORD0\n\n";
+				if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD1)
+					Defines += "#define USE_TEXCOORD1\n\n";
+				if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TANGENT)
+					Defines += "#define USE_TANGENTS\n\n";
+				if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_BINORMAL)
+					Defines += "#define USE_BINORMALS\n\n";
 
 
 
-			//if (subsetIt.m_effects.m_glossMap != "")
-			//	Defines += "#define USE_GLOSS_MAP\n\n";
-			if (subsetIt.m_effects.m_normalMap != "")
-				Defines += "#define USE_NORMAL_MAP\n\n";
-			if (subsetIt.m_effects.m_specularMap != "")
-				Defines += "#define USE_SPEC_MAP\n\n";
+				//if (subsetIt.m_effects.m_glossMap != "")
+				//	Defines += "#define USE_GLOSS_MAP\n\n";
+				if (subsetIt.m_effects.m_normalMap != "")
+					Defines += "#define USE_NORMAL_MAP\n\n";
+				if (subsetIt.m_effects.m_specularMap != "")
+					Defines += "#define USE_SPEC_MAP\n\n";
 
-			Defines += "#define USE_PIXELLIGHTING \n\n";
-			Defines += "#define USING_ATENUATION \n\n";
-			Defines += "#define USE_SPECULAR_BLIN \n\n";
+				if (useLight)
+				{
+					Defines += "#define USE_PIXELLIGHTING \n\n";
+					Defines += "#define USING_ATENUATION \n\n";
+					Defines += "#define USE_SPECULAR \n\n";
+				}
 #ifdef USING_OPENGL
-			Defines += "#define lowp\n\n";
-			Defines += "#define mediump\n\n";
-			Defines += "#define highp\n\n";
+				Defines += "#define lowp\n\n";
+				Defines += "#define mediump\n\n";
+				Defines += "#define highp\n\n";
 #endif // USING_OPENGL
-
+			}
 
 
 			vstr = Defines + vstr;

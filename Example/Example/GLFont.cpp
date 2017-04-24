@@ -29,9 +29,12 @@ void GLFont::Create()
 	}
 	std::string Defines;
 #ifdef USING_OPENGL
-	Defines += "#define lowp\n\n";
-	Defines += "#define mediump\n\n";
-	Defines += "#define highp\n\n";
+	if (vsSourceP != NULL && fsSourceP != NULL)
+	{
+		Defines += "#define lowp\n\n";
+		Defines += "#define mediump\n\n";
+		Defines += "#define highp\n\n";
+	}
 #endif // USING_OPENGL
 	vsrc = Defines + vsrc;
 	fsrc = Defines + fsrc;
@@ -65,15 +68,15 @@ void GLFont::Create()
 		ySeparationLoc = glGetUniformLocation(shaderID, "ySeparation");
 
 
-		//Cargar propiedades de fuente
-		font.LoadFile("Fonts/ArialFont.fnt");
+
 		//Cargar textura de fuente
 		IdTex = Tools::LoadTexture("ArialFont_0.tga");
 		Texture *tex = Tools::GetTexture(IdTex);
 		IdTexUniformLoc = glGetUniformLocation(shaderID, "diffuse");
 		textureWidth = tex->x;
 	}
-
+	//Cargar propiedades de fuente
+	font.LoadFile("Fonts/ArialFont.fnt");
 	m_VBO[0] = { 0.0f,  1.0f, 0.0f ,1.0f,  0.0f, 0.0f };//Left Top
 	m_VBO[1] = { 0.0f,  0.0f, 0.0f ,1.0f,  0.0f, 1.0f };//Left Bot
 	m_VBO[2] = { 1.0f,  0.0f, 0.0f ,1.0f,  1.0f, 1.0f };//Right Bot

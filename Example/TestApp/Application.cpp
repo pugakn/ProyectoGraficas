@@ -13,7 +13,7 @@ extern PxPhysics* g_Physics;
 extern PxScene *g_scene;
 void TestApp::InitVars() {
 	physxManager.Init();
-
+	usePhysX = false;
 	//Material
 	PxMaterial* material = g_Physics->createMaterial(1, 1, 0.0);
 	//Actors
@@ -74,119 +74,97 @@ void TestApp::InitVars() {
 void TestApp::CreateAssets() {	
 	
 
-	int index = PrimitiveMgr.CreateModel("Models/Scene.X");
+	int index = PrimitiveMgr.CreateModel("Models/Scene.X",true);
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 
 
-	/*index = PrimitiveMgr.CreateModel("Models/House.X");
+	//index = PrimitiveMgr.CreateModel("Models/House.X");
 
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(-350, 0, -75);
-	Models.back().Update();
-
-
-	index = PrimitiveMgr.CreateModel("Models/Jinx.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(350, 0, 0);
-	Models.back().RotateYAbsolute(180);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/Vi.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(250, 0, 0);
-	Models.back().RotateYAbsolute(180);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/grag.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(150, 0, 0);
-	Models.back().RotateYAbsolute(180);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/ashe.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(50, 0, 0);
-	Models.back().RotateYAbsolute(180);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/ahri.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(-50, 0, 0);
-	Models.back().RotateYAbsolute(180);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/ahriFire.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(350, 0, -150);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/amumu.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(250, 0, -150);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/anie.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(150, 0, -150);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/Darius.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(10);
-	Models.back().TranslateAbsolute(50, 0, -150);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/garen.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(-50, 0, -150);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/sona.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(2);
-	Models.back().TranslateAbsolute(-50, 0, -75);
-	Models.back().RotateYAbsolute(90);
-	Models.back().Update();
-
-	index = PrimitiveMgr.CreateModel("Models/CerdoNuevo.X");
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(20);
-	Models.back().RotateXAbsolute(90);
-	Models.back().RotateZAbsolute(-30);
-	Models.back().TranslateAbsolute(200, 25, 220);
-	Models.back().Update();
-*/
-	index = PrimitiveMgr.CreateCube();
 	//Models.push_back(PrimitiveInst());
 	//Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	////Models.back().TranslateAbsolute(200, 0, 90);
-	//Models.back().ScaleAbsolute(10);
-	////Models.back().RotateYAbsolute(90);
+	//Models.back().ScaleAbsolute(2);
+	//Models.back().TranslateAbsolute(-350, 0, -75);
 	//Models.back().Update();
+
+
+	index = PrimitiveMgr.CreateModel("Models/Jinx.X",false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(100, 0, -360);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/Vi.X", false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(-50, 0, -360);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/grag.X", false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(-100, 0, -360);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/ashe.X", false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(150, 0, -360);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/ahri.X", false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(-150, 0, -360);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/ahriFire.X", false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(200, 0, -360);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/amumu.X", false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(-200, 0, -360);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/anie.X", false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(250, 0, -360);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/Darius.X", false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().ScaleAbsolute(3);
+	Models.back().TranslateAbsolute(-250, 0, -360);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/garen.X", false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(300, 0, -360);
+	Models.back().Update();
+
+	index = PrimitiveMgr.CreateModel("Models/sona.X", false);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().TranslateAbsolute(-300, 0, -360);
+	Models.back().Update();
+
+	//index = PrimitiveMgr.CreateModel("Models/CerdoNuevo.X");
+	//Models.push_back(PrimitiveInst());
+	//Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	//Models.back().ScaleAbsolute(20);
+	//Models.back().RotateXAbsolute(90);
+	//Models.back().RotateZAbsolute(-30);
+	//Models.back().TranslateAbsolute(200, 25, 220);
+	//Models.back().Update();
+
+	index = PrimitiveMgr.CreateCube();
 
 	for (size_t k = 0; k < 5; k++)
 	{
@@ -213,13 +191,13 @@ void TestApp::CreateAssets() {
 			{
 				Cubes.push_back(new PxCube());
 				Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 2);
-				Cubes.back()->Traslate(Vector3D(i * 4, 4 + j * 4, k * 4));
+				Cubes.back()->Traslate(Vector3D(i * 4.5, 4.5 + j * 4.5, k * 4.5));
 				Cubes.back()->body->setMass(40.0f);
 			}
 		}
 	}
 
-	index = PrimitiveMgr.CreateModel("Models/NuBatman.X");
+	index = PrimitiveMgr.CreateModel("Models/NuBatman.X", true);
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	Models.back().ScaleAbsolute(0.5);
@@ -227,7 +205,7 @@ void TestApp::CreateAssets() {
 	Models.back().Update();
 
 
-	index = PrimitiveMgr.CreateModel("Models/NuVenomJok.X");
+	index = PrimitiveMgr.CreateModel("Models/NuVenomJok.X",true);
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	Models.back().ScaleAbsolute(0.5);
@@ -238,11 +216,6 @@ void TestApp::CreateAssets() {
 	//==================== Reflejo ===========================
 	index = PrimitiveMgr.CreatePlane();
 	dynamic_cast<Plane*>(PrimitiveMgr.primitives[index])->tex = Tools::RTs[0]->vColorTextures[0];
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().TranslateAbsolute(-1500, 1, -400);
-	Models.back().RotateXAbsolute(90);
-	Models.back().Update();
 
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
@@ -279,7 +252,7 @@ void TestApp::CreateAssets() {
 	textFPS->Update();
 
 
-	index = PrimitiveMgr.CreateModel("Models/CerdoNuevo.X");
+	index = PrimitiveMgr.CreateModel("Models/CerdoNuevo.X",true);
 	lightPrimitive.CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	lightPrimitive.ScaleAbsolute(3);
 	lightPrimitive.RotateXAbsolute(90);
@@ -297,11 +270,14 @@ void TestApp::DestroyAssets() {
 
 void TestApp::OnUpdate() {
 	DtTimer.Update();
-	if (physxManager.Step(DtTimer.GetDTSecs()))
-		for (auto& it : Cubes)
-		{
-			it->Update();
-		}
+	if (usePhysX)
+	{
+		if (physxManager.Step(DtTimer.GetDTSecs()))
+			for (auto& it : Cubes)
+			{
+				it->Update();
+			}
+	}
 
 	//static int cubeIndex = 0;
 	//static float cubeTimeAccum = 0;
@@ -345,7 +321,7 @@ void TestApp::OnDraw() {
 	Tools::PushRT(0);
 	pFramework->pVideoDriver->SetCullFace(BaseDriver::BACK);
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < Models.size()-4; i++) {
 		Matrix4D temp = Models[i].Scale;
 		//Models[i].TranslateAbsolute(0,0,0);
 		Models[i].Scale = Models[i].Scale * Scaling(1,-1,1);
@@ -458,6 +434,10 @@ void TestApp::OnInput() {
 	if (IManager.PressedKey(SDLK_p)) {
 		SceneProp.renderMode = RM::RenderMode::SOLID_WIREFRAME;
 	}
+	if (IManager.PressedOnceKey(SDLK_l)) {
+		usePhysX = !usePhysX;
+	}
+
 
 
 

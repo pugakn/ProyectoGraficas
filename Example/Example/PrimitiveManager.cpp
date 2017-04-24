@@ -34,13 +34,15 @@ int	 PrimitiveManager::CreateCube(){
 
 }
 
-int	 PrimitiveManager::CreateModel(char * fileName) {
+int	 PrimitiveManager::CreateModel(char * fileName, bool useLight) {
 #ifdef USING_GL_COMMON
 	PrimitiveBase *primitive = new ModelGL();
+	primitive->useLight = useLight;
 	dynamic_cast<ModelGL*>(primitive)->SetFileName(fileName);
 	dynamic_cast<ModelGL*>(primitive)->Create();
 #elif defined(USING_D3D11)
 	PrimitiveBase *primitive = new MeshD3D();
+	primitive->useLight = useLight;
 	dynamic_cast<MeshD3D*>(primitive)->SetFileName(fileName);
 	dynamic_cast<MeshD3D*>(primitive)->Create();
 #endif

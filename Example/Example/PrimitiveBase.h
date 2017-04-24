@@ -9,6 +9,7 @@ struct CVertex {
 };
 class PrimitiveBase {
 public:
+	bool useLight;
 	virtual void Create() = 0;
 	virtual void Transform(float *t) = 0;
 	virtual void Draw(float *t) = 0;

@@ -52,11 +52,11 @@ void PhysXManager::Init()
 bool PhysXManager::Step(float delta)
 {
 	m_fAccumulator += delta;
-	if (!m_fAccumulator < STEP_TIME)
+	if (m_fAccumulator > STEP_TIME)
 	{
-		m_fAccumulator -= STEP_TIME;
-		g_scene->simulate(STEP_TIME);
+		g_scene->simulate(m_fAccumulator);
 		g_scene->fetchResults(true);
+		m_fAccumulator = 0;
 		return true;
 	}
 	return false;

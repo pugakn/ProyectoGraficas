@@ -17,7 +17,7 @@ public:
 	//}
 	int  CreateTriangle();
 	int	 CreateCube();
-	int CreateModel(char * fileName);
+	int CreateModel(char * fileName , bool useLight);
 	int CreateText();
 	int CreatePlane();
 

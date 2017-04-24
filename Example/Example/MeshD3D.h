@@ -76,7 +76,7 @@ public:
 	void Destroy() override;
 	MeshParser m_parser;
 	std::vector<MeshInfo> m_meshInfo;
-	MeshD3D() {};
+	MeshD3D() { useLight = true; };
 	~MeshD3D() {};
 };
 #endif

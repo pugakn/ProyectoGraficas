@@ -6,6 +6,7 @@ extern ComPtr<ID3D11DeviceContext>     D3D11DeviceContext;
 
 void TextMeshD3D::Create()
 {
+	difuseText = NULL;
 	bool errorShader = false;
 	transform = Identity();
 	Scale = Identity();
@@ -64,14 +65,13 @@ void TextMeshD3D::Create()
 	}
 	else
 	{
-		//Cargar propiedades de fuente
-		font.LoadFile("Fonts/ArialFont.fnt");
 		//=========================== Create Textures ===============================
 		int textureID = Tools::LoadTexture("ArialFont_t0.tga");
 		difuseText = Tools::GetTexture(textureID);
 		textureWidth = difuseText->x;
 	}
-
+	//Cargar propiedades de fuente
+	font.LoadFile("Fonts/ArialFont.fnt");
 
 
 	//==================== Create Decl Data =====================
@@ -204,10 +204,12 @@ void TextMeshD3D::Draw()
 		//==================== Set IB =====================
 		D3D11DeviceContext->IASetIndexBuffer(IB.Get(), DXGI_FORMAT_R16_UINT, 0);
 		//==================== Set Texture =====================
-
-		TextureD3D *texd3d = dynamic_cast<TextureD3D*>(difuseText);
-		D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
-		D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
+		if (difuseText != NULL)
+		{
+			TextureD3D *texd3d = dynamic_cast<TextureD3D*>(difuseText);
+			D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
+			D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
+		}
 		//==================== Draw =====================
 		D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		D3D11DeviceContext->DrawIndexed(6, 0, 0);

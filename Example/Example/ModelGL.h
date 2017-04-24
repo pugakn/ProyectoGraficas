@@ -100,7 +100,7 @@ public:
 	void Draw(float *t) override;
 	void Destroy() override;
 	MeshParser parser;
-	ModelGL()  {};
+	ModelGL() { useLight = true; };
 	~ModelGL();
 };
 #endif

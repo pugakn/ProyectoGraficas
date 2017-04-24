@@ -68,9 +68,12 @@ void MeshD3D::Create()
 				if (subsetIt.m_effects.m_normalMap != "")
 					Defines += "#define USE_NORMAL_MAP\n\n";
 
-				Defines += "#define USE_PIXELLIGHTING \n\n";
-				Defines += "#define USING_ATENUATION \n\n";
-				Defines += "#define USE_SPECULAR \n\n";
+				if (useLight)
+				{
+					Defines += "#define USE_PIXELLIGHTING \n\n";
+					Defines += "#define USING_ATENUATION \n\n";
+					Defines += "#define USE_SPECULAR \n\n";
+				}
 
 				vstr = Defines + vstr;
 				fstr = Defines + fstr;

@@ -22,7 +22,9 @@ void CubeGL::Create() {
 	tex = Tools::textureCheker;
 #ifdef USING_GL_COMMON
 	shaderID = glCreateProgram();
-
+	matWorldUniformLoc = -1;
+	normalAttribLoc = -1;
+	uvAttribLoc = -1;
 	char *vsSourceP = file2string("Shaders/VS.glsl");
 	char *fsSourceP = file2string("Shaders/FS.glsl");
 
@@ -39,9 +41,12 @@ void CubeGL::Create() {
 
 	std::string Defines;
 #ifdef USING_OPENGL
-	Defines += "#define lowp\n\n";
-	Defines += "#define mediump\n\n";
-	Defines += "#define highp\n\n";
+	if (vsSourceP != NULL && fsSourceP != NULL)
+	{
+		Defines += "#define lowp\n\n";
+		Defines += "#define mediump\n\n";
+		Defines += "#define highp\n\n";
+	}
 #endif // USING_OPENGL
 	vsrc = Defines + vsrc;
 	fsrc = Defines + fsrc;
@@ -315,8 +320,8 @@ void CubeGL::Draw(float *t) {
 
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D WVP = transform*VP;
-
-	glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
+	if (matWorldUniformLoc != -1)
+		glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
 	glUniformMatrix4fv(matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
