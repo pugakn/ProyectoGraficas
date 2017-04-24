@@ -70,6 +70,13 @@ void ModelGL::Create()
 			Defines += "#define USE_PIXELLIGHTING \n\n";
 			Defines += "#define USING_ATENUATION \n\n";
 			Defines += "#define USE_SPECULAR_BLIN \n\n";
+#ifdef USING_OPENGL
+			Defines += "#define lowp\n\n";
+			Defines += "#define mediump\n\n";
+			Defines += "#define highp\n\n";
+#endif // USING_OPENGL
+
+
 
 			vstr = Defines + vstr;
 			fstr = Defines + fstr;

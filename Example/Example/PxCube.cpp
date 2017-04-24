@@ -9,7 +9,7 @@ void PxCube::Create(PrimitiveBase* prm, float scale)
 
 	//PhysX
 	//Material
-	PxMaterial* material2 = g_Physics->createMaterial(0.2, 0.2, 0.2);
+	PxMaterial* material2 = g_Physics->createMaterial(0.5, 0.5, 0.2);
 	//Box
 	PxTransform boxPos(PxVec3(0, 0, 0));
 	PxBoxGeometry boxGeo(PxVec3(scale, scale, scale));

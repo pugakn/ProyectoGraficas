@@ -131,16 +131,16 @@ void D3DXDriver::InitDriver(){
 
 
 	D3D11_RASTERIZER_DESC rasterizerState;
-	rasterizerState.FillMode = D3D11_FILL_SOLID;
+	rasterizerState.FillMode = D3D11_FILL_SOLID; //D3D11_FILL_WIREFRAME  
 	rasterizerState.CullMode = D3D11_CULL_BACK;
 	rasterizerState.FrontCounterClockwise = true;
-	rasterizerState.DepthBias = false;
-	rasterizerState.DepthBiasClamp = 0;
-	rasterizerState.SlopeScaledDepthBias = 0;
-	rasterizerState.DepthClipEnable = true;
-	rasterizerState.ScissorEnable = true;
-	rasterizerState.MultisampleEnable = false;
-	rasterizerState.AntialiasedLineEnable = false;
+	rasterizerState.DepthBias = 0;
+	rasterizerState.DepthBiasClamp = 0.0f;
+	rasterizerState.SlopeScaledDepthBias = 0.0f;
+	rasterizerState.DepthClipEnable = TRUE;
+	rasterizerState.ScissorEnable = FALSE;
+	rasterizerState.MultisampleEnable = FALSE;
+	rasterizerState.AntialiasedLineEnable = FALSE;
 	HRESULT result = D3D11Device->CreateRasterizerState(&rasterizerState, &rasterStateCull_back);
 	if (FAILED(result)) return;
 

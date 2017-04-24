@@ -98,12 +98,14 @@ int Tools::LoadTexture(const char * path)
 	}
 	std::cout << "File not Found" << std::endl;
 	delete tex;
-	return -1;
+	return textureChekerID;
 }
 Texture * Tools::GetTexture(int id)
 {
-	if (id == -1)
+	if (id == textureChekerID)
+	{
 		return textureCheker;
+	}
 	return *std::find_if(m_textures.begin(), m_textures.end(), [&id](const Texture* p) { return p->id == id; });;
 }
 #ifdef USING_GL_COMMON
@@ -122,6 +124,7 @@ int Tools::CreateRT(int numRT, int colorf, int depthf, int w, int h)
 		h = pVideoDriver->height;
 	if (pRT->Load(numRT, colorf, depthf, w, h)) {
 		RTs.push_back(pRT);
+		glBindFramebuffer(GL_FRAMEBUFFER, pVideoDriver->originalFBO);
 		return (RTs.size() - 1);
 	}
 	else {
@@ -134,6 +137,7 @@ int Tools::CreateRT(int numRT)
 	GLRT	*pRT = new GLRT;
 	if (pRT->Load(numRT, 0, 0, pVideoDriver->width, pVideoDriver->height)) {
 		RTs.push_back(pRT);
+		glBindFramebuffer(GL_FRAMEBUFFER, pVideoDriver->originalFBO);
 		return (RTs.size() - 1);
 	}
 	else {
@@ -160,7 +164,7 @@ void Tools::PushRT(int id) {
 }
 
 void Tools::PopRT() {
-	glBindFramebuffer(GL_FRAMEBUFFER, pVideoDriver->CurrentFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, pVideoDriver->originalFBO);
 }
 
 void Tools::DestroyRTs() {
@@ -172,8 +176,14 @@ void Tools::DestroyRTs() {
 void Tools::Init(BaseDriver* driver)
 {
 	pVideoDriver = dynamic_cast<GLDriver*>(driver);
+#ifdef USING_OPENGL
+	char *vsSourceWire = "attribute vec4 Vertex;uniform mat4 WVP;void main() {gl_Position = WVP*Vertex;}";
+	char *fsSourceWire = "void main() {gl_FragColor = vec4(1, 0, 1, 1);}";
+#else
 	char *vsSourceWire = "attribute highp vec4 Vertex;uniform highp mat4 WVP;void main() {gl_Position = WVP*Vertex;}";
 	char *fsSourceWire = "void main() {gl_FragColor = vec4(1, 0, 1, 1);}";
+#endif // USING_OPENGL
+
 	GLuint vshaderWire_id = createShader(GL_VERTEX_SHADER, const_cast<char*>(vsSourceWire));
 	GLuint fshaderWire_id = createShader(GL_FRAGMENT_SHADER, const_cast<char*>(fsSourceWire));
 	DefaultShaderID = glCreateProgram();
@@ -209,6 +219,7 @@ int Tools::CreateRT(int numRT, int colorf, int depthf, int w, int h)
 		h = pVideoDriver->Height;
 	if (pRT->Load(numRT, colorf, depthf, w, h)) {
 		RTs.push_back(pRT);
+		D3D11DeviceContext->OMSetRenderTargets(1, D3D11RenderTargetView.GetAddressOf(), D3D11DepthStencilTargetView.Get());
 		return (RTs.size() - 1);
 	}
 	else {
@@ -221,6 +232,7 @@ int Tools::CreateRT(int numRT)
 	D3DRT	*pRT = new D3DRT;
 	if (pRT->Load(numRT, 0, 0, pVideoDriver->Width, pVideoDriver->Height)) {
 		RTs.push_back(pRT);
+		D3D11DeviceContext->OMSetRenderTargets(1, D3D11RenderTargetView.GetAddressOf(), D3D11DepthStencilTargetView.Get());
 		return (RTs.size() - 1);
 	}
 	else {

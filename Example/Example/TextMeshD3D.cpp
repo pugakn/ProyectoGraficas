@@ -6,6 +6,7 @@ extern ComPtr<ID3D11DeviceContext>     D3D11DeviceContext;
 
 void TextMeshD3D::Create()
 {
+	bool errorShader = false;
 	transform = Identity();
 	Scale = Identity();
 	Position = Identity();
@@ -13,64 +14,65 @@ void TextMeshD3D::Create()
 
 	char *vsSource = file2string("Shaders/VS_Font.hlsl");
 	char *fsSource = file2string("Shaders/FS_Font.hlsl");
-	std::string vstr = std::string(vsSource);
-	std::string fstr = std::string(fsSource);
+	std::string vstr;
+	std::string fstr;
+	if (!vsSource || !fsSource)
+		errorShader = true;
+	else {
+		vstr = std::string(vsSource);
+		fstr = std::string(fsSource);
+	}
 	delete[] vsSource;
 	delete[] fsSource;
-	if (!vsSource || !fsSource)
-		return;
-	//==================== compile VS =====================
-	VS_blob = nullptr;
-	ComPtr<ID3DBlob> errorBlob = nullptr;
-	if (D3DCompile(vstr.c_str(), vstr.size(), 0, 0, 0, "VS", "vs_5_0", 0, 0, &VS_blob, &errorBlob) != S_OK) {
-		if (errorBlob) {
-			std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
-			return;
+	if (!errorShader)
+	{
+		//==================== compile VS =====================
+		VS_blob = nullptr;
+		ComPtr<ID3DBlob> errorBlob = nullptr;
+		if (D3DCompile(vstr.c_str(), vstr.size(), 0, 0, 0, "VS", "vs_5_0", 0, 0, &VS_blob, &errorBlob) != S_OK) {
+			if (errorBlob) {
+				std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
+			}
+			errorShader = true;
 		}
-		if (VS_blob) {
-			return;
+		//=========== Create VS ============
+		if (D3D11Device->CreateVertexShader(VS_blob->GetBufferPointer(), VS_blob->GetBufferSize(), 0, &pVS) != S_OK) {
+			std::cout << "Error Creatong Vertex Shader" << std::endl;
+			errorShader = true;
 		}
-	}
-	//=========== Create VS ============
-	if (D3D11Device->CreateVertexShader(VS_blob->GetBufferPointer(), VS_blob->GetBufferSize(), 0, &pVS) != S_OK) {
-		std::cout << "Error Creatong Vertex Shader" << std::endl;
-
-		return;
-	}
-	//==================== compile PS =====================
-	FS_blob = nullptr;
-	errorBlob.Reset();
-	if (D3DCompile(fstr.c_str(), fstr.size(), 0, 0, 0, "FS", "ps_5_0", 0, 0, &FS_blob, &errorBlob) != S_OK) {
-		if (errorBlob) {
-			std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
-			return;
+		//==================== compile PS =====================
+		FS_blob = nullptr;
+		errorBlob.Reset();
+		if (D3DCompile(fstr.c_str(), fstr.size(), 0, 0, 0, "FS", "ps_5_0", 0, 0, &FS_blob, &errorBlob) != S_OK) {
+			if (errorBlob) {
+				std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
+			}
+			errorShader = true;
 		}
-
-		if (FS_blob) {
-			return;
+		//=========== Create PS ==============
+		if (D3D11Device->CreatePixelShader(FS_blob->GetBufferPointer(), FS_blob->GetBufferSize(), 0, &pFS) != S_OK) {
+			std::cout << "Error Creating Pixel Shader" << std::endl;
+			errorShader = true;
 		}
 	}
-	//=========== Create PS ==============
-	if (D3D11Device->CreatePixelShader(FS_blob->GetBufferPointer(), FS_blob->GetBufferSize(), 0, &pFS) != S_OK) {
-		std::cout << "Error Creating Pixel Shader" << std::endl;
-		return;
+	if (errorShader)
+	{
+		VS_blob = Tools::DefaultVS_blob;
+		pVS = Tools::pDefaultVS;
+		FS_blob = Tools::DefaultFS_blob;
+		pFS = Tools::pDefaultFS;
+	}
+	else
+	{
+		//Cargar propiedades de fuente
+		font.LoadFile("Fonts/ArialFont.fnt");
+		//=========================== Create Textures ===============================
+		int textureID = Tools::LoadTexture("ArialFont_t0.tga");
+		difuseText = Tools::GetTexture(textureID);
+		textureWidth = difuseText->x;
 	}
 
 
-
-	//Cargar propiedades de fuente
-	font.LoadFile("Fonts/ArialFont.fnt");
-	//=========================== Create Textures ===============================
-	Texture *tex = new TextureD3D;
-	int textureID = tex->LoadTexture("ArialFont_t0.tga");
-	if (textureID != -1) {
-		difuseText = tex;
-	}
-	else {
-		std::cout << "Texture not Found" << std::endl;
-		delete tex;
-	}
-	textureWidth = tex->x;
 
 	//==================== Create Decl Data =====================
 	D3D11_INPUT_ELEMENT_DESC elementDesc;
@@ -91,6 +93,7 @@ void TextMeshD3D::Create()
 	elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	elementDesc.InstanceDataStepRate = 0;
 	VertexDecl.push_back(elementDesc);
+	
 
 
 	//==================== Create Input Layout =====================
@@ -103,7 +106,7 @@ void TextMeshD3D::Create()
 	//==================== Create Buffer Layout =====================
 	D3D11_BUFFER_DESC bdesc = { 0 };
 	bdesc.Usage = D3D11_USAGE_DEFAULT;
-	bdesc.ByteWidth = sizeof(TextMeshD3D::ConstBuffer);
+	bdesc.ByteWidth = errorShader ? sizeof(Matrix4D) : sizeof(TextMeshD3D::ConstBuffer);
 	bdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	if (D3D11Device->CreateBuffer(&bdesc, 0, ConstantBuffer.GetAddressOf()) != S_OK) {

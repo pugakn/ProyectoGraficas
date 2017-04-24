@@ -6,28 +6,73 @@
 
 void GLFont::Create()
 {
+	vertexAttribLoc = -1;
+	uvAttribLoc = -1;
+	matWorldViewProjUniformLoc = -1;
+	matWorldUniformLoc = -1;
+	xOffsetLoc = -1;
+	yOffsetLoc = -1;
+	xSeparationLoc = -1;
+	ySeparationLoc = -1;
+	IdTexUniformLoc = -1;
+
 	shaderID = glCreateProgram();
 
 	char *vsSourceP = file2string("Shaders/VS_Font.glsl");
 	char *fsSourceP = file2string("Shaders/FS_Font.glsl");
+	std::string vsrc;
+	std::string fsrc;
+	if (vsSourceP && fsSourceP)
+	{
+		vsrc = std::string(vsSourceP);
+		fsrc = std::string(fsSourceP);
+	}
+	std::string Defines;
+#ifdef USING_OPENGL
+	Defines += "#define lowp\n\n";
+	Defines += "#define mediump\n\n";
+	Defines += "#define highp\n\n";
+#endif // USING_OPENGL
+	vsrc = Defines + vsrc;
+	fsrc = Defines + fsrc;
 
-	GLuint vshader_id = createShader(GL_VERTEX_SHADER, vsSourceP);
-	GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, fsSourceP);
+	GLuint vshader_id = createShader(GL_VERTEX_SHADER, (char*)vsrc.c_str());
+	GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, (char*)fsrc.c_str());
+	if (vshader_id == 0 || fshader_id == 0)
+	{
+		shaderID = Tools::DefaultShaderID;
+		glLinkProgram(shaderID);
+		glUseProgram(shaderID);
 
-	glAttachShader(shaderID, vshader_id);
-	glAttachShader(shaderID, fshader_id);
+		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
+		matWorldUniformLoc = glGetUniformLocation(shaderID, "WVP");
+	}
+	else
+	{
+		glAttachShader(shaderID, vshader_id);
+		glAttachShader(shaderID, fshader_id);
 
-	glLinkProgram(shaderID);
-	glUseProgram(shaderID);
-	//Attributes
-	vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
-	uvAttribLoc = glGetAttribLocation(shaderID, "UV");
-	//Uniforms
-	matWorldUniformLoc = glGetUniformLocation(shaderID, "World");
-	xOffsetLoc  = glGetUniformLocation(shaderID, "xOffset");
-	yOffsetLoc = glGetUniformLocation(shaderID, "yOffset");
-	xSeparationLoc = glGetUniformLocation(shaderID, "xSeparation");
-	ySeparationLoc = glGetUniformLocation(shaderID, "ySeparation");
+		glLinkProgram(shaderID);
+		glUseProgram(shaderID);
+		//Attributes
+		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
+		uvAttribLoc = glGetAttribLocation(shaderID, "UV");
+		//Uniforms
+		matWorldUniformLoc = glGetUniformLocation(shaderID, "World");
+		xOffsetLoc = glGetUniformLocation(shaderID, "xOffset");
+		yOffsetLoc = glGetUniformLocation(shaderID, "yOffset");
+		xSeparationLoc = glGetUniformLocation(shaderID, "xSeparation");
+		ySeparationLoc = glGetUniformLocation(shaderID, "ySeparation");
+
+
+		//Cargar propiedades de fuente
+		font.LoadFile("Fonts/ArialFont.fnt");
+		//Cargar textura de fuente
+		IdTex = Tools::LoadTexture("ArialFont_0.tga");
+		Texture *tex = Tools::GetTexture(IdTex);
+		IdTexUniformLoc = glGetUniformLocation(shaderID, "diffuse");
+		textureWidth = tex->x;
+	}
 
 	m_VBO[0] = { 0.0f,  1.0f, 0.0f ,1.0f,  0.0f, 0.0f };//Left Top
 	m_VBO[1] = { 0.0f,  0.0f, 0.0f ,1.0f,  0.0f, 1.0f };//Left Bot
@@ -58,20 +103,6 @@ void GLFont::Create()
 	Scale = Identity();
 	Position = Identity();
 	m_text = "Inserte Texto 'XD";
-	//Cargar propiedades de fuente
-	font.LoadFile("Fonts/ArialFont.fnt");
-	//Cargar textura de fuente
-	Texture *tex = new TextureGL;
-	int textureID = tex->LoadTexture(const_cast<char*>("ArialFont_0.tga"));
-	if (textureID != -1) {
-		IdTex = textureID;
-		IdTexUniformLoc = glGetUniformLocation(shaderID, "diffuse");
-	}
-	else {
-		std::cout << "Texture not Found" << std::endl;
-		delete tex;
-	}
-	textureWidth = tex->x;
 }
 void GLFont::Draw()
 {
@@ -95,12 +126,17 @@ void GLFont::Draw()
 		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(fontVertex), &newVBO[0], GL_STATIC_DRAW);
 		//Set uniforms
 		xSeparation += font.m_charInfo[x].xoffset / textureWidth;
-		float ySeparation = 0;//TODO:
-		glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
-		glUniform1f(xOffsetLoc, font.m_charInfo[x].x / textureWidth);
-		glUniform1f(yOffsetLoc, font.m_charInfo[x].y / textureWidth);
-		glUniform1f(xSeparationLoc, xSeparation);
-		glUniform1f(ySeparationLoc, ySeparation);
+		float ySeparation = 0;//TODO: Agregar separación en y
+		if (matWorldUniformLoc != -1)
+			glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
+		if (xOffsetLoc != -1)
+			glUniform1f(xOffsetLoc, font.m_charInfo[x].x / textureWidth);
+		if (yOffsetLoc != -1)
+			glUniform1f(yOffsetLoc, font.m_charInfo[x].y / textureWidth);
+		if (xSeparationLoc != -1)
+			glUniform1f(xSeparationLoc, xSeparation);
+		if (ySeparationLoc != -1)
+			glUniform1f(ySeparationLoc, ySeparation);
 		//Set Atributes
 		glEnableVertexAttribArray(vertexAttribLoc);
 		if (uvAttribLoc != -1)
@@ -109,9 +145,12 @@ void GLFont::Draw()
 		if (uvAttribLoc != -1)
 			glVertexAttribPointer(uvAttribLoc, 2, GL_FLOAT, GL_FALSE, sizeof(fontVertex), BUFFER_OFFSET(16));
 		//Set texture
-		glActiveTexture(GL_TEXTURE0);//Set Active texture unit
-		glBindTexture(GL_TEXTURE_2D, IdTex);
-		glUniform1i(IdTexUniformLoc, 0); //Specify location
+		if (IdTexUniformLoc != -1)
+		{
+			glActiveTexture(GL_TEXTURE0);//Set Active texture unit
+			glBindTexture(GL_TEXTURE_2D, IdTex);
+			glUniform1i(IdTexUniformLoc, 0); //Specify location
+		}
 		//Draw
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 

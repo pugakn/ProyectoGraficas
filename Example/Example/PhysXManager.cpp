@@ -3,6 +3,8 @@ using namespace physx;
 physx::PxFoundation *g_Foundation;
 physx::PxPhysics* g_Physics;
 physx::PxScene *g_scene;
+physx::PxDefaultCpuDispatcher* g_Dispatcher;
+physx::PxCudaContextManager* g_CudaContextManager;
 void PhysXManager::Init()
 {
 	static PxDefaultErrorCallback gDefaultErrorCallback;
@@ -29,10 +31,25 @@ void PhysXManager::Init()
 	scDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
 	scDesc.filterShader = PxDefaultSimulationFilterShader;
 
+
+
+	PxCudaContextManagerDesc cudaContextManagerDesc;
+	g_CudaContextManager = PxCreateCudaContextManager(*g_Foundation, cudaContextManagerDesc);
+
+	PxSceneDesc sceneDesc(g_Physics->getTolerancesScale());
+	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+	g_Dispatcher = PxDefaultCpuDispatcherCreate(4);
+	sceneDesc.cpuDispatcher = g_Dispatcher;
+	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.gpuDispatcher = g_CudaContextManager->getGpuDispatcher();
+
+	sceneDesc.flags |= PxSceneFlag::eENABLE_GPU_DYNAMICS;
+	sceneDesc.broadPhaseType = PxBroadPhaseType::eGPU;
+
 	g_scene = g_Physics->createScene(scDesc);
 }
 
-void PhysXManager::Step(float delta)
+bool PhysXManager::Step(float delta)
 {
 	m_fAccumulator += delta;
 	if (!m_fAccumulator < STEP_TIME)
@@ -40,5 +57,7 @@ void PhysXManager::Step(float delta)
 		m_fAccumulator -= STEP_TIME;
 		g_scene->simulate(STEP_TIME);
 		g_scene->fetchResults(true);
+		return true;
 	}
+	return false;
 }

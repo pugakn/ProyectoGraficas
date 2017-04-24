@@ -54,7 +54,7 @@ public:
 
 	EGLNativeWindowType	eglWindow;
 #endif
-	GLint				CurrentFBO;
+	GLint				originalFBO;
 #if defined(USING_OPENGL) || defined(USING_OPENGL_ES30)
 	GLenum				DrawBuffers[16];
 #endif

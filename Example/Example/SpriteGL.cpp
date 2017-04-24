@@ -7,25 +7,59 @@
 
 void SpriteGL::Create(Matrix4D &VP)
 {
+	uvAttribLoc = -1;
+	IdTexUniformLoc = -1;
 	m_VP = VP;
 	shaderID = glCreateProgram();
 
 	char *vsSourceP = file2string("Shaders/VS_Sprite.glsl");
 	char *fsSourceP = file2string("Shaders/FS_Sprite.glsl");
+	std::string vsrc;
+	std::string fsrc;
+	if (vsSourceP && fsSourceP)
+	{
+		vsrc = std::string(vsSourceP);
+		fsrc = std::string(fsSourceP);
+	}
+	std::string Defines;
+#ifdef USING_OPENGL
+	Defines += "#define lowp\n\n";
+	Defines += "#define mediump\n\n";
+	Defines += "#define highp\n\n";
+#endif // USING_OPENGL
+	vsrc = Defines + vsrc;
+	fsrc = Defines + fsrc;
 
-	GLuint vshader_id = createShader(GL_VERTEX_SHADER, vsSourceP);
-	GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, fsSourceP);
+	GLuint vshader_id = createShader(GL_VERTEX_SHADER, (char*)vsrc.c_str());
+	GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, (char*)fsrc.c_str());
+	if (vshader_id == 0 || fshader_id == 0)
+	{
+		shaderID = Tools::DefaultShaderID;
+		glLinkProgram(shaderID);
+		glUseProgram(shaderID);
 
-	glAttachShader(shaderID, vshader_id);
-	glAttachShader(shaderID, fshader_id);
+		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
+		matWorldUniformLoc = glGetUniformLocation(shaderID, "WVP");
+	}
+	else
+	{
+		glAttachShader(shaderID, vshader_id);
+		glAttachShader(shaderID, fshader_id);
 
-	glLinkProgram(shaderID);
-	glUseProgram(shaderID);
-	//Attributes
-	vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
-	uvAttribLoc = glGetAttribLocation(shaderID, "UV");
-	//Uniforms
-	matWorldUniformLoc = glGetUniformLocation(shaderID, "WVP");
+		glLinkProgram(shaderID);
+		glUseProgram(shaderID);
+		//Attributes
+		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
+		uvAttribLoc = glGetAttribLocation(shaderID, "UV");
+		//Uniforms
+		matWorldUniformLoc = glGetUniformLocation(shaderID, "WVP");
+
+		//Cargar textura
+		IdTex = Tools::LoadTexture(m_str);
+		Texture *tex = Tools::GetTexture(IdTex);
+		IdTexUniformLoc = glGetUniformLocation(shaderID, "diffuse");
+		textureWidth = tex->x;
+	}
 
 	m_VBO[0] = { 0.0f,  1.0f, 0.0f ,1.0f,  0.0f, 0.0f };//Left Top
 	m_VBO[1] = { 0.0f,  0.0f, 0.0f ,1.0f,  0.0f, 1.0f };//Left Bot
@@ -55,18 +89,6 @@ void SpriteGL::Create(Matrix4D &VP)
 	transform = Identity();
 	Scale = Identity();
 	Position = Identity();
-	//Cargar textura
-	Texture *tex = new TextureGL;
-	int textureID = tex->LoadTexture(const_cast<char*>(m_str));
-	if (textureID != -1) {
-		IdTex = textureID;
-		IdTexUniformLoc = glGetUniformLocation(shaderID, "diffuse");
-	}
-	else {
-		std::cout << "Texture not Found" << std::endl;
-		delete tex;
-	}
-	textureWidth = tex->x;
 }
 
 void SpriteGL::Draw()
@@ -85,10 +107,13 @@ void SpriteGL::Draw()
 	if (uvAttribLoc != -1)
 		glVertexAttribPointer(uvAttribLoc, 2, GL_FLOAT, GL_FALSE, sizeof(spriteVertex), BUFFER_OFFSET(16));
 	//Set texture
-	glActiveTexture(GL_TEXTURE0);//Set Active texture unit
-	glBindTexture(GL_TEXTURE_2D, IdTex);
-	glUniform1i(IdTexUniformLoc, 0); //Specify location
-									 //Draw
+	if (IdTexUniformLoc != -1)
+	{
+		glActiveTexture(GL_TEXTURE0);//Set Active texture unit
+		glBindTexture(GL_TEXTURE_2D, IdTex);
+		glUniform1i(IdTexUniformLoc, 0); //Specify location
+	}
+	//Draw
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 	//Reset 
 	if (uvAttribLoc != -1) {

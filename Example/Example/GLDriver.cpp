@@ -135,7 +135,7 @@ void	GLDriver::InitDriver() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//
-	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &CurrentFBO);
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &originalFBO);
 #if defined(USING_OPENGL) || defined(USING_OPENGL_ES30)
 	for (int i = 0; i < 16; i++) {
 		DrawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;

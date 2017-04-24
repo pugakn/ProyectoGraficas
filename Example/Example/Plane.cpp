@@ -38,7 +38,11 @@ void Plane::Create() {
 	free(fsSourceP);
 
 	std::string Defines;
-
+#ifdef USING_OPENGL
+	Defines += "#define lowp\n\n";
+	Defines += "#define mediump\n\n";
+	Defines += "#define highp\n\n";
+#endif // USING_OPENGL
 	vsrc = Defines + vsrc;
 	fsrc = Defines + fsrc;
 

@@ -9,5 +9,5 @@ public:
 		m_fAccumulator = 0.0f; 
 	}
 	void Init();
-	void Step(float delta);
+	bool Step(float delta);
 };

@@ -188,15 +188,15 @@ void TestApp::CreateAssets() {
 	////Models.back().RotateYAbsolute(90);
 	//Models.back().Update();
 
-	for (size_t k = 0; k < 4; k++)
+	for (size_t k = 0; k < 5; k++)
 	{
-		for (size_t i = 0; i < 4; i++)
+		for (size_t i = 0; i < 5; i++)
 		{
-			for (size_t j = 0; j < 4; j++)
+			for (size_t j = 0; j < 7; j++)
 			{
 				Cubes.push_back(new PxCube());
-				Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 1);
-				Cubes.back()->Traslate(Vector3D( i * 4 , 300 + j * 4 , k * 4 ));
+				Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 0.6);
+				Cubes.back()->Traslate(Vector3D( i * 4 , 100 + j * 100 , k * 4 ));
 				Cubes.back()->body->setMass(20.0f);
 				//Cubes.back()->body->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 				//Cubes.back()->body->setAngularVelocity(PxVec3(0.f, 2.f, 0.0));
@@ -212,28 +212,12 @@ void TestApp::CreateAssets() {
 			for (size_t j = 0; j < 4; j++)
 			{
 				Cubes.push_back(new PxCube());
-				Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 1);
-				Cubes.back()->Traslate(Vector3D(i * 4, 100 + j * 4, k * 4));
-				Cubes.back()->body->setMass(20.0f);
+				Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 2);
+				Cubes.back()->Traslate(Vector3D(i * 4, 4 + j * 4, k * 4));
+				Cubes.back()->body->setMass(40.0f);
 			}
 		}
 	}
-	for (size_t k = 0; k < 5; k++)
-	{
-		for (size_t i = 0; i < 5; i++)
-		{
-			for (size_t j = 0; j < 5; j++)
-			{
-				Cubes.push_back(new PxCube());
-				Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 1);
-				Cubes.back()->Traslate(Vector3D(i * 4, 5 + j * 4, k * 4));
-				Cubes.back()->body->setMass(5.0f);
-			}
-		}
-	}
-	//Cubes.push_back(new PxCube());
-	//Cubes.back()->Create(PrimitiveMgr.GetPrimitive(index), 10);
-	//Cubes.back()->Traslate(Vector3D(-300, 800, 100));
 
 	index = PrimitiveMgr.CreateModel("Models/NuBatman.X");
 	Models.push_back(PrimitiveInst());
@@ -313,12 +297,31 @@ void TestApp::DestroyAssets() {
 
 void TestApp::OnUpdate() {
 	DtTimer.Update();
-	physxManager.Step(DtTimer.GetDTSecs());
+	if (physxManager.Step(DtTimer.GetDTSecs()))
+		for (auto& it : Cubes)
+		{
+			it->Update();
+		}
 
-	for (auto& it: Cubes)
-	{
-		it->Update();
-	}
+	//static int cubeIndex = 0;
+	//static float cubeTimeAccum = 0;
+	//cubeTimeAccum += DtTimer.GetDTSecs();
+	//if (cubeTimeAccum > 5.0f) {
+	//	cubeTimeAccum = 0.0f;
+	//	for (size_t k = 0; k < 4; k++)
+	//	{
+	//		for (size_t i = 0; i < 4; i++)
+	//		{
+	//			Cubes[cubeIndex]->Traslate(Vector3D(i * 4,  300, k * 4));
+	//			Cubes[cubeIndex]->body->clearForce();
+	//			cubeIndex++;
+	//		}
+	//	}
+	//	if (cubeIndex == Cubes.size())
+	//		cubeIndex = 0;
+	//}
+
+
 
 	Vector3D campos = cam.m_pos / 1500.f;
 	dot->TranslateAbsolute(2.44-campos.z,1.45-campos.x,0);
@@ -333,7 +336,6 @@ void TestApp::OnUpdate() {
 	{
 		count = 0.0f;
 		textFPS->m_text = "FPS: " + std::to_string(static_cast<int>(1 / DtTimer.GetDTSecs()));
-		//std::cout << std::to_string(static_cast<int>(1 / DtTimer.GetDTSecs())) << std::endl;
 	}
 	OnDraw();
 }
