@@ -39,104 +39,50 @@
     <Filter Include="Source Files\Video\GL">
       <UniqueIdentifier>{d0b39b27-0bfd-45dd-99f5-44adafa904d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{222765ef-f8e7-4274-9dd6-03e094e42f7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{9d36249b-576f-4d15-875f-917a75dfd2dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene">
+      <UniqueIdentifier>{80ddf66b-a80d-4e2f-b61f-eb71559de9c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\GL">
+      <UniqueIdentifier>{2516cf86-6535-40ee-88a7-42d7353b7ef3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\D3D">
+      <UniqueIdentifier>{b98667c2-199c-4c55-b461-b071c93ffe41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\Base">
+      <UniqueIdentifier>{c1f1096a-4e88-42da-9518-e7d7a14716c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{145e8c9b-88e4-42be-a2fc-4f4711e46eec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene\Base">
+      <UniqueIdentifier>{e04440ee-fd41-4c3f-ae4c-44cdbbddc33d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene\GL">
+      <UniqueIdentifier>{4a8aedf4-c323-459d-9e5e-47c4260991b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene\D3D">
+      <UniqueIdentifier>{112ec5b2-1671-4322-a01a-aa4c9c11d8c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Math">
+      <UniqueIdentifier>{7facab59-5258-4680-a7f3-39b62118329f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Math">
+      <UniqueIdentifier>{dbf28808-d059-4457-af86-5e8bd9639d8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\PhysX">
+      <UniqueIdentifier>{23fb1435-6c17-473a-804f-21c088612eda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PhysX">
+      <UniqueIdentifier>{06bea7d7-61e9-40b0-8e38-334a01f339f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BaseDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Win32Framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GLDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PrimitiveBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TriangleGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PrimitiveManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CubeGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PrimitiveInstance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix4D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector4D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BMPParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureD3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D3DXDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshD3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneProp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FPCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Wireframe.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Font.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GLFont.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TextMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TextMeshD3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteD3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UtilsGL.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
@@ -152,113 +98,119 @@
     <ClInclude Include="GLRT.h">
       <Filter>Header Files\Video\GL</Filter>
     </ClInclude>
-    <ClInclude Include="Plane.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysXManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PxInstance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PxCube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="D3DRT.h">
       <Filter>Header Files\Video\D3D</Filter>
     </ClInclude>
+    <ClInclude Include="GLDriver.h">
+      <Filter>Header Files\Video\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DXDriver.h">
+      <Filter>Header Files\Video\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseDriver.h">
+      <Filter>Header Files\Video\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Core.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32Framework.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelGL.h">
+      <Filter>Header Files\Scene\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="GLFont.h">
+      <Filter>Header Files\Scene\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="FPCamera.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Header Files\Scene\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeGL.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimitiveBase.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshD3D.h">
+      <Filter>Header Files\Scene\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Header Files\Scene\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteGL.h">
+      <Filter>Header Files\Scene\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteD3D.h">
+      <Filter>Header Files\Scene\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="TextMesh.h">
+      <Filter>Header Files\Scene\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureD3D.h">
+      <Filter>Header Files\Video\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Video\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureGL.h">
+      <Filter>Header Files\Video\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="TextMeshD3D.h">
+      <Filter>Header Files\Scene\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Wireframe.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimitiveInstance.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimitiveManager.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneProp.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshParser.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="BMPParser.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="TriangleGL.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector4D.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3D.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix4D.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysXManager.h">
+      <Filter>Header Files\PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="PxCube.h">
+      <Filter>Header Files\PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="PxInstance.h">
+      <Filter>Header Files\PhysX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Core.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Win32Framework.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GLDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TriangleGL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PrimitiveManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CubeGL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PrimitiveInstance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Matrix4D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector4D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelGL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BMPParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TextureGL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TextureD3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D3DXDriver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshD3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneProp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FPCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Wireframe.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Font.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GLFont.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TextMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TextMeshD3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteGL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteD3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UtilsGL.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
@@ -268,20 +220,110 @@
     <ClCompile Include="GLRT.cpp">
       <Filter>Source Files\Video\GL</Filter>
     </ClCompile>
-    <ClCompile Include="Plane.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysXManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PxInstance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PxCube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="D3DRT.cpp">
       <Filter>Source Files\Video\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="GLDriver.cpp">
+      <Filter>Source Files\Video\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DXDriver.cpp">
+      <Filter>Source Files\Video\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Core.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="BMPParser.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32Framework.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Video\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureGL.cpp">
+      <Filter>Source Files\Video\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshParser.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="TriangleGL.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeGL.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Source Files\Scene\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelGL.cpp">
+      <Filter>Source Files\Scene\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshD3D.cpp">
+      <Filter>Source Files\Scene\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="GLFont.cpp">
+      <Filter>Source Files\Scene\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="FPCamera.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Source Files\Scene\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteGL.cpp">
+      <Filter>Source Files\Scene\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteD3D.cpp">
+      <Filter>Source Files\Scene\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneProp.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="TextMesh.cpp">
+      <Filter>Source Files\Scene\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="TextMeshD3D.cpp">
+      <Filter>Source Files\Scene\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureD3D.cpp">
+      <Filter>Source Files\Video\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Wireframe.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="PrimitiveInstance.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="PrimitiveManager.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix4D.cpp">
+      <Filter>Source Files\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3D.cpp">
+      <Filter>Source Files\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector4D.cpp">
+      <Filter>Source Files\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysXManager.cpp">
+      <Filter>Source Files\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="PxInstance.cpp">
+      <Filter>Source Files\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="PxCube.cpp">
+      <Filter>Source Files\PhysX</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
