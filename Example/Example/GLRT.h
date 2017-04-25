@@ -17,7 +17,7 @@ class GLRT :
 	public BaseRT
 {
 public:
-	bool	LoadAPIRT() override;
+	bool	Load(int nrt, int cf, int df, int w, int h) override;
 
 	std::vector<GLuint>		vFrameBuffers;
 	std::vector<GLuint>		vGLColorTex;

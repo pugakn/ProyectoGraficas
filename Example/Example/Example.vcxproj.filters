@@ -155,9 +155,6 @@
     <ClInclude Include="Plane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D3DRT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PhysXManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -166,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="PxCube.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DRT.h">
+      <Filter>Header Files\Video\D3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -271,9 +271,6 @@
     <ClCompile Include="Plane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D3DRT.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PhysXManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -282,6 +279,9 @@
     </ClCompile>
     <ClCompile Include="PxCube.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DRT.cpp">
+      <Filter>Source Files\Video\D3D</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

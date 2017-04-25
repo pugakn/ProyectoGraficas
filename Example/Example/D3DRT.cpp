@@ -17,16 +17,17 @@
 extern ComPtr<ID3D11Device>            D3D11Device;
 extern ComPtr<ID3D11DeviceContext>     D3D11DeviceContext;
 
-bool D3DRT::LoadAPIRT() {
+bool D3DRT::Load(int numRt, int colorf, int depthf, int w, int h) {
+	m_numRT = numRt;
 	DXGI_FORMAT cfmt, dfmt;
 
 	cfmt = DXGI_FORMAT_R8G8B8A8_UNORM;
 	dfmt = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	//	if (this->color_format) // TODO: check for more formats
-	//	if (this->depth_format) // TODO: check for more formats		
+	//	if (colorf) // TODO: check for more formats
+	//	if (depthf) // TODO: check for more formats		
 	HRESULT hr;
-	for (int i = 0; i < number_RT; i++) {
+	for (int i = 0; i < numRt; i++) {
 		D3D11_TEXTURE2D_DESC desc = { 0 };
 		desc.Width = w;
 		desc.Height = h;

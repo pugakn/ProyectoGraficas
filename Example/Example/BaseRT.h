@@ -21,17 +21,10 @@ public:
 		BGRA8,
 		BGRA32
 	};
-	bool			Load(int nrt, int cf, int df, int w, int h);
+	virtual bool Load(int nrt, int cf, int df, int w, int h) = 0;
 	std::vector<Texture*>	vColorTextures;
 	Texture*				pDepthTexture;
-
-	virtual bool	LoadAPIRT() = 0;
-
-	int w;
-	int h;
-	int number_RT;
-	int color_format;
-	int depth_format;
+	int m_numRT;
 };
 
 

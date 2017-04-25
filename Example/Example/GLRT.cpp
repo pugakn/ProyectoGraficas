@@ -2,11 +2,11 @@
 #include "TextureGL.h"
 
 
-bool GLRT::LoadAPIRT()
+bool GLRT::Load(int numRt, int colorf, int depthf, int w, int h)
 {
+	m_numRT = numRt;
 	GLint depth_fmt = GL_DEPTH_COMPONENT;
 	GLint color_fmt = GL_RGB;
-
 	GLuint fbo;
 	GLuint dtex;
 
@@ -28,7 +28,7 @@ bool GLRT::LoadAPIRT()
 	pTextureDepth->id = dtex;
 	this->pDepthTexture = pTextureDepth;
 	DepthTexture = dtex;
-	for (int i = 0; i < number_RT; i++) {
+	for (int i = 0; i < numRt; i++) {
 
 		GLuint ctex;
 		glGenTextures(1, &ctex);
@@ -44,7 +44,7 @@ bool GLRT::LoadAPIRT()
 		TextureGL *pTextureColor = new TextureGL;
 #if defined(USING_OPENGL_ES20)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ctex, 0);
-		for (int i = 0; i < number_RT; i++) {
+		for (int i = 0; i < numRt; i++) {
 			pTextureColor->id = ctex;
 			vColorTextures.push_back(pTextureColor);
 			vFrameBuffers.push_back(fbo);

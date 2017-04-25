@@ -14,7 +14,7 @@ using namespace Microsoft::WRL;
 
 class D3DRT : public BaseRT {
 public:
-	bool			LoadAPIRT();
+	bool Load(int nrt, int cf, int df, int w, int h) override;
 
 	std::vector<ComPtr<ID3D11RenderTargetView>>		vD3D11RenderTargetView;
 	std::vector<ComPtr<ID3D11Texture2D>>			vD3D11ColorTex;

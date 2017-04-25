@@ -33,18 +33,18 @@ void PhysXManager::Init()
 
 
 
-	PxCudaContextManagerDesc cudaContextManagerDesc;
-	g_CudaContextManager = PxCreateCudaContextManager(*g_Foundation, cudaContextManagerDesc);
+	//PxCudaContextManagerDesc cudaContextManagerDesc;
+	//g_CudaContextManager = PxCreateCudaContextManager(*g_Foundation, cudaContextManagerDesc);
 
-	PxSceneDesc sceneDesc(g_Physics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	g_Dispatcher = PxDefaultCpuDispatcherCreate(4);
-	sceneDesc.cpuDispatcher = g_Dispatcher;
-	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-	sceneDesc.gpuDispatcher = g_CudaContextManager->getGpuDispatcher();
+	//PxSceneDesc sceneDesc(g_Physics->getTolerancesScale());
+	//sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+	//g_Dispatcher = PxDefaultCpuDispatcherCreate(4);
+	//sceneDesc.cpuDispatcher = g_Dispatcher;
+	//sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	//sceneDesc.gpuDispatcher = g_CudaContextManager->getGpuDispatcher();
 
-	sceneDesc.flags |= PxSceneFlag::eENABLE_GPU_DYNAMICS;
-	sceneDesc.broadPhaseType = PxBroadPhaseType::eGPU;
+	//sceneDesc.flags |= PxSceneFlag::eENABLE_GPU_DYNAMICS;
+	//sceneDesc.broadPhaseType = PxBroadPhaseType::eGPU;
 
 	g_scene = g_Physics->createScene(scDesc);
 }

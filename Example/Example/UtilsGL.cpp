@@ -157,7 +157,7 @@ void Tools::PushRT(int id) {
 	glBindFramebuffer(GL_FRAMEBUFFER, pRT->vFrameBuffers[0]);
 
 #if defined(USING_OPENGL) || defined(USING_OPENGL_ES30)
-	glDrawBuffers(pRT->number_RT, pVideoDriver->DrawBuffers);
+	glDrawBuffers(pRT->m_numRT, pVideoDriver->DrawBuffers);
 #endif
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
@@ -170,10 +170,8 @@ void Tools::PopRT() {
 }
 
 void Tools::DestroyRTs() {
-	for (unsigned int i = 0; i < RTs.size(); i++) {
-		GLRT *pRT = dynamic_cast<GLRT*>(RTs[i]);
-		delete pRT;
-	}
+	for (auto &it : RTs)
+		delete it;
 }
 void Tools::Init(BaseDriver* driver)
 {
@@ -250,11 +248,11 @@ void Tools::PushRT(int id) {
 	D3DRT *pRT = dynamic_cast<D3DRT*>(RTs[id]);
 
 	std::vector<ID3D11RenderTargetView**> RTVA;
-	for (int i = 0; i < pRT->number_RT; i++) {
+	for (int i = 0; i < pRT->m_numRT; i++) {
 		RTVA.push_back(pRT->vD3D11RenderTargetView[i].GetAddressOf());
 	}
 
-	D3D11DeviceContext->OMSetRenderTargets(pRT->number_RT, &RTVA[0][0], pRT->D3D11DepthStencilTargetView.Get());
+	D3D11DeviceContext->OMSetRenderTargets(pRT->m_numRT, &RTVA[0][0], pRT->D3D11DepthStencilTargetView.Get());
 
 	float rgba[4];
 	rgba[0] = 0.5f;
@@ -262,7 +260,7 @@ void Tools::PushRT(int id) {
 	rgba[2] = 0.5f;
 	rgba[3] = 1.0f;
 
-	for (int i = 0; i < pRT->number_RT; i++) {
+	for (int i = 0; i < pRT->m_numRT; i++) {
 		D3D11DeviceContext->ClearRenderTargetView(pRT->vD3D11RenderTargetView[i].Get(), rgba);
 	}
 
@@ -274,10 +272,8 @@ void Tools::PopRT() {
 }
 
 void Tools::DestroyRTs() {
-	for (unsigned int i = 0; i < RTs.size(); i++) {
-		D3DRT *pRT = dynamic_cast<D3DRT*>(RTs[i]);
-		delete pRT;
-	}
+	for (auto &it : RTs)
+		delete it;
 }
 void Tools::Init(BaseDriver* driver)
 {

@@ -7,7 +7,9 @@
 #include"SpriteD3D.h"
 #include "Plane.h"
 #include "BaseRT.h"
-//NOTA: PRESIONAR L PARA COMENZAR O PAUSAR LA FISICAS
+///////////////////////////////////////////////////////////////////////////
+//NOTA: PRESIONAR L PARA COMENZAR O PAUSAR LA FISICAS                            <-----------------------------!!
+//////////////////////////////////////////////////////////////////////////
 using namespace physx;
 extern PxFoundation *g_Foundation;
 extern PxPhysics* g_Physics;
