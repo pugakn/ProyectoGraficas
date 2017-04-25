@@ -101,6 +101,7 @@ lowp vec4 Ambient = color * vec4(0.3,0.3,0.3,1);
 //Lambert
 lowp vec4 Lambert = vec4(lightColor,1.0);
 Lambert*= color * vec4(light_mod,light_mod,light_mod,1.0);
+#ifdef USE_PIXELLIGHTING
 //Specular
 lowp vec4 Specular = vec4(lightColor,1.0);
 Specular *= specular;
@@ -108,6 +109,7 @@ Specular *= specular;
 	Specular *= texture2D(specularMap,vecUVCoords);
 #endif
 Specular *= att;
+#endif
 #if defined USE_SPECULAR_BLIN || defined USE_SPECULAR_PHONG
 gl_FragColor = Ambient + Lambert + Specular;
 #else

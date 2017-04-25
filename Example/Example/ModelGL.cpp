@@ -34,9 +34,6 @@ void ModelGL::Create()
 		fstr = std::string(fsSourceP);
 	}
 
-	delete[] vsSourceP;
-	delete[] fsSourceP;
-
 
 	//Iterar cada Mesh y subsets
 	for (auto &meshIt: parser.m_meshes)
@@ -73,7 +70,7 @@ void ModelGL::Create()
 				{
 					Defines += "#define USE_PIXELLIGHTING \n\n";
 					Defines += "#define USING_ATENUATION \n\n";
-					Defines += "#define USE_SPECULAR \n\n";
+					Defines += "#define USE_SPECULAR_BLIN \n\n";
 				}
 #ifdef USING_OPENGL
 				Defines += "#define lowp\n\n";
@@ -191,6 +188,10 @@ void ModelGL::Create()
 	//Liberar Memoria
 	parser.Deallocate();
 	transform = Identity();
+
+
+	delete[] vsSourceP;
+	delete[] fsSourceP;
 }
 
 void ModelGL::Transform(float * t)
