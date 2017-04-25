@@ -27,13 +27,12 @@ void PxCube::Update()
 {
 	PxVec3 pos = body->getGlobalPose().p;
 	PxQuat rotQuat = body->getGlobalPose().q;
-	float rotX,rotY,rotZ;
-	rotQuat.toRadiansAndUnitAxis(rotX, PxVec3(1, 0, 0));
-	rotQuat.toRadiansAndUnitAxis(rotY, PxVec3(0, 1, 0));
-	rotQuat.toRadiansAndUnitAxis(rotZ, PxVec3(0, 0, 1));
-	primitive->RotateXAbsolute(rotX * 57.2958f);
-	primitive->RotateYAbsolute(rotY * 57.2958f);
-	primitive->RotateZAbsolute(rotZ * 57.2958f);
+	
+	Matrix4D rot{rotQuat.getBasisVector0().x,rotQuat.getBasisVector0().y,rotQuat.getBasisVector0().z,0,
+				 rotQuat.getBasisVector1().x,rotQuat.getBasisVector1().y,rotQuat.getBasisVector1().z,0,
+				 rotQuat.getBasisVector2().x,rotQuat.getBasisVector2().y,rotQuat.getBasisVector2().z,0,
+				 0,0,0,1};
+	primitive->m_RotationX = rot;
 	primitive->TranslateAbsolute(pos.x,pos.y,pos.z);
 	primitive->Update();
 }

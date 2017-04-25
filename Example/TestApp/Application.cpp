@@ -79,16 +79,6 @@ void TestApp::CreateAssets() {
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 
-
-	//index = PrimitiveMgr.CreateModel("Models/House.X");
-
-	//Models.push_back(PrimitiveInst());
-	//Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	//Models.back().ScaleAbsolute(2);
-	//Models.back().TranslateAbsolute(-350, 0, -75);
-	//Models.back().Update();
-
-
 	index = PrimitiveMgr.CreateModel("Models/Jinx.X",false);
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
@@ -155,15 +145,6 @@ void TestApp::CreateAssets() {
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	Models.back().TranslateAbsolute(-300, 0, -360);
 	Models.back().Update();
-
-	//index = PrimitiveMgr.CreateModel("Models/CerdoNuevo.X");
-	//Models.push_back(PrimitiveInst());
-	//Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	//Models.back().ScaleAbsolute(20);
-	//Models.back().RotateXAbsolute(90);
-	//Models.back().RotateZAbsolute(-30);
-	//Models.back().TranslateAbsolute(200, 25, 220);
-	//Models.back().Update();
 
 	index = PrimitiveMgr.CreateCube();
 
@@ -232,7 +213,6 @@ void TestApp::CreateAssets() {
 	Models.back().ScaleAbsolute(3000);
 	Models.back().Update();
 
-	//dynamic_cast<Plane*>(PrimitiveMgr.primitives[index])->tex = Tools::RTs[0]->vColorTextures[0];
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	Models.back().TranslateAbsolute(380, 1, 1500);
@@ -280,26 +260,6 @@ void TestApp::OnUpdate() {
 			}
 	}
 
-	//static int cubeIndex = 0;
-	//static float cubeTimeAccum = 0;
-	//cubeTimeAccum += DtTimer.GetDTSecs();
-	//if (cubeTimeAccum > 5.0f) {
-	//	cubeTimeAccum = 0.0f;
-	//	for (size_t k = 0; k < 4; k++)
-	//	{
-	//		for (size_t i = 0; i < 4; i++)
-	//		{
-	//			Cubes[cubeIndex]->Traslate(Vector3D(i * 4,  300, k * 4));
-	//			Cubes[cubeIndex]->body->clearForce();
-	//			cubeIndex++;
-	//		}
-	//	}
-	//	if (cubeIndex == Cubes.size())
-	//		cubeIndex = 0;
-	//}
-
-
-
 	Vector3D campos = cam.m_pos / 1500.f;
 	dot->TranslateAbsolute(2.44-campos.z,1.45-campos.x,0);
 	dot->Update();
@@ -324,7 +284,6 @@ void TestApp::OnDraw() {
 
 	for (int i = 0; i < Models.size()-4; i++) {
 		Matrix4D temp = Models[i].Scale;
-		//Models[i].TranslateAbsolute(0,0,0);
 		Models[i].Scale = Models[i].Scale * Scaling(1,-1,1);
 
 		Models[i].Update();
@@ -333,16 +292,6 @@ void TestApp::OnDraw() {
 		Models[i].Update();
 
 	}
-	//for (auto& it : Cubes)
-	//{
-	//	Matrix4D temp = it->primitive->Scale;
-	//	it->primitive->Scale = it->primitive->Scale * Scaling(1, -1, 1);
-
-	//	it->primitive->Update();
-	//	it->primitive->Draw();
-	//	it->primitive->Scale = temp;
-	//	it->primitive->Update();
-	//}
 	pFramework->pVideoDriver->SetCullFace(BaseDriver::FRONT);
 	Tools::PopRT();
 	//====================================================
@@ -364,7 +313,6 @@ void TestApp::OnDraw() {
 }
 
 void TestApp::OnInput() {
-	//cam.OnInput(DtTimer.GetDTSecs());
 	if (IManager.PressedKey(SDLK_w)) {
 		cam.TraslateFront(-40.0f*DtTimer.GetDTSecs());
 	}
