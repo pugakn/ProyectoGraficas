@@ -407,3 +407,7 @@ void CubeGL::Destroy() {
 #elif defined(USING_D3D11)
 #endif
 }
+
+void CubeGL::SetShaderBySignature(unsigned long sig)
+{
+}

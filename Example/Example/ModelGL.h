@@ -15,6 +15,7 @@
 #include "UtilsGL.h"
 #include "Matrix4D.h"
 #include "Wireframe.h"
+#include "GLShader.h"
 
 class Texture;
 class ModelGL : public PrimitiveBase
@@ -37,6 +38,7 @@ private:
 		GLint	 uvAttribLocs;
 		//Uniforms
 		GLint  matWorldViewProjUniformLoc;
+		GLint  matWorldViewUniformLoc;
 		GLint  matWorldUniformLoc;
 
 		GLint lightLoc;
@@ -44,11 +46,15 @@ private:
 		GLint camPosLoc;
 		GLint specExpLoc;
 		GLint attMaxLoc;
+		GLint camFarLoc;
 
 		//Index Bufer ID
 		GLuint	IB;
 		//Textures
 		TextureInfo textInfo;
+		GLShader* m_shader;
+
+		unsigned long sig;
 		SubsetInfo() {
 			vertexAttribLocs = -1;
 			normalAttribLocs = -1;
@@ -63,6 +69,9 @@ private:
 			camPosLoc = -1;
 			specExpLoc = -1;
 			attMaxLoc = -1;
+
+			sig = 0;
+			m_shader = nullptr;
 		}
 
 	};
@@ -90,7 +99,6 @@ private:
 	Wireframe wireframe;
 	WireframeInfo wire;
 
-
 	inline void DrawMeshes(const Matrix4D &VP, const Matrix4D &WVP);
 	inline void DrawWireframe(const Matrix4D &VP, const Matrix4D &WVP);
 public:
@@ -99,6 +107,7 @@ public:
 	void Transform(float *t) override;
 	void Draw(float *t) override;
 	void Destroy() override;
+	void SetShaderBySignature(unsigned long sig) override;
 	MeshParser parser;
 	ModelGL() { useLight = true; };
 	~ModelGL();

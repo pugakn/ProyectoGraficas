@@ -148,7 +148,7 @@ int Tools::CreateRT(int numRT)
 	return -1;
 }
 
-void Tools::PushRT(int id) {
+void Tools::UseRT(int id) {
 	if (id < 0 || id >= (int)RTs.size())
 		return;
 
@@ -165,7 +165,7 @@ void Tools::PushRT(int id) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Tools::PopRT() {
+void Tools::UseOriginalFBO() {
 	glBindFramebuffer(GL_FRAMEBUFFER, pVideoDriver->originalFBO);
 }
 
@@ -241,7 +241,7 @@ int Tools::CreateRT(int numRT)
 	return -1;
 }
 
-void Tools::PushRT(int id) {
+void Tools::UseRT(int id) {
 	if (id < 0 || id >= (int)RTs.size())
 		return;
 
@@ -267,7 +267,7 @@ void Tools::PushRT(int id) {
 	D3D11DeviceContext->ClearDepthStencilView(pRT->D3D11DepthStencilTargetView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
-void Tools::PopRT() {
+void Tools::UseOriginalFBO() {
 	D3D11DeviceContext->OMSetRenderTargets(1, D3D11RenderTargetView.GetAddressOf(), D3D11DepthStencilTargetView.Get());
 }
 

@@ -33,6 +33,7 @@ public:
 
 	PrimitiveManager PrimitiveMgr;
 	std::vector<PrimitiveInst>	Models;
+	std::vector<PrimitiveInst>	DebugRT;
 	PrimitiveInst lightPrimitive;
 
 	TextMesh* textFPS;

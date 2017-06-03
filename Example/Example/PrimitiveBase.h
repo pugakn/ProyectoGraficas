@@ -15,6 +15,7 @@ public:
 	virtual void Draw(float *t) = 0;
 	virtual void Destroy() = 0;
 
+	virtual void SetShaderBySignature(unsigned long sig) = 0;
 	void SetSceneProps(SceneProps *p) { pScProp = p; }
 	SceneProps	*pScProp;
 };

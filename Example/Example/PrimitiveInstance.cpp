@@ -1,5 +1,5 @@
 #include "PrimitiveInstance.h"
-
+#include "ShaderManager.h"
 void PrimitiveInst::TranslateAbsolute(float x, float y, float z){
 	Position = Translation(x, y, z);
 }
@@ -52,4 +52,10 @@ void PrimitiveInst::Update() {
 
 void PrimitiveInst::Draw(){
 	pBase->Draw(&Final.m[0][0]);
+}
+
+void PrimitiveInst::SetShaderByGlobalSignature(unsigned long gsig)
+{
+	ShaderManager::SetGlobalSignature(gsig);
+	pBase->SetShaderBySignature(gsig);
 }

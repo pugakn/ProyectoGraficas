@@ -41,17 +41,28 @@ varying highp vec2 vecUVCoords;
 
 uniform highp mat4 WVP;
 uniform highp mat4 World;
+#ifdef LINEAR_DEPTH
+uniform highp mat4 WV;
+#endif
 
+varying highp vec4 pos;
 void main(){
 	highp mat3 m3World = mat3(World);
 	pixelPos	= (World*Vertex).xyz;
-
+	#ifndef LINEAR_DEPTH
+	pos = WVP * Vertex;
+	#else
+  pos = WV * Vertex;
+	#endif
 
 #ifdef USE_TEXCOORD0
 	vecUVCoords = UV;
 #endif
-
+#ifndef LINEAR_DEPTH
+	gl_Position = pos;
+#else
 	gl_Position = WVP*Vertex;
+#endif
 #ifdef USE_NORMALS
 	normalTransformed = normalize(m3World*Normal.rgb);
 #endif

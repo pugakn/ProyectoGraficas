@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="BaseDriver.h" />
     <ClInclude Include="BaseRT.h" />
+    <ClInclude Include="BaseShader.h" />
     <ClInclude Include="BMPParser.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="D3DRT.h" />
@@ -29,6 +30,7 @@
     <ClInclude Include="FPCamera.h" />
     <ClInclude Include="GLFont.h" />
     <ClInclude Include="GLRT.h" />
+    <ClInclude Include="GLShader.h" />
     <ClInclude Include="MeshD3D.h" />
     <ClInclude Include="ModelGL.h" />
     <ClInclude Include="Core.h" />
@@ -44,7 +46,9 @@
     <ClInclude Include="PrimitiveManager.h" />
     <ClInclude Include="PxCube.h" />
     <ClInclude Include="PxInstance.h" />
+    <ClInclude Include="Quad.h" />
     <ClInclude Include="SceneProp.h" />
+    <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteD3D.h" />
     <ClInclude Include="SpriteGL.h" />
@@ -64,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseRT.cpp" />
+    <ClCompile Include="BaseShader.cpp" />
     <ClCompile Include="BMPParser.cpp" />
     <ClCompile Include="D3DRT.cpp" />
     <ClCompile Include="D3DXDriver.cpp" />
@@ -71,6 +76,7 @@
     <ClCompile Include="FPCamera.cpp" />
     <ClCompile Include="GLFont.cpp" />
     <ClCompile Include="GLRT.cpp" />
+    <ClCompile Include="GLShader.cpp" />
     <ClCompile Include="MeshD3D.cpp" />
     <ClCompile Include="ModelGL.cpp" />
     <ClCompile Include="Core.cpp" />
@@ -85,7 +91,9 @@
     <ClCompile Include="PrimitiveManager.cpp" />
     <ClCompile Include="PxCube.cpp" />
     <ClCompile Include="PxInstance.cpp" />
+    <ClCompile Include="Quad.cpp" />
     <ClCompile Include="SceneProp.cpp" />
+    <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteD3D.cpp" />
     <ClCompile Include="SpriteGL.cpp" />

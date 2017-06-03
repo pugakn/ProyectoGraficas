@@ -33,9 +33,9 @@
 
 #include "Matrix4D.h"
 #include "PrimitiveBase.h"
-class Plane : public PrimitiveBase {
+class Quad : public PrimitiveBase {
 public:
-	Plane()
+	Quad()
 #ifdef USING_GL_COMMON
 		: shaderID(0)
 #endif
@@ -43,7 +43,7 @@ public:
 
 #ifdef USING_D3D11
 	struct CBuffer {
-		Matrix4D WVP;
+		Matrix4D World;
 	};
 #endif
 
@@ -58,9 +58,21 @@ public:
 	GLuint	shaderID;
 	GLint	vertexAttribLoc;
 	GLint	diffuseLoc;
+	GLint normalTextLoc;
+	GLint specularTextLoc;
+	GLint depthTextLoc;
+	GLint   uvAttribLoc;
 
 
-	GLint  matWorldViewProjUniformLoc;
+	GLint  matWorldUniformLoc;
+	GLint WVPLoc;
+	GLint WorldLoc;
+	GLint WorldViewLoc;
+	GLint VPInverseLoc;
+	GLint LightPositionsLoc;
+	GLint LightColorsLoc;
+	GLint CameraPositionLoc;
+	GLint NumLightsLoc;
 
 	GLuint			VB;
 	GLuint			IB;
@@ -74,14 +86,19 @@ public:
 	ComPtr<ID3D11InputLayout>   Layout;
 	ComPtr<ID3D11Buffer>        pd3dConstantBuffer;
 
-	Plane::CBuffer	CnstBuffer;
+	Quad::CBuffer	CnstBuffer;
 #endif
 
-	int		TexId;
+	int		difTextId;
+	Texture		*normalTex;
+	int		normalTextId;
+	Texture		*depthTex;
+	int		depthTextId;
+	Texture		*difTex;
+	int		specTextId;
+	Texture		*specTex;
 	CVertex			vertices[4];
 	unsigned short	indices[6];
 	Matrix4D	transform;
-	Texture		*tex;
 };
-
 

@@ -1,3 +1,4 @@
+#include "Quad.h"
 /*********************************************************
 * Copyright (C) 2017 Daniel Enriquez (camus_mm@hotmail.com)
 * All Rights Reserved
@@ -10,26 +11,23 @@
 * ** Enjoy, learn and share.
 *********************************************************/
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-#include "Plane.h"
 
 #ifdef USING_D3D11
 extern ComPtr<ID3D11Device>            D3D11Device;
 extern ComPtr<ID3D11DeviceContext>     D3D11DeviceContext;
 #endif
 
-void Plane::Create() {
-#ifdef USING_GL_COMMON
-	TexId = Tools::textureChekerID;
-#elif defined(USING_D3D11)
-	tex = Tools::textureCheker;
-#endif
+void Quad::Create() {
+	difTextId = Tools::textureChekerID;
+	difTex = Tools::textureCheker;
+
 
 
 #ifdef USING_GL_COMMON
 	shaderID = glCreateProgram();
 
-	char *vsSourceP = file2string("Shaders/VS_Water.glsl");
-	char *fsSourceP = file2string("Shaders/FS_Water.glsl");
+	char *vsSourceP = file2string("Shaders/VS_Quad.glsl");
+	char *fsSourceP = file2string("Shaders/FS_Quad.glsl");
 
 	std::string vsrc;
 	std::string fsrc;
@@ -50,6 +48,8 @@ void Plane::Create() {
 		Defines += "#define mediump\n\n";
 		Defines += "#define highp\n\n";
 	}
+	//Defines += "#define LINEAR_DEPTH\n\n";
+	Defines += "#define G_BUFF_PASS\n\n";
 #endif // USING_OPENGL
 	vsrc = Defines + vsrc;
 	fsrc = Defines + fsrc;
@@ -63,7 +63,7 @@ void Plane::Create() {
 		glUseProgram(shaderID);
 
 		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
-		matWorldViewProjUniformLoc = glGetUniformLocation(shaderID, "WVP");
+		matWorldUniformLoc = glGetUniformLocation(shaderID, "W");
 	}
 	else
 	{
@@ -72,17 +72,29 @@ void Plane::Create() {
 
 		glLinkProgram(shaderID);
 		glUseProgram(shaderID);
-
+		//Attributes
 		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
-
-		matWorldViewProjUniformLoc = glGetUniformLocation(shaderID, "WVP");
+		uvAttribLoc = glGetAttribLocation(shaderID, "UV");
+		//Uniforms
+		matWorldUniformLoc = glGetUniformLocation(shaderID, "W");
+		WVPLoc = glGetUniformLocation(shaderID, "WVP");
+		WorldLoc = glGetUniformLocation(shaderID, "World");
+		WorldViewLoc = glGetUniformLocation(shaderID, "WorldView");
+		VPInverseLoc = glGetUniformLocation(shaderID, "VPInverse");
+		LightPositionsLoc = glGetUniformLocation(shaderID, "LightPositions");
+		LightColorsLoc = glGetUniformLocation(shaderID, "LightColors");
+		CameraPositionLoc = glGetUniformLocation(shaderID, "CameraPosition");
+		NumLightsLoc = glGetUniformLocation(shaderID, "NumLights");
 
 		diffuseLoc = glGetUniformLocation(shaderID, "diffuse");
+		normalTextLoc = glGetUniformLocation(shaderID, "normalText");
+		specularTextLoc = glGetUniformLocation(shaderID, "specularText");
+		depthTextLoc = glGetUniformLocation(shaderID, "depthText");
 	}
 #elif defined(USING_D3D11)
 	bool errorShader = false;
-	char *vsSourceP = file2string("Shaders/VS_Water.hlsl");
-	char *fsSourceP = file2string("Shaders/FS_Water.hlsl");
+	char *vsSourceP = file2string("Shaders/VS_Quad.hlsl");
+	char *fsSourceP = file2string("Shaders/FS_Quad.hlsl");
 
 	if (!vsSourceP || !fsSourceP)
 		errorShader = true;
@@ -136,10 +148,11 @@ void Plane::Create() {
 	free(fsSourceP);
 #endif
 
-	vertices[0] = { 0.0f,  1.0f, 0.0f , 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 0.0f };
-	vertices[1] = { 0.0f,  0.0f, 0.0f , 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 1.0f };
-	vertices[2] = { 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f,  1.0f, 1.0f };
-	vertices[3] = { 1.0f,  1.0f, 0.0f, 1.0f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f };
+	vertices[0] = { -1.0f,  1.0f,  0.0f ,1.0f,  0.0f, 0.0f };//Left Top
+	vertices[1] = { -1.0f,  -1.0f, 0.0f ,1.0f,  0.0f, 1.0f };//Left Bot
+	vertices[2] = { 1.0f,  -1.0f,  0.0f ,1.0f,  1.0f, 1.0f };//Right Bot
+	vertices[3] = { 1.0f,  1.0f,   0.0f ,1.0f,  1.0f, 0.0f };//Right Top
+
 
 	indices[0] = 2;
 	indices[1] = 1;
@@ -163,7 +176,8 @@ void Plane::Create() {
 	D3D11DeviceContext->PSSetShader(pFS.Get(), 0, 0);
 
 	D3D11_INPUT_ELEMENT_DESC vertexDeclaration[] = {
-		{ "POSITION" , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "POSITION" , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0,DXGI_FORMAT_R32G32_FLOAT, 0, 16,D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	hr = D3D11Device->CreateInputLayout(vertexDeclaration, ARRAYSIZE(vertexDeclaration), VS_blob->GetBufferPointer(), VS_blob->GetBufferSize(), &Layout);
@@ -175,7 +189,7 @@ void Plane::Create() {
 
 	D3D11_BUFFER_DESC bdesc = { 0 };
 	bdesc.Usage = D3D11_USAGE_DEFAULT;
-	bdesc.ByteWidth = errorShader ? sizeof(Matrix4D) : sizeof(Plane::CBuffer);
+	bdesc.ByteWidth = errorShader ? sizeof(Matrix4D) : sizeof(Quad::CBuffer);
 	bdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	hr = D3D11Device->CreateBuffer(&bdesc, 0, pd3dConstantBuffer.GetAddressOf());
@@ -220,11 +234,11 @@ void Plane::Create() {
 	transform = Identity();
 }
 
-void Plane::Transform(float *t) {
+void Quad::Transform(float *t) {
 	transform = t;
 }
 
-void Plane::Draw(float *t) {
+void Quad::Draw(float *t) {
 #ifdef USING_GL_COMMON
 	glUseProgram(shaderID);
 
@@ -232,28 +246,73 @@ void Plane::Draw(float *t) {
 		transform = t;
 
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
-	Matrix4D WVP = transform*VP;
+	Matrix4D W = transform;
+	Matrix4D WVP = W*VP;
+	Matrix4D WV = W*pScProp->pCameras[0]->m_view;
+	Matrix4D WVPI = Inverse(VP);
+	std::vector<Vector3D>LightPositions;
+	std::vector<Vector3D>LightColors;
+	for (unsigned int i = 0; i < pScProp->Lights.size(); i++) {
+		LightPositions.push_back(pScProp->Lights[i].Position);
+		LightColors.push_back(pScProp->Lights[i].Color);
+	}
+	if (matWorldUniformLoc != -1)
+		glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &W.m[0][0]);
+	if (WVPLoc != -1)
+		glUniformMatrix4fv(WVPLoc, 1, GL_FALSE, &WVP.m[0][0]);
+	if (WorldLoc != -1)
+		glUniformMatrix4fv(WorldLoc, 1, GL_FALSE, &W.m[0][0]);
+	if (WorldViewLoc!=-1)
+		glUniformMatrix4fv(WorldViewLoc, 1, GL_FALSE, &WV.m[0][0]);
+	if (VPInverseLoc != -1)
+		glUniformMatrix4fv(VPInverseLoc, 1, GL_FALSE, &WVPI.m[0][0]);
 
-	glUniformMatrix4fv(matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
+	if (LightColorsLoc != -1)
+		glUniform4fv(LightColorsLoc, LightColors.size(), &LightColors[0].x);
+	if (LightPositionsLoc != -1)
+		glUniform4fv(LightPositionsLoc, LightPositions.size(), &LightPositions[0].x);
 
+	if (CameraPositionLoc != -1)
+		glUniform4fv(CameraPositionLoc, 1, &pScProp->pCameras[0]->m_pos.x);
+	int ligthSize = pScProp->Lights.size();
+	if (NumLightsLoc != -1)
+		glUniform1iv(NumLightsLoc, 1, &ligthSize);
+	//if (uvAttribLoc != -1)
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
 
 	glEnableVertexAttribArray(vertexAttribLoc);
+	if (uvAttribLoc != -1)
+		glEnableVertexAttribArray(uvAttribLoc);
+
 
 	glVertexAttribPointer(vertexAttribLoc, 4, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(0));
+	if (uvAttribLoc != -1)
+		glVertexAttribPointer(uvAttribLoc, 2, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(16));
 	if (shaderID != Tools::DefaultShaderID)
 	{
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex->id);
+		glBindTexture(GL_TEXTURE_2D, difTex->id);
 		glUniform1i(diffuseLoc, 0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, depthTex->id);
+		glUniform1i(depthTextLoc, 1);
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, specTex->id);
+		glUniform1i(specularTextLoc, 2);
+
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, normalTex->id);
+		glUniform1i(normalTextLoc, 3);
 	}
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-
+	if (uvAttribLoc != -1) 
+		glDisableVertexAttribArray(uvAttribLoc);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 	glDisableVertexAttribArray(vertexAttribLoc);
 
 
@@ -263,8 +322,7 @@ void Plane::Draw(float *t) {
 		transform = t;
 
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
-	Matrix4D WVP = transform*VP;
-	CnstBuffer.WVP = WVP;
+	CnstBuffer.World = transform;
 
 	UINT stride = sizeof(CVertex);
 	UINT offset = 0;
@@ -273,7 +331,7 @@ void Plane::Draw(float *t) {
 
 	D3D11DeviceContext->IASetInputLayout(Layout.Get());
 
-	D3D11DeviceContext->UpdateSubresource(pd3dConstantBuffer.Get(), 0, 0, &CnstBuffer.WVP.m[0][0], 0, 0);
+	D3D11DeviceContext->UpdateSubresource(pd3dConstantBuffer.Get(), 0, 0, &CnstBuffer.World.m[0][0], 0, 0);
 
 	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(tex);
 	D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
@@ -288,15 +346,15 @@ void Plane::Draw(float *t) {
 	D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	D3D11DeviceContext->DrawIndexed(6, 0, 0);
 #endif
-}
 
-void Plane::Destroy() {
+}
+void Quad::Destroy() {
 #ifdef USING_GL_COMMON
 	glDeleteProgram(shaderID);
 #elif defined(USING_D3D11)
 #endif
 }
 
-void Plane::SetShaderBySignature(unsigned long sig)
+void Quad::SetShaderBySignature(unsigned long sig)
 {
 }

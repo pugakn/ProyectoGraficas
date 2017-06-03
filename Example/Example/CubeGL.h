@@ -54,6 +54,7 @@ public:
 	void Transform(float *t);
 	void Draw(float *t) override;
 	void Destroy();
+	void SetShaderBySignature(unsigned long sig) override;
 
 #ifdef USING_GL_COMMON
 	GLuint	shaderID;

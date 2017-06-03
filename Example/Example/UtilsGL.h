@@ -47,8 +47,8 @@ private:
 public:
 	static int CreateRT(int numRT, int colorf, int depthf, int w, int h);
 	static int CreateRT(int numRT);
-	static void PushRT(int id);
-	static void PopRT();
+	static void UseRT(int id);
+	static void UseOriginalFBO();
 	static void DestroyRTs();
 	static Texture* textureCheker;
 	static int textureChekerID;

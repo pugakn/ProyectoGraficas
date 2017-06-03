@@ -30,6 +30,7 @@ public:
 	Vector3D m_pos;
 	Matrix4D m_view;
 	Matrix4D VP;
+	float farPlane;
 	FPCamera();
 	~FPCamera();
 };

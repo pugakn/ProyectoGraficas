@@ -7,11 +7,23 @@
 #include "MeshD3D.h"
 #endif
 #include "CubeGL.h"
+#include "Quad.h"
+#include "ShaderManager.h"
 PrimitiveBase*	PrimitiveManager::GetPrimitive(unsigned int index) {
 	if (index >= primitives.size())
 		return 0;
 
 	return primitives[index];
+}
+
+void PrimitiveManager::SetShaderGlobalSignature(unsigned long sig)
+{
+	ShaderManager::SetGlobalSignature(sig);
+	for (auto &it : primitives)
+	{
+		it->SetShaderBySignature(sig);
+	}
+
 }
 
 int  PrimitiveManager::CreateTriangle() {
@@ -54,6 +66,14 @@ int	 PrimitiveManager::CreateModel(char * fileName, bool useLight) {
 int PrimitiveManager::CreatePlane()
 {
 	PrimitiveBase *primitive = new Plane();
+	primitive->Create();
+	primitives.push_back(primitive);
+	return (int)(primitives.size() - 1);
+}
+
+int PrimitiveManager::CreateQuad()
+{
+	PrimitiveBase *primitive = new Quad();
 	primitive->Create();
 	primitives.push_back(primitive);
 	return (int)(primitives.size() - 1);

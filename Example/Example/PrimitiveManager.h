@@ -20,10 +20,12 @@ public:
 	int CreateModel(char * fileName , bool useLight);
 	int CreateText();
 	int CreatePlane();
+	int CreateQuad();
 
 	void DrawPrimitives();
 	void DestroyPrimitives();
 	PrimitiveBase*	GetPrimitive(unsigned int);
+	void SetShaderGlobalSignature(unsigned long sig);
 
 	std::vector<PrimitiveBase*> primitives;
 
