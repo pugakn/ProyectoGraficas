@@ -297,6 +297,7 @@ void Plane::Destroy() {
 #endif
 }
 
-void Plane::SetShaderBySignature(unsigned long sig)
+void Plane::SetShaderType(Shader::TYPE type)
 {
 }
+

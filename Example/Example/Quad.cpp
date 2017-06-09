@@ -61,7 +61,6 @@ void Quad::Create() {
 		shaderID = Tools::DefaultShaderID;
 		glLinkProgram(shaderID);
 		glUseProgram(shaderID);
-
 		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
 		matWorldUniformLoc = glGetUniformLocation(shaderID, "W");
 	}
@@ -148,10 +147,10 @@ void Quad::Create() {
 	free(fsSourceP);
 #endif
 
-	vertices[0] = { -1.0f,  1.0f,  0.0f ,1.0f,  0.0f, 0.0f };//Left Top
-	vertices[1] = { -1.0f,  -1.0f, 0.0f ,1.0f,  0.0f, 1.0f };//Left Bot
-	vertices[2] = { 1.0f,  -1.0f,  0.0f ,1.0f,  1.0f, 1.0f };//Right Bot
-	vertices[3] = { 1.0f,  1.0f,   0.0f ,1.0f,  1.0f, 0.0f };//Right Top
+	vertices[0] = { -1.0f,  1.0f,  0.9f ,1.0f,  0.0f, 0.0f };//Left Top
+	vertices[1] = { -1.0f,  -1.0f, 0.9f ,1.0f,  0.0f, 1.0f };//Left Bot
+	vertices[2] = { 1.0f,  -1.0f,  0.9f ,1.0f,  1.0f, 1.0f };//Right Bot
+	vertices[3] = { 1.0f,  1.0f,   0.9f ,1.0f,  1.0f, 0.0f };//Right Top
 
 
 	indices[0] = 2;
@@ -202,7 +201,7 @@ void Quad::Create() {
 	D3D11DeviceContext->PSSetConstantBuffers(0, 1, pd3dConstantBuffer.GetAddressOf());
 
 
-	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(tex);
+	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(difTex);
 	D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
 	D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
 
@@ -211,7 +210,7 @@ void Quad::Create() {
 	bdesc.ByteWidth = sizeof(CVertex) * 4;
 	bdesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA subData = { vertices, 0, 0 };
-
+		|
 	hr = D3D11Device->CreateBuffer(&bdesc, &subData, &VB);
 	if (hr != S_OK) {
 		printf("Error Creating Vertex Buffer\n");
@@ -248,13 +247,13 @@ void Quad::Draw(float *t) {
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D W = transform;
 	Matrix4D WVP = W*VP;
-	Matrix4D WV = W*pScProp->pCameras[0]->m_view;
+	Matrix4D WV = pScProp->pCameras[0]->m_view;
 	Matrix4D WVPI = Inverse(VP);
-	std::vector<Vector3D>LightPositions;
-	std::vector<Vector3D>LightColors;
+	std::vector<Vector4D>LightPositions;
+	std::vector<Vector4D>LightColors;
 	for (unsigned int i = 0; i < pScProp->Lights.size(); i++) {
-		LightPositions.push_back(pScProp->Lights[i].Position);
-		LightColors.push_back(pScProp->Lights[i].Color);
+		LightPositions.push_back(Vector4D(pScProp->Lights[i].Position,1.0));
+		LightColors.push_back(Vector4D(pScProp->Lights[i].Color,1.0));
 	}
 	if (matWorldUniformLoc != -1)
 		glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &W.m[0][0]);
@@ -333,7 +332,7 @@ void Quad::Draw(float *t) {
 
 	D3D11DeviceContext->UpdateSubresource(pd3dConstantBuffer.Get(), 0, 0, &CnstBuffer.World.m[0][0], 0, 0);
 
-	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(tex);
+	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(difTex);
 	D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
 	D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
 
@@ -355,6 +354,7 @@ void Quad::Destroy() {
 #endif
 }
 
-void Quad::SetShaderBySignature(unsigned long sig)
+void Quad::SetShaderType(Shader::TYPE type)
 {
 }
+

@@ -9,10 +9,29 @@
 #elif defined(USING_OPENGL)
 #include <GL\glew.h>
 #endif
-#endif
 class GLShader : public Shader
 {
+
 public:
+	struct
+	{
+		GLint	 vertexAttribLocs;
+		GLint	 normalAttribLocs;
+		GLint	 binormalAttribLocs;
+		GLint	 tangentAttribLocs;
+		GLint	 uvAttribLocs;
+		//Uniforms
+		GLint  matWorldViewProjUniformLoc;
+		GLint  matWorldViewUniformLoc;
+		GLint  matWorldUniformLoc;
+
+		GLint lightLoc;
+		GLint lightColLoc;
+		GLint camPosLoc;
+		GLint specExpLoc;
+		GLint attMaxLoc;
+		GLint camFarLoc;
+	} m_locs;
 	GLuint vshader_id;
 	GLuint fshader_id;
 	GLint ShaderID;
@@ -20,4 +39,5 @@ public:
 	GLShader();
 	~GLShader();
 };
+#endif
 

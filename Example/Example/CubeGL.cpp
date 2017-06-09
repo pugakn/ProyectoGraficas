@@ -408,6 +408,6 @@ void CubeGL::Destroy() {
 #endif
 }
 
-void CubeGL::SetShaderBySignature(unsigned long sig)
+void CubeGL::SetShaderType(Shader::TYPE type)
 {
 }

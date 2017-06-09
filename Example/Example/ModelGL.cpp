@@ -54,41 +54,23 @@ void ModelGL::Create()
 				if (!useLight)
 					m_meshInfo.back().subsetInfo.back().sig |= Shader::NOT_LIGHT;
 
-			m_meshInfo.back().subsetInfo.back().m_shader = (GLShader*)ShaderManager::GetShaderBySignature(m_meshInfo.back().subsetInfo.back().sig);
-			m_meshInfo.back().subsetInfo.back().shadersID = ((GLShader*)m_meshInfo.back().subsetInfo.back().m_shader)->ShaderID;
 
-			if (((GLShader*)m_meshInfo.back().subsetInfo.back().m_shader)->vshader_id == 0 || ((GLShader*)m_meshInfo.back().subsetInfo.back().m_shader)->fshader_id == 0)
+				auto  set = ShaderManager::GetShaderSetBySignature(m_meshInfo.back().subsetInfo.back().sig);
+				m_meshInfo.back().subsetInfo.back().m_shaderSet = set;
+				m_shaderType = Shader::TYPE::G_FORWARD_PASS;
+				GLShader * glDefaultShader = (GLShader*)(m_meshInfo.back().subsetInfo.back().m_shaderSet)[m_shaderType];
+				m_meshInfo.back().subsetInfo.back().shadersID = glDefaultShader->ShaderID;
+
+			if (glDefaultShader->vshader_id == 0 || glDefaultShader->fshader_id == 0)
 			{
 				m_meshInfo.back().subsetInfo.back().shadersID = Tools::DefaultShaderID;
-				glLinkProgram(m_meshInfo.back().subsetInfo.back().shadersID);
+				//glLinkProgram(m_meshInfo.back().subsetInfo.back().shadersID);
 				glUseProgram(m_meshInfo.back().subsetInfo.back().shadersID);
-
-				m_meshInfo.back().subsetInfo.back().vertexAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Vertex");
-				m_meshInfo.back().subsetInfo.back().matWorldViewProjUniformLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "WVP");
 			}
 			else
 			{
-				glLinkProgram(m_meshInfo.back().subsetInfo.back().shadersID);
+				//glLinkProgram(m_meshInfo.back().subsetInfo.back().shadersID);
 				glUseProgram(m_meshInfo.back().subsetInfo.back().shadersID);
-
-				//Obtener locaciones de Attributes
-				m_meshInfo.back().subsetInfo.back().vertexAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Vertex");
-				m_meshInfo.back().subsetInfo.back().normalAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Normal");
-				m_meshInfo.back().subsetInfo.back().binormalAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Binormal");
-				m_meshInfo.back().subsetInfo.back().tangentAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Tangent");
-				m_meshInfo.back().subsetInfo.back().uvAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "UV");
-
-				//Obtener locaciones de Uniforms
-				m_meshInfo.back().subsetInfo.back().matWorldViewUniformLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "WV");
-				m_meshInfo.back().subsetInfo.back().matWorldViewProjUniformLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "WVP");
-				m_meshInfo.back().subsetInfo.back().matWorldUniformLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "World");
-				m_meshInfo.back().subsetInfo.back().lightLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "light");
-				m_meshInfo.back().subsetInfo.back().lightColLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "lightColor");
-				m_meshInfo.back().subsetInfo.back().camPosLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "camPos");
-				m_meshInfo.back().subsetInfo.back().specExpLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "specExp");
-				m_meshInfo.back().subsetInfo.back().attMaxLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "attMax");
-				m_meshInfo.back().subsetInfo.back().camFarLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "camFar");
-				
 				//=========================== Create Textures ===============================
 				m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "diffuse"));
 				int textureID = Tools::LoadTexture(subsetIt.m_effects.m_difusePath.c_str());
@@ -208,50 +190,51 @@ inline void ModelGL::DrawMeshes(const Matrix4D & VP, const Matrix4D & WVP)
 			glUseProgram(sIt->shadersID);
 			//Set Uniforms
 			Matrix4D WV = transform * pScProp->pCameras[0]->m_view;
-			glUniformMatrix4fv(sIt->matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
-			if (sIt->matWorldViewUniformLoc != -1)
-				glUniformMatrix4fv(sIt->matWorldViewUniformLoc, 1, GL_FALSE, &WV.m[0][0]);
-			if (sIt->matWorldUniformLoc != -1)
-				glUniformMatrix4fv(sIt->matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
-			if (sIt->lightLoc != -1)
-				glUniform3fv(sIt->lightLoc, 1, &pScProp->Lights[0].Position.x);
-			if (sIt->lightColLoc != -1)
-				glUniform3fv(sIt->lightColLoc, 1, &pScProp->Lights[0].Color.r);
-			if (sIt->camPosLoc != -1)
-				glUniform3fv(sIt->camPosLoc, 1, &pScProp->pCameras[0]->m_pos.x);
-			if (sIt->specExpLoc != -1)
-				glUniform1fv(sIt->specExpLoc, 1, &pScProp->specExp);
-			if (sIt->attMaxLoc != 1)
-				glUniform1fv(sIt->attMaxLoc, 1, &pScProp->attMax);
-			if (sIt->camFarLoc != 1)
-				glUniform1fv(sIt->camFarLoc, 1, &pScProp->pCameras[0]->farPlane);
+			auto locs = ((GLShader*)(sIt->m_shaderSet[m_shaderType]))->m_locs;
+			glUniformMatrix4fv(locs.matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
+			if (locs.matWorldViewUniformLoc != -1)
+				glUniformMatrix4fv(locs.matWorldViewUniformLoc, 1, GL_FALSE, &WV.m[0][0]);
+			if (locs.matWorldUniformLoc != -1)
+				glUniformMatrix4fv(locs.matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
+			if (locs.lightLoc != -1)
+				glUniform3fv(locs.lightLoc, 1, &pScProp->Lights[0].Position.x);
+			if (locs.lightColLoc != -1)
+				glUniform3fv(locs.lightColLoc, 1, &pScProp->Lights[0].Color.r);
+			if (locs.camPosLoc != -1)
+				glUniform3fv(locs.camPosLoc, 1, &pScProp->pCameras[0]->m_pos.x);
+			if (locs.specExpLoc != -1)
+				glUniform1fv(locs.specExpLoc, 1, &pScProp->specExp);
+			if (locs.attMaxLoc != 1)
+				glUniform1fv(locs.attMaxLoc, 1, &pScProp->attMax);
+			if (locs.camFarLoc != 1)
+				glUniform1fv(locs.camFarLoc, 1, &pScProp->pCameras[0]->farPlane);
 			//Enable Attributes
-			glEnableVertexAttribArray(sIt->vertexAttribLocs);
-			if (sIt->normalAttribLocs != -1)
-				glEnableVertexAttribArray(sIt->normalAttribLocs);
-			if (sIt->binormalAttribLocs != -1)
-				glEnableVertexAttribArray(sIt->binormalAttribLocs);
-			if (sIt->tangentAttribLocs != -1)
-				glEnableVertexAttribArray(sIt->tangentAttribLocs);
-			if (sIt->uvAttribLocs != -1)
-				glEnableVertexAttribArray(sIt->uvAttribLocs);
+			glEnableVertexAttribArray(locs.vertexAttribLocs);
+			if (locs.normalAttribLocs != -1)
+				glEnableVertexAttribArray(locs.normalAttribLocs);
+			if (locs.binormalAttribLocs != -1)
+				glEnableVertexAttribArray(locs.binormalAttribLocs);
+			if (locs.tangentAttribLocs != -1)
+				glEnableVertexAttribArray(locs.tangentAttribLocs);
+			if (locs.uvAttribLocs != -1)
+				glEnableVertexAttribArray(locs.uvAttribLocs);
 			//Specify Attributes location
-			glVertexAttribPointer(sIt->vertexAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(0));
-			if (sIt->normalAttribLocs != -1)
+			glVertexAttribPointer(locs.vertexAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(0));
+			if (locs.normalAttribLocs != -1)
 			{
-				glVertexAttribPointer(sIt->normalAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(16));
+				glVertexAttribPointer(locs.normalAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(16));
 			}
-			if (sIt->tangentAttribLocs != -1)
+			if (locs.tangentAttribLocs != -1)
 			{
-				glVertexAttribPointer(sIt->tangentAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(32));
+				glVertexAttribPointer(locs.tangentAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(32));
 			}
-			if (sIt->binormalAttribLocs != -1)
+			if (locs.binormalAttribLocs != -1)
 			{
-				glVertexAttribPointer(sIt->binormalAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(48));
+				glVertexAttribPointer(locs.binormalAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(48));
 			}
-			if (sIt->uvAttribLocs != -1)
+			if (locs.uvAttribLocs != -1)
 			{
-				glVertexAttribPointer(sIt->uvAttribLocs, 2, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(64));
+				glVertexAttribPointer(locs.uvAttribLocs, 2, GL_FLOAT, GL_FALSE, sizeof(vertexStruct), BUFFER_OFFSET(64));
 			}
 			//Bind Buffers
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sIt->IB);
@@ -267,13 +250,13 @@ inline void ModelGL::DrawMeshes(const Matrix4D & VP, const Matrix4D & WVP)
 			glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_SHORT, 0);
 #endif // USING_32BIT_IB
 
-			if (sIt->normalAttribLocs != -1) {
-				glDisableVertexAttribArray(sIt->normalAttribLocs);
+			if (locs.normalAttribLocs != -1) {
+				glDisableVertexAttribArray(locs.normalAttribLocs);
 			}
-			if (sIt->uvAttribLocs != -1) {
-				glDisableVertexAttribArray(sIt->uvAttribLocs);
+			if (locs.uvAttribLocs != -1) {
+				glDisableVertexAttribArray(locs.uvAttribLocs);
 			}
-			glDisableVertexAttribArray(sIt->vertexAttribLocs);
+			glDisableVertexAttribArray(locs.vertexAttribLocs);
 			//Disable Shader
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glUseProgram(0);
@@ -315,39 +298,24 @@ void ModelGL::Destroy()
 {
 	
 }
-void ModelGL::SetShaderBySignature(unsigned long sig)
+void ModelGL::SetShaderType(Shader::TYPE type)
 {
-	for (auto &meshIt : m_meshInfo)
+	if (m_shaderType != type)
 	{
-		for (auto &subsetIt : meshIt.subsetInfo)
+		m_shaderType = type;
+		for (auto &meshIt : m_meshInfo)
 		{
-			Shader* actual = subsetIt.m_shader;
-			subsetIt.m_shader = (GLShader*)ShaderManager::GetShaderBySignature(subsetIt.sig);
-			if (subsetIt.m_shader != actual)
+			for (auto &subsetIt : meshIt.subsetInfo)
 			{
-				subsetIt.shadersID = ((GLShader*)subsetIt.m_shader)->ShaderID;
-				glLinkProgram(subsetIt.shadersID);
-				glUseProgram(subsetIt.shadersID);
-
-				//Obtener locaciones de Attributes
-				subsetIt.vertexAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Vertex");
-				subsetIt.normalAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Normal");
-				subsetIt.binormalAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Binormal");
-				subsetIt.tangentAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "Tangent");
-				subsetIt.uvAttribLocs = glGetAttribLocation(m_meshInfo.back().subsetInfo.back().shadersID, "UV");
-
-				//Obtener locaciones de Uniforms
-				subsetIt.matWorldViewUniformLoc = glGetUniformLocation(subsetIt.shadersID, "WV");
-				subsetIt.matWorldViewProjUniformLoc = glGetUniformLocation(subsetIt.shadersID, "WVP");
-				subsetIt.matWorldUniformLoc = glGetUniformLocation(subsetIt.shadersID, "World");
-				subsetIt.lightLoc = glGetUniformLocation(subsetIt.shadersID, "light");
-				subsetIt.lightColLoc = glGetUniformLocation(subsetIt.shadersID, "lightColor");
-				subsetIt.camPosLoc = glGetUniformLocation(subsetIt.shadersID, "camPos");
-				subsetIt.specExpLoc = glGetUniformLocation(subsetIt.shadersID, "specExp");
-				subsetIt.attMaxLoc = glGetUniformLocation(subsetIt.shadersID, "attMax");
-				subsetIt.camFarLoc = glGetUniformLocation(subsetIt.shadersID, "camFar");
+					subsetIt.shadersID =((GLShader*)(subsetIt.m_shaderSet)[type])->ShaderID;
+					//glLinkProgram(subsetIt.shadersID);
+					glUseProgram(subsetIt.shadersID);
+					subsetIt.textInfo.IdTexUniformLocs.clear();
+					subsetIt.textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(subsetIt.shadersID, "diffuse"));
+					subsetIt.textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(subsetIt.shadersID, "glossMap"));
+					subsetIt.textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(subsetIt.shadersID, "normalMap"));
+					subsetIt.textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(subsetIt.shadersID, "specularMap"));
 			}
-
 		}
 	}
 }

@@ -25,7 +25,7 @@ public:
 	void DrawPrimitives();
 	void DestroyPrimitives();
 	PrimitiveBase*	GetPrimitive(unsigned int);
-	void SetShaderGlobalSignature(unsigned long sig);
+	void SetShaderGlobalType(Shader::TYPE type);
 
 	std::vector<PrimitiveBase*> primitives;
 

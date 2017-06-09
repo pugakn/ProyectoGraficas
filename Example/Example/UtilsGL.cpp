@@ -115,6 +115,8 @@ Texture * Tools::GetTexture(int id)
 #include "GLRT.h"
 #include "GLDriver.h"
 GLuint Tools::DefaultShaderID = 0;
+GLint  Tools::DefaultVertexAttribLocs = -1;
+GLint  Tools::DefaultMatWorldViewProjUniformLoc = -1;
 GLDriver* Tools::pVideoDriver;
 //===================== Render Targets ================================
 int Tools::CreateRT(int numRT, int colorf, int depthf, int w, int h)
@@ -189,6 +191,8 @@ void Tools::Init(BaseDriver* driver)
 	DefaultShaderID = glCreateProgram();
 	glAttachShader(DefaultShaderID, vshaderWire_id);
 	glAttachShader(DefaultShaderID, fshaderWire_id);
+	DefaultVertexAttribLocs = glGetAttribLocation(DefaultShaderID, "Vertex");
+	DefaultMatWorldViewProjUniformLoc = glGetUniformLocation(DefaultShaderID, "WVP");
 
 	textureCheker = new TextureGL;
 	textureChekerID = textureCheker->LoadDefaultTxture();

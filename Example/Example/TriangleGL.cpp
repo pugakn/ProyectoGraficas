@@ -128,7 +128,7 @@ void TrangleGL::Draw(float *t) {
 void TrangleGL::Destroy() {
 	glDeleteProgram(shaderID);
 }
-void TrangleGL::SetShaderBySignature(unsigned long sig)
+void TrangleGL::SetShaderType(Shader::TYPE type)
 {
 }
 #endif

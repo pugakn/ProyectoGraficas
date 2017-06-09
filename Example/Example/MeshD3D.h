@@ -11,11 +11,13 @@
 #include "Wireframe.h"
 
 #include <vector>
+#include "D3DShader.h"
 
 
 class MeshD3D : public PrimitiveBase
 {
 	struct ConstBuffer {
+		Matrix4D WV;
 		Matrix4D WVP;
 		Matrix4D World;
 		Vector4D lightDir;
@@ -39,6 +41,9 @@ private:
 		std::vector<D3D11_INPUT_ELEMENT_DESC>	VertexDecl;
 		ComPtr<ID3D11Buffer>        ConstantBuffer;
 		MeshD3D::ConstBuffer		CnstBuffer;
+
+		unsigned long sig;
+		D3DShader* m_shader;
 	};
 	struct MeshInfo {
 		std::vector<SubSetInfo>					m_subSets;
@@ -74,6 +79,7 @@ public:
 	void Transform(float *t) override;
 	void Draw(float *t) override;
 	void Destroy() override;
+	void SetShaderBySignature(unsigned long sig) override;
 	MeshParser m_parser;
 	std::vector<MeshInfo> m_meshInfo;
 	MeshD3D() { useLight = true; };

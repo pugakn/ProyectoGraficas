@@ -16,7 +16,7 @@
 //extern PxFoundation *g_Foundation;
 //extern PxPhysics* g_Physics;
 //extern PxScene *g_scene;
-const int NUM_LIGHTS = 64;
+const int NUM_LIGHTS = 48;
 void TestApp::InitVars() {
 	//physxManager.Init();
 	//usePhysX = false;
@@ -44,7 +44,7 @@ void TestApp::InitVars() {
 		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		SceneProp.AddLight(Vector3D(rand() / static_cast <float> (RAND_MAX) * 66, 10.0f, rand() / static_cast <float> (RAND_MAX) * 66), Vector3D(r, g, b), true);
+		SceneProp.AddLight(Vector3D(rand() / static_cast <float> (RAND_MAX) * 300, 10.0f, rand() / static_cast <float> (RAND_MAX) * 300), Vector3D(r, g, b), true);
 	}
 	SceneProp.specExp = 14.0f;
 	SceneProp.attMax = 12000.0f;
@@ -87,7 +87,6 @@ void TestApp::InitVars() {
 
 void TestApp::CreateAssets() {	
 	
-
 	int index = PrimitiveMgr.CreateModel("Models/Scene.X",true);
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
@@ -250,7 +249,7 @@ void TestApp::CreateAssets() {
 	DebugRT.push_back(PrimitiveInst());
 	DebugRT.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	//DebugRT.back().TranslateAbsolute(-0.6,0.3, 0);
-	DebugRT.back().ScaleAbsolute(0.5);
+	DebugRT.back().ScaleAbsolute(1);
 	DebugRT.back().Update();
 
 
@@ -294,7 +293,7 @@ void TestApp::CreateAssets() {
 
 
 	PrimitiveMgr.SetSceneProps(&SceneProp);
-	PrimitiveMgr.SetShaderGlobalSignature(Shader::GBUFF_PASS);
+	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_BUFF_PASS);
 }
 
 void TestApp::DestroyAssets() {
@@ -311,6 +310,16 @@ void TestApp::OnUpdate() {
 	//			it->Update();
 	//		}
 	//}
+
+	static float t = 0.3;
+	t += DtTimer.GetDTSecs()*0.01;
+	if (t > 1)
+		t = 0;
+	for (size_t i = 0; i < SceneProp.Lights.size(); i++)
+	{
+		float time = t*i;
+		SceneProp.Lights[i].Position = Vector3D((pow(.95, time)*sinf(time)*200),15,(pow(.89, time)*cosf(time)*200));
+	}
 
 	Vector3D campos = cam.m_pos / 1500.f;
 	dot->TranslateAbsolute(2.44-campos.z,1.45-campos.x,0);

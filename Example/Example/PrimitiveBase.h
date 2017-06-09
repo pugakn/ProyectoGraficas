@@ -1,6 +1,8 @@
 #ifndef UAD_PRIMITIVEBASE_H
 #define UAD_PRIMITIVEBASE_H
 #include "SceneProp.h"
+#include "BaseShader.h"
+#include<vector>
 struct CVertex {
 
 	float x, y, z, w;
@@ -15,7 +17,10 @@ public:
 	virtual void Draw(float *t) = 0;
 	virtual void Destroy() = 0;
 
-	virtual void SetShaderBySignature(unsigned long sig) = 0;
+	virtual void SetShaderType(Shader::TYPE type) = 0;
+	//std::vector<Shader*> m_shaders;
+	Shader::TYPE m_shaderType;
+
 	void SetSceneProps(SceneProps *p) { pScProp = p; }
 	SceneProps	*pScProp;
 };

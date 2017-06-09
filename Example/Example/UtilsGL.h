@@ -58,6 +58,8 @@ private:
 	static GLDriver* pVideoDriver;
 public:
 	static GLuint DefaultShaderID;
+	static GLint  DefaultVertexAttribLocs;
+	static GLint  DefaultMatWorldViewProjUniformLoc;
 #elif defined USING_D3D11
 private:
 	static D3DXDriver* pVideoDriver;

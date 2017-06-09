@@ -74,7 +74,8 @@ specularVec = texture2D(specularMap,vecUVCoords);
 		shinness = texture2D(GlossTex,vecUVCoords).r + shinness;
 #endif
 
-gl_FragData[0] = color;
+gl_FragData[0]= color;
+//gl_FragData[0].w = 1.0;
 gl_FragData[1] = vec4(norm,1.0);
 gl_FragData[1].a = shinness;
 gl_FragData[2] = specularVec;

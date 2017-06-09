@@ -1,4 +1,5 @@
 cbuffer ConstantBuffer{
+    float4x4 WorldView;
     float4x4 WVP;
 	  float4x4 World;
     float4 light;
@@ -52,6 +53,7 @@ struct VS_OUTPUT{
 #endif
 
   float4 pixelPos : POSITION1;
+  float4 Pos		: TEXCOORD1;
 
 };
 
@@ -59,6 +61,7 @@ VS_OUTPUT VS( VS_INPUT input ){
     VS_OUTPUT OUT;
     OUT.hposition = mul( WVP , input.position );
     OUT.pixelPos = mul( World , input.position);
+    OUT.Pos = mul( WorldView , input.position );
 
 #ifdef USE_NORMALS
 	OUT.hnormal = float4(normalize(mul( (float3x3)World , input.normal.xyz )),0.0);

@@ -1,10 +1,11 @@
 #include "BaseShader.h"
 
 
-void Shader::Load(char* vsStr, char* fsStr, unsigned long signature)
+void Shader::Load(char* vsStr, char* fsStr, unsigned long signature, Shader::TYPE type)
 {
 	Defines.clear();
 	m_signature = signature;
+	m_type = type;
 	errorShader = false;
 	char *vsSource = file2string(vsStr);
 	char *fsSource = file2string(fsStr);
@@ -16,9 +17,14 @@ void Shader::Load(char* vsStr, char* fsStr, unsigned long signature)
 	}
 	if (vsSource != NULL && fsSource != NULL)
 	{
-		if (signature & SIGNATURE::GBUFF_PASS)
+		//Types
+		if (m_type == TYPE::G_BUFF_PASS)
 			Defines += "#define G_BUFF_PASS \n\n";
-
+		else if (m_type == TYPE::G_FORWARD_PASS)
+			Defines += "#define G_FORWARD_PASS \n\n";
+		else if (m_type == TYPE::G_SHADOW_PASS)
+			Defines += "#define G_SHADOW_PASS \n\n";
+		//Signature 
 		if (signature & SIGNATURE::HAS_NORMALS)
 			Defines += "#define USE_NORMALS\n\n";
 		if (signature & SIGNATURE::HAS_TEXCOORD0)

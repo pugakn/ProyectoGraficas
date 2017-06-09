@@ -5,31 +5,40 @@
 class Shader
 {
 public:
+	enum TYPE
+	{
+		G_BUFF_PASS,
+		G_FORWARD_PASS,
+		G_SHADOW_PASS,
+		COUNT
+	};
 	enum SIGNATURE
 	{
 		//TYPES
-		GBUFF_PASS = 1,
-		GFORWARD_PASS = GBUFF_PASS << 1 ,
+		//GBUFF_PASS = 1,
+		//GFORWARD_PASS = GBUFF_PASS << 1 ,
+		//GSHADOW_PASS = GBUFF_PASS << 11,
 
-		HAS_NORMALS = GBUFF_PASS << 2,
-		HAS_TANGENTS = GBUFF_PASS << 3,
-		HAS_BINORMALS = GBUFF_PASS << 4,
-		HAS_TEXCOORD0 = GBUFF_PASS << 5,
-		HAS_TEXCOORD1 = GBUFF_PASS << 6,
+		HAS_NORMALS = 1,
+		HAS_TANGENTS = HAS_NORMALS << 1,
+		HAS_BINORMALS = HAS_NORMALS << 2,
+		HAS_TEXCOORD0 = HAS_NORMALS << 3,
+		HAS_TEXCOORD1 = HAS_NORMALS << 4,
 
-		USE_NORMAL_MAP = GBUFF_PASS << 7,
-		USE_SPEC_MAP = GBUFF_PASS << 8,
-		USE_GLOSS_MAP = GBUFF_PASS << 9,
-		NOT_LIGHT = GBUFF_PASS << 10
+		USE_NORMAL_MAP = HAS_NORMALS << 5,
+		USE_SPEC_MAP = HAS_NORMALS << 6,
+		USE_GLOSS_MAP = HAS_NORMALS << 7,
+		NOT_LIGHT = HAS_NORMALS << 8
 
 	};
-	void Load(char* vsStr, char* fsStr, unsigned long signature);
+	void Load(char* vsStr, char* fsStr, unsigned long signature, Shader::TYPE type);
 	unsigned long m_signature;
+	Shader::TYPE m_type;
 	virtual void LoadAPI() = 0;
 	virtual ~Shader() {};
+	bool errorShader;
 protected:
 	std::string vstr;
 	std::string fstr;
 	std::string Defines;
-	bool errorShader;
 };

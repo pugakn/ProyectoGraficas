@@ -35,7 +35,7 @@ class PrimitiveInst {
 
 		void	Update();
 		void	Draw();
-		void SetShaderByGlobalSignature(unsigned long gsig);
+		void SetShaderType(Shader::TYPE type);
 		//void SetShaderLocalSignature();
 
 		Matrix4D		Position;

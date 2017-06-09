@@ -14,7 +14,7 @@ uniform mediump sampler2D specularText;
 uniform mediump sampler2D depthText;
 
 varying highp vec2 vecUVCoords;
-varying highp vec4 Pos;
+//varying highp vec4 Pos;
 varying highp vec4 PosCorner;
 void main(){
 	highp vec2 coords = vecUVCoords;
@@ -34,7 +34,6 @@ void main(){
 	highp vec2 vcoord = coords *2.0 - 1.0;
 	highp vec4 position = VPInverse*vec4(vcoord ,depth,1.0);
 	position.xyz /= position.w;
-	//position = CameraPosition + position;
 	#else
 	highp vec4 position = CameraPosition + PosCorner*depth;
 	#endif //LINEAR_DEPTH
@@ -75,11 +74,12 @@ void main(){
 			}
 		//gl_FragColor = vec4(depth,depth,depth,1.0);
 		//gl_FragColor = vec4(position.xyz,1.0);
+		//gl_FragColor = vec4(specularmap.xyz,1.0);
 		Ambient = color * 0.2;
 		Final+= Ambient;
 		gl_FragColor = vec4(Final.xyz,1.0);
 }
-#else
+#else //G_BUFF_PASS
 uniform highp sampler2D diffuse;
 varying highp vec2 vecUVCoords;
 void main(){

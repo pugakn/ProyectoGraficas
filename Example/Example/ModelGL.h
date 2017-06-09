@@ -30,48 +30,15 @@ private:
 	struct SubsetInfo
 	{
 		GLuint shadersID;
-		//Atributes
-		GLint	 vertexAttribLocs;
-		GLint	 normalAttribLocs;
-		GLint	 binormalAttribLocs;
-		GLint	 tangentAttribLocs;
-		GLint	 uvAttribLocs;
-		//Uniforms
-		GLint  matWorldViewProjUniformLoc;
-		GLint  matWorldViewUniformLoc;
-		GLint  matWorldUniformLoc;
-
-		GLint lightLoc;
-		GLint lightColLoc;
-		GLint camPosLoc;
-		GLint specExpLoc;
-		GLint attMaxLoc;
-		GLint camFarLoc;
-
 		//Index Bufer ID
 		GLuint	IB;
 		//Textures
 		TextureInfo textInfo;
-		GLShader* m_shader;
+		std::vector<Shader*> m_shaderSet;
 
 		unsigned long sig;
 		SubsetInfo() {
-			vertexAttribLocs = -1;
-			normalAttribLocs = -1;
-			binormalAttribLocs = -1;
-			tangentAttribLocs = -1;
-			uvAttribLocs = -1;
-			matWorldViewProjUniformLoc = -1;
-			matWorldUniformLoc = -1;
-
-			lightLoc = -1;
-			lightColLoc = -1;
-			camPosLoc = -1;
-			specExpLoc = -1;
-			attMaxLoc = -1;
-
 			sig = 0;
-			m_shader = nullptr;
 		}
 
 	};
@@ -107,7 +74,7 @@ public:
 	void Transform(float *t) override;
 	void Draw(float *t) override;
 	void Destroy() override;
-	void SetShaderBySignature(unsigned long sig) override;
+	void SetShaderType(Shader::TYPE type) override;
 	MeshParser parser;
 	ModelGL() { useLight = true; };
 	~ModelGL();

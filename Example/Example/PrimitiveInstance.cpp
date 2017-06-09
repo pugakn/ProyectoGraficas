@@ -54,8 +54,8 @@ void PrimitiveInst::Draw(){
 	pBase->Draw(&Final.m[0][0]);
 }
 
-void PrimitiveInst::SetShaderByGlobalSignature(unsigned long gsig)
+void PrimitiveInst::SetShaderType(Shader::TYPE type)
 {
-	ShaderManager::SetGlobalSignature(gsig);
-	pBase->SetShaderBySignature(gsig);
+	//ShaderManager::SetGlobalSignature(gsig);
+	pBase->SetShaderType(type);
 }

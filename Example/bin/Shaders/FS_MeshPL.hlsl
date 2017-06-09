@@ -1,4 +1,5 @@
 cbuffer ConstantBuffer{
+    float4x4 WorldView;
     float4x4 World;
     float4x4 WVP;
     float4 light;
@@ -48,9 +49,56 @@ struct VS_OUTPUT{
     float light_mod : PSIZE;
 #endif
   float4 pixelPos : POSITION1;
+    float4 Pos		: TEXCOORD1;
 };
+  #ifdef G_BUFF_PASS
+  struct FS_OUT{
+	float4 difuse : SV_TARGET0;
+	float4 normal : SV_TARGET1;
+	float4 specular : SV_TARGET2;
+	float  depth  : SV_Depth;
+  };
+FS_OUT FS( VS_OUTPUT input )   {
+    float4 color;
+    float4 Specular;
+    #ifdef USE_TANGENTS
+  	float3 tang = normalize(input.htangent.xyz);
+  	#endif
+  	#ifdef USE_BINORMALS
+  	float3 binor = normalize(input.hbinormal.xyz);
+  	#endif
+  #ifdef USE_NORMAL_MAP
+  	float3 norm = TextureNormal.Sample( SS, input.texture0 ).xyz * 2.0 - 1.0;
+  	norm.y = -norm.y;
+  	float3x3 TBN = float3x3(tang,binor,normalize(input.hnormal.xyz));
+  	norm = mul(norm ,TBN);
+  	norm = normalize(norm);
+    //float3 norm = normalize(input.hnormal.xyz);
+  #else
+  	float3 norm = normalize(input.hnormal.xyz);
+  #endif
+	color = TextureRGB.Sample( SS, input.texture0 );
+  float shinness;
+  #ifdef USE_GLOSS_MAP
+    shinness = TextureGloss.Sample( SS, input.texture0 ).r;
+  #endif
+    #ifdef USE_SPEC_MAP
+    Specular = TextureSpecular.Sample( SS, input.texture0 );
+  #endif
+    FS_OUT fou;
+  	fou.difuse = color;
+  	fou.normal.rgb = norm.rgb;
+  	fou.normal.a 	= shinness;
 
+  	fou.specular.rgb = Specular.rgb;
+  	fou.specular.a 	= shinness;
+
+    fou.depth		= input.Pos.z / 5000.0;
+    return fou;
+}
+#else//G_BUFF_PASS
 float4 FS( VS_OUTPUT input ) : SV_TARGET  {
+
     float4 color;
 
     #ifdef USE_TANGENTS
@@ -109,11 +157,14 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
     #ifndef USE_VERTEXLIGHTING
     float light_mod = 1.0;
     #endif
+    #ifdef USING_ATENUATION
+    light_mod = min(light_mod / ((lightDist * lightDist)/15000.0),light_mod );
+    #endif
 #endif
 #ifdef USING_ATENUATION
 light_mod = min(light_mod / ((lightDist * lightDist)/15000.0),light_mod );
-specular = min(specular / ((lightDist * lightDist)/15000.0),specular);
 #endif
+
 
 
 #ifdef USE_VERTEXLIGHTING
@@ -135,3 +186,4 @@ return color * 0.3 + color * input.light_mod * lightColor;
     #endif
   #endif
 }
+#endif

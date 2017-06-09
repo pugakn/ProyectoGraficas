@@ -52,7 +52,7 @@ void main(){
 	#ifndef LINEAR_DEPTH
 	pos = WVP * Vertex;
 	#else
-  pos = WV * Vertex;
+  pos = WVP * Vertex;
 	#endif
 
 #ifdef USE_TEXCOORD0

@@ -25,6 +25,7 @@
     <ClInclude Include="BMPParser.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="D3DRT.h" />
+    <ClInclude Include="D3DShader.h" />
     <ClInclude Include="D3DXDriver.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FPCamera.h" />
@@ -71,6 +72,7 @@
     <ClCompile Include="BaseShader.cpp" />
     <ClCompile Include="BMPParser.cpp" />
     <ClCompile Include="D3DRT.cpp" />
+    <ClCompile Include="D3DShader.cpp" />
     <ClCompile Include="D3DXDriver.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FPCamera.cpp" />
