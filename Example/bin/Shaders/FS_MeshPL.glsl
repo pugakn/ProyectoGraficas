@@ -36,9 +36,9 @@ varying highp vec3 normalTransformed;
 #ifdef USE_BINORMALS
 varying highp vec3 binormalTransformed;
 #endif
-#ifdef LINEAR_DEPTH
+//#ifdef LINEAR_DEPTH
 uniform highp float camFar;
-#endif
+//#endif
 varying highp vec4 pos;
 //
 
@@ -90,7 +90,7 @@ gl_FragData[2].a = shinness;
 #ifndef LINEAR_DEPTH
 gl_FragDepth = pos.z / pos.w;
 #else
-gl_FragDepth = pos.z / camFar;
+gl_FragDepth = pos.z / camFar; //gl_FragCoord.z
 #endif
 
 
@@ -102,11 +102,12 @@ gl_FragDepth = pos.z / camFar;
 lowp vec4 color = vec4(0.0,1.0,0.0,1.0);
 color = texture2D(diffuse,vecUVCoords);
 gl_FragData[0] = color;
-#ifndef LINEAR_DEPTH
-gl_FragDepth = pos.z / pos.w;
-#else
-gl_FragDepth = pos.z / camFar;
-#endif
+//#ifndef LINEAR_DEPTH
+//gl_FragDepth = pos.z / pos.w;
+//gl_FragDepth = gl_FragCoord.z;
+//#else
+//gl_FragDepth = pos.z / camFar;
+//#endif
 
 
 

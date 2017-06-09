@@ -68,7 +68,7 @@ Matrix4D RotationXLH(float theta);
 Matrix4D RotationYLH(float theta);
 Matrix4D RotationZLH(float theta);
 Matrix4D Scaling(float sx, float sy, float sz);
-
+Matrix4D ProjOrthoRH(const float &w, const float &h, const float &zn, const float &zf);
 Matrix4D Inverse(const Matrix4D &o);
 //float Det(const MATRIX4D& M);
 //MATRIX4D Transpose(const MATRIX4D& M);

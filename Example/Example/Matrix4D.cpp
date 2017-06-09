@@ -186,6 +186,26 @@ Matrix4D Scaling(float sx, float sy, float sz) {
 	return S;
 }
 
+Matrix4D ProjOrthoRH( const float &w, const float &h, const float &nearPlane, const float &farPlane) {
+	Matrix4D m = Identity();
+	m.m[0][0] = 2.0f / w;
+	m.m[1][1] = 2.0f / h;
+	m.m[2][2] = 1.0f / (nearPlane - farPlane);
+	m.m[3][2] = nearPlane / (nearPlane - farPlane);
+	m.m[3][3] = 1.0f;
+
+
+	//m.m[0][0] = 2.0f * w;
+	//m.m[1][1] = 2.0f * h;
+	//m.m[2][2] = -2*(farPlane - nearPlane);
+	//m.m[0][3] = -w;
+	//m.m[1][3] = -h;
+	//m.m[2][3] = -farPlane + (farPlane*nearPlane) - farPlane;
+	////m.m[3][2] = nearPlane / (nearPlane - farPlane );
+	//m.m[3][3] = 1.0f;
+	return m;
+}
+
 Matrix4D Inverse(const Matrix4D & o)
 {
 

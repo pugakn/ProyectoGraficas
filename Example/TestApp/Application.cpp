@@ -36,9 +36,10 @@ void TestApp::InitVars() {
 
 	SceneProp.AddCamera(&cam);
 	
-	Vector3D shadowLightPos(20, 30, 20);
-	Matrix4D shadowLightVP = LookAtRH(shadowLightPos,Vector3D(-5,10,-5),Vector3D(0,1,0));
-	shadowLightVP = shadowLightVP* cam.Projection;
+	Vector3D shadowLightPos(10, 8, 10);
+	Matrix4D shadowLightVP = LookAtRH(shadowLightPos,Vector3D(0,0,1),Vector3D(0,1,0));
+	float factor =  720.0f/1280.0;
+	shadowLightVP = shadowLightVP* ProjOrthoRH(180,180*factor,1,250);
 	SceneProp.AddLightWShadow(shadowLightPos,Vector3D(0.5,0.2,0.1),true,shadowLightVP);
 	for (int i = SceneProp.LightsWShadow.size(); i < NUM_LIGHTS; i++)
 	{
@@ -255,7 +256,7 @@ void TestApp::CreateAssets() {
 	DebugRT.back().Update();
 
 	index = PrimitiveMgr.CreateQuad();
-	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->difTex = Tools::RTs[1]->vColorTextures[0];
+	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->difTex = Tools::RTs[1]->pDepthTexture;
 	//dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->difTex = Tools::RTs[1]->pDepthTexture;
 	DebugRT.push_back(PrimitiveInst());
 	DebugRT.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
@@ -376,12 +377,14 @@ void TestApp::OnDraw() {
 	Tools::UseOriginalFBO();
 	//Shadow Pass
 	Tools::UseRT(1);
+	//pFramework->pVideoDriver->SetCullFace(BaseDriver::BACK);
 	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_SHADOW_PASS);
 	for (int i = 0; i < Models.size(); i++) {
 		Models[i].Draw();
 	}
 	Tools::UseOriginalFBO();
 	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_FORWARD_PASS);
+	//pFramework->pVideoDriver->SetCullFace(BaseDriver::FRONT);
 	//====================================================
 	pFramework->pVideoDriver->Clear();
 	

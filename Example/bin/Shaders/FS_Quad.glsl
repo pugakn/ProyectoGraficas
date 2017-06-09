@@ -75,31 +75,40 @@ void main(){
 					Final += Specular*attenuation ;
 				}
 			}
-
-			Ambient = color * 0.2;
-			Final+= Ambient;
 			//Shadow Map=============================
-			lowp vec4 shadow = vec4(0.0,0.0,0.0,1.0);
 			highp vec4 fromCamPos;
 			position.w = 1.0;
 			fromCamPos = CamVP*position;
-			fromCamPos.z = fromCamPos.z/fromCamPos.w;
-			highp vec2 proj = fromCamPos.xy / fromCamPos.w;
-			highp vec2 shCoords = 0.5 * (proj + 1.0);
+			//fromCamPos.z = fromCamPos.z/fromCamPos.w;
+			//fromCamPos.z
+			highp vec3 proj = fromCamPos.xyz / fromCamPos.w;
+			proj = 0.5 * (proj + 1.0);
+			highp vec2 shCoords =  proj.xy;
+			highp float shadow = 0.0;
 			if (shCoords.x <= 1 && shCoords.y <= 1 && shCoords.x >= 0 && shCoords.y >= 0
-			&&fromCamPos.z <=1 && fromCamPos.z >= 0 ){
-				shadow = texture2D(shadowMap, shCoords);
-				if (fromCamPos.z > shadow.r +0.001)
+			&&proj.z <=1 && proj.z >= 0 ){
+				highp vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+				for(int x = -1; x <= 1; ++x)
 				{
-					//pixel en la sombra
-					Final *= vec4(0.1,0.1,0.1,1.0);
+				    for(int y = -1; y <= 1; ++y)
+				    {
+				        float pcfDepth = texture(shadowMap, shCoords + vec2((float)x, (float)y) * texelSize).r;
+								if (proj.z > pcfDepth +0.001)
+								{
+									//pixel en la sombra
+									shadow += 1.0;
+								}
+				    }
 				}
+				shadow /= 9.0;
+				Final.xyz = Final.xyz *(1-shadow);
 			}
 			//End Shadow Map ========================
+			Ambient = color * 0.2;
+			Final+= Ambient;
 		//gl_FragColor = vec4(fromCamPos.z,0.0,0.0,1.0);
 		//gl_FragColor = vec4(color.xyz,1.0);
 		//gl_FragColor = vec4(specularmap.xyz,1.0);
-
 		gl_FragColor = vec4(Final.xyz,1.0);
 }
 #else //G_BUFF_PASS
