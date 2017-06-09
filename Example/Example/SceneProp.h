@@ -33,10 +33,19 @@ struct Light{
 	int		 Enabled;
 };
 
+struct LightWShadow {
+	Vector3D Position;
+	Vector3D Color;
+	int		 Type;
+	int		 Enabled;
+	Matrix4D VP;
+};
+
 struct SceneProps{
 	SceneProps() : ActiveCamera(0) , ActiveLights(0), renderMode(RM::SOLID) {}
 
 	void	AddLight(Vector3D Pos, Vector3D Color,bool enabled);
+	void	AddLightWShadow(Vector3D Pos, Vector3D Color, bool enabled, Matrix4D VP);
 	void	RemoveLight(unsigned int index);
 	void	SetLightPos(unsigned int index, Vector3D);
 
@@ -44,7 +53,8 @@ struct SceneProps{
 	void	RemoveCamera(unsigned int index);
 	
 
-	std::vector<Light>	   Lights;
+	std::vector<Light>	        Lights;
+	std::vector<LightWShadow>	LightsWShadow;
 	std::vector<FPCamera*> pCameras;
 
 	Vector3D			AmbientColor;

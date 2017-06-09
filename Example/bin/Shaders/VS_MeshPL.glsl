@@ -46,7 +46,13 @@ uniform highp mat4 WV;
 #endif
 
 varying highp vec4 pos;
+//SHADOW_PASS
+#ifdef G_SHADOW_PASS
+uniform highp mat4 CamWVP;
+#endif
+//END-SHADOW PASS
 void main(){
+	#ifndef G_SHADOW_PASS
 	highp mat3 m3World = mat3(World);
 	pixelPos	= (World*Vertex).xyz;
 	#ifndef LINEAR_DEPTH
@@ -81,4 +87,11 @@ void main(){
 	light_mod = min(light_mod / ((lightDist * lightDist)/15000.0),light_mod );
 	#endif
 #endif
+#else //G_SHADOW_PASS
+#ifdef USE_TEXCOORD0
+	vecUVCoords = UV;
+#endif
+	pos =  CamWVP * Vertex;
+	gl_Position = pos;
+#endif//END-SHADOW
 }

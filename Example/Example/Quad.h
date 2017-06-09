@@ -39,7 +39,13 @@ public:
 #ifdef USING_GL_COMMON
 		: shaderID(0)
 #endif
-	{}
+	{
+		difTex = nullptr;
+		depthTex = nullptr;
+		normalTex = nullptr;
+		specTex = nullptr;
+		shadowMapTexture = nullptr;
+	}
 
 #ifdef USING_D3D11
 	struct CBuffer {
@@ -74,6 +80,9 @@ public:
 	GLint CameraPositionLoc;
 	GLint NumLightsLoc;
 
+	GLint CamVPLoc;
+	GLint ShadowMapLoc;
+
 	GLuint			VB;
 	GLuint			IB;
 #elif defined(USING_D3D11)
@@ -97,6 +106,8 @@ public:
 	Texture		*difTex;
 	int		specTextId;
 	Texture		*specTex;
+
+	Texture		*shadowMapTexture;
 	CVertex			vertices[4];
 	unsigned short	indices[6];
 	Matrix4D	transform;

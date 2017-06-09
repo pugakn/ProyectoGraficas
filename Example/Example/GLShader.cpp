@@ -16,6 +16,7 @@ void GLShader::LoadAPI()
 		glAttachShader(ShaderID, vshader_id);
 		glAttachShader(ShaderID, fshader_id);
 		glLinkProgram(ShaderID);
+		glUseProgram(ShaderID);
 
 
 		//Obtener locaciones de Attributes
@@ -29,6 +30,7 @@ void GLShader::LoadAPI()
 		m_locs.matWorldViewUniformLoc = glGetUniformLocation(ShaderID, "WV");
 		m_locs.matWorldViewProjUniformLoc = glGetUniformLocation(ShaderID, "WVP");
 		m_locs.matWorldUniformLoc = glGetUniformLocation(ShaderID, "World");
+		m_locs.matLightCamWVPLoc = glGetUniformLocation(ShaderID, "CamWVP");
 		m_locs.lightLoc = glGetUniformLocation(ShaderID, "light");
 		m_locs.lightColLoc = glGetUniformLocation(ShaderID, "lightColor");
 		m_locs.camPosLoc = glGetUniformLocation(ShaderID, "camPos");

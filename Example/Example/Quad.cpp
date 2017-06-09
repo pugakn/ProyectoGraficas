@@ -24,7 +24,6 @@ void Quad::Create() {
 
 
 #ifdef USING_GL_COMMON
-	shaderID = glCreateProgram();
 
 	char *vsSourceP = file2string("Shaders/VS_Quad.glsl");
 	char *fsSourceP = file2string("Shaders/FS_Quad.glsl");
@@ -59,13 +58,14 @@ void Quad::Create() {
 	if (vshader_id == 0 || fshader_id == 0)
 	{
 		shaderID = Tools::DefaultShaderID;
-		glLinkProgram(shaderID);
+		//glLinkProgram(shaderID);
 		glUseProgram(shaderID);
 		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
 		matWorldUniformLoc = glGetUniformLocation(shaderID, "W");
 	}
 	else
 	{
+		shaderID = glCreateProgram();
 		glAttachShader(shaderID, vshader_id);
 		glAttachShader(shaderID, fshader_id);
 
@@ -85,10 +85,14 @@ void Quad::Create() {
 		CameraPositionLoc = glGetUniformLocation(shaderID, "CameraPosition");
 		NumLightsLoc = glGetUniformLocation(shaderID, "NumLights");
 
-		diffuseLoc = glGetUniformLocation(shaderID, "diffuse");
+		diffuseLoc = glGetUniformLocation(shaderID, "difuse");
 		normalTextLoc = glGetUniformLocation(shaderID, "normalText");
 		specularTextLoc = glGetUniformLocation(shaderID, "specularText");
 		depthTextLoc = glGetUniformLocation(shaderID, "depthText");
+
+
+		CamVPLoc = glGetUniformLocation(shaderID, "CamVP");
+		ShadowMapLoc = glGetUniformLocation(shaderID, "shadowMap");
 	}
 #elif defined(USING_D3D11)
 	bool errorShader = false;
@@ -276,6 +280,11 @@ void Quad::Draw(float *t) {
 	int ligthSize = pScProp->Lights.size();
 	if (NumLightsLoc != -1)
 		glUniform1iv(NumLightsLoc, 1, &ligthSize);
+
+	Matrix4D LightVP = pScProp->LightsWShadow[0].VP;
+	if (CamVPLoc != -1)
+		glUniformMatrix4fv(CamVPLoc, 1, GL_FALSE, &LightVP.m[0][0]);
+
 	//if (uvAttribLoc != -1)
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
@@ -290,21 +299,37 @@ void Quad::Draw(float *t) {
 		glVertexAttribPointer(uvAttribLoc, 2, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(16));
 	if (shaderID != Tools::DefaultShaderID)
 	{
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, difTex->id);
-		glUniform1i(diffuseLoc, 0);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, depthTex->id);
-		glUniform1i(depthTextLoc, 1);
-
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, specTex->id);
-		glUniform1i(specularTextLoc, 2);
-
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, normalTex->id);
-		glUniform1i(normalTextLoc, 3);
+		int c = 0;
+		if (difTex)
+		{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, difTex->id);
+			glUniform1i(diffuseLoc, c++);
+		}
+		if (depthTex)
+		{
+			glActiveTexture(GL_TEXTURE0+c);
+			glBindTexture(GL_TEXTURE_2D, depthTex->id);
+			glUniform1i(depthTextLoc, c++);
+		}
+		if (specTex)
+		{
+			glActiveTexture(GL_TEXTURE0+c);
+			glBindTexture(GL_TEXTURE_2D, specTex->id);
+			glUniform1i(specularTextLoc, c++);
+		}
+		if (normalTex)
+		{
+			glActiveTexture(GL_TEXTURE0+c);
+			glBindTexture(GL_TEXTURE_2D, normalTex->id);
+			glUniform1i(normalTextLoc, c++);
+		}
+		if (shadowMapTexture)
+		{
+			glActiveTexture(GL_TEXTURE0+c);
+			glBindTexture(GL_TEXTURE_2D, shadowMapTexture->id);
+			glUniform1i(ShadowMapLoc, c++);
+		}
 	}
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);

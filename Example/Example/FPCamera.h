@@ -5,7 +5,7 @@
 class FPCamera
 {
 private:
-	Matrix4D Projection;
+
 	InputManager IManager;
 
 	Vector3D zDir;
@@ -29,6 +29,7 @@ public:
 
 	Vector3D m_pos;
 	Matrix4D m_view;
+	Matrix4D Projection;
 	Matrix4D VP;
 	float farPlane;
 	FPCamera();

@@ -1,12 +1,12 @@
 #ifdef G_BUFF_PASS
-uniform highp mat4 WVP;
-uniform highp mat4 World;
-uniform highp mat4 WorldView;
+//uniform highp mat4 WVP;
+//uniform highp mat4 World;
+//uniform highp mat4 WorldView;
 uniform highp mat4 VPInverse;
-uniform highp vec4 LightPositions[128];
-uniform highp vec4 LightColors[128];
+//uniform highp vec4 LightPositions[128];
+//uniform highp vec4 LightColors[128];
 uniform highp vec4 CameraPosition;
-uniform highp vec4 CameraInfo;
+//uniform highp vec4 CameraInfo;
 
 
 uniform highp mat4 W;

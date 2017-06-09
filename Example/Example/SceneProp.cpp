@@ -9,6 +9,16 @@ void	SceneProps::AddLight(Vector3D Pos, Vector3D Color, bool enabled){
 	Lights.push_back(l);
 }
 
+void SceneProps::AddLightWShadow(Vector3D Pos, Vector3D Color, bool enabled, Matrix4D VP) {
+	LightWShadow l;
+	l.Position = Pos;
+	l.Color = Color;
+	l.Enabled = (int)enabled;
+	//Matrix4D tmp = LookAtRH(Pos, target, up);
+	l.VP = VP;
+	LightsWShadow.push_back(l);
+}
+
 void	SceneProps::RemoveLight(unsigned int index){
 	if(index < 0 || index >= Lights.size())
 		return;

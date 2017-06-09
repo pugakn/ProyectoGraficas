@@ -196,6 +196,10 @@ inline void ModelGL::DrawMeshes(const Matrix4D & VP, const Matrix4D & WVP)
 				glUniformMatrix4fv(locs.matWorldViewUniformLoc, 1, GL_FALSE, &WV.m[0][0]);
 			if (locs.matWorldUniformLoc != -1)
 				glUniformMatrix4fv(locs.matWorldUniformLoc, 1, GL_FALSE, &transform.m[0][0]);
+
+			Matrix4D CamWVP = transform * pScProp->LightsWShadow[0].VP;
+			if (locs.matLightCamWVPLoc != -1)
+				glUniformMatrix4fv(locs.matLightCamWVPLoc, 1, GL_FALSE, &CamWVP.m[0][0]);//CamWVP
 			if (locs.lightLoc != -1)
 				glUniform3fv(locs.lightLoc, 1, &pScProp->Lights[0].Position.x);
 			if (locs.lightColLoc != -1)

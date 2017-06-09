@@ -42,8 +42,14 @@ uniform highp float camFar;
 varying highp vec4 pos;
 //
 
+//G_SHADOW_PASS
+#ifdef G_SHADOW_PASS
+
+#endif
+//END-SHADOW PASS
+
 void main(){
-#ifdef G_BUFF_PASS
+#if defined G_BUFF_PASS
 lowp vec4 color = vec4(0.0,0.0,0.0,1.0);
 lowp vec4 specularVec = vec4(0.5,0.5,0.5,1.0);
 mediump float shinness = 2.0;
@@ -86,6 +92,25 @@ gl_FragDepth = pos.z / pos.w;
 #else
 gl_FragDepth = pos.z / camFar;
 #endif
+
+
+
+
+
+
+#elif defined G_SHADOW_PASS
+lowp vec4 color = vec4(0.0,1.0,0.0,1.0);
+color = texture2D(diffuse,vecUVCoords);
+gl_FragData[0] = color;
+#ifndef LINEAR_DEPTH
+gl_FragDepth = pos.z / pos.w;
+#else
+gl_FragDepth = pos.z / camFar;
+#endif
+
+
+
+
 
 #else //G_BUFF_PASS
 lowp vec4 color = vec4(0.0,0.0,0.0,1.0);

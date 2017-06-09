@@ -28,18 +28,19 @@ void TestApp::InitVars() {
 	//plane->createShape(PxPlaneGeometry(), *material);
 	//g_scene->addActor(*plane);
 
-
-
-
 	Tools::Init(pFramework->pVideoDriver);
-	//Tools::CreateRT(1);
 	Tools::CreateRT(3);
+	Tools::CreateRT(1); //ShadowMap
 	DtTimer.Init();
 	cam.Init();
 
 	SceneProp.AddCamera(&cam);
 	
-	for (int i = 0; i < NUM_LIGHTS; i++)
+	Vector3D shadowLightPos(20, 30, 20);
+	Matrix4D shadowLightVP = LookAtRH(shadowLightPos,Vector3D(-5,10,-5),Vector3D(0,1,0));
+	shadowLightVP = shadowLightVP* cam.Projection;
+	SceneProp.AddLightWShadow(shadowLightPos,Vector3D(0.5,0.2,0.1),true,shadowLightVP);
+	for (int i = SceneProp.LightsWShadow.size(); i < NUM_LIGHTS; i++)
 	{
 		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
@@ -246,11 +247,22 @@ void TestApp::CreateAssets() {
 	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->normalTex = Tools::RTs[0]->vColorTextures[1];
 	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->specTex = Tools::RTs[0]->vColorTextures[2];
 	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->depthTex = Tools::RTs[0]->pDepthTexture;
+	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->shadowMapTexture = Tools::RTs[1]->pDepthTexture;//ShadowMap
 	DebugRT.push_back(PrimitiveInst());
 	DebugRT.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	//DebugRT.back().TranslateAbsolute(-0.6,0.3, 0);
 	DebugRT.back().ScaleAbsolute(1);
 	DebugRT.back().Update();
+
+	index = PrimitiveMgr.CreateQuad();
+	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->difTex = Tools::RTs[1]->vColorTextures[0];
+	//dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->difTex = Tools::RTs[1]->pDepthTexture;
+	DebugRT.push_back(PrimitiveInst());
+	DebugRT.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	DebugRT.back().TranslateAbsolute(-0.6,0.3, 0);
+	DebugRT.back().ScaleAbsolute(0.3);
+	DebugRT.back().Update();
+
 
 
 	//index = PrimitiveMgr.CreateQuad();
@@ -314,7 +326,7 @@ void TestApp::OnUpdate() {
 	static float t = 0.3;
 	t += DtTimer.GetDTSecs()*0.01;
 	if (t > 1)
-		t = 0;
+		t = 0.3;
 	for (size_t i = 0; i < SceneProp.Lights.size(); i++)
 	{
 		float time = t*i;
@@ -357,12 +369,19 @@ void TestApp::OnDraw() {
 	//====================================================
 	// ====================== RTs========================
 	Tools::UseRT(0);
+	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_BUFF_PASS);
 	for (int i = 0; i < Models.size(); i++) {
-		//Models[i].SetShaderByGlobalSignature(Shader::GBUFF_PASS);
 		Models[i].Draw();
-		//Models[i].SetShaderByGlobalSignature(Shader::GFORWARD_PASS);
 	}
 	Tools::UseOriginalFBO();
+	//Shadow Pass
+	Tools::UseRT(1);
+	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_SHADOW_PASS);
+	for (int i = 0; i < Models.size(); i++) {
+		Models[i].Draw();
+	}
+	Tools::UseOriginalFBO();
+	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_FORWARD_PASS);
 	//====================================================
 	pFramework->pVideoDriver->Clear();
 	

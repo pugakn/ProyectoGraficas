@@ -25,6 +25,8 @@ public:
 		GLint  matWorldViewUniformLoc;
 		GLint  matWorldUniformLoc;
 
+		GLint  matLightCamWVPLoc;
+
 		GLint lightLoc;
 		GLint lightColLoc;
 		GLint camPosLoc;

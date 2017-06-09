@@ -1,7 +1,7 @@
 #ifdef G_BUFF_PASS
-uniform highp mat4 WVP;
-uniform highp mat4 World;
-uniform highp mat4 WorldView;
+//uniform highp mat4 WVP;
+//uniform highp mat4 World;
+//uniform highp mat4 WorldView;
 uniform highp mat4 VPInverse;
 uniform highp vec4 LightPositions[128];
 uniform highp vec4 LightColors[128];
@@ -12,6 +12,9 @@ uniform mediump sampler2D difuse;
 uniform mediump sampler2D normalText;
 uniform mediump sampler2D specularText;
 uniform mediump sampler2D depthText;
+
+uniform highp mat4 CamVP;
+uniform mediump sampler2D shadowMap;
 
 varying highp vec2 vecUVCoords;
 //varying highp vec4 Pos;
@@ -72,11 +75,31 @@ void main(){
 					Final += Specular*attenuation ;
 				}
 			}
-		//gl_FragColor = vec4(depth,depth,depth,1.0);
-		//gl_FragColor = vec4(position.xyz,1.0);
+
+			Ambient = color * 0.2;
+			Final+= Ambient;
+			//Shadow Map=============================
+			lowp vec4 shadow = vec4(0.0,0.0,0.0,1.0);
+			highp vec4 fromCamPos;
+			position.w = 1.0;
+			fromCamPos = CamVP*position;
+			fromCamPos.z = fromCamPos.z/fromCamPos.w;
+			highp vec2 proj = fromCamPos.xy / fromCamPos.w;
+			highp vec2 shCoords = 0.5 * (proj + 1.0);
+			if (shCoords.x <= 1 && shCoords.y <= 1 && shCoords.x >= 0 && shCoords.y >= 0
+			&&fromCamPos.z <=1 && fromCamPos.z >= 0 ){
+				shadow = texture2D(shadowMap, shCoords);
+				if (fromCamPos.z > shadow.r +0.001)
+				{
+					//pixel en la sombra
+					Final *= vec4(0.1,0.1,0.1,1.0);
+				}
+			}
+			//End Shadow Map ========================
+		//gl_FragColor = vec4(fromCamPos.z,0.0,0.0,1.0);
+		//gl_FragColor = vec4(color.xyz,1.0);
 		//gl_FragColor = vec4(specularmap.xyz,1.0);
-		Ambient = color * 0.2;
-		Final+= Ambient;
+
 		gl_FragColor = vec4(Final.xyz,1.0);
 }
 #else //G_BUFF_PASS
