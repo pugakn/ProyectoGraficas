@@ -26,6 +26,8 @@ bool GLRT::Load(int numRt, int colorf, int depthf, int w, int h)
 
 	TextureGL *pTextureDepth = new TextureGL;
 	pTextureDepth->id = dtex;
+	pTextureDepth->x = w;
+	pTextureDepth->y = h;
 	this->pDepthTexture = pTextureDepth;
 	DepthTexture = dtex;
 	for (int i = 0; i < numRt; i++) {

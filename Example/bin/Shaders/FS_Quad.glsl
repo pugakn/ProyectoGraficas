@@ -7,6 +7,7 @@ uniform highp vec4 LightPositions[128];
 uniform highp vec4 LightColors[128];
 uniform highp vec4 CameraPosition;
 uniform highp int NumLights;
+uniform highp vec2 ShadowTexSize;
 
 uniform mediump sampler2D difuse;
 uniform mediump sampler2D normalText;
@@ -87,12 +88,12 @@ void main(){
 			highp float shadow = 0.0;
 			if (shCoords.x <= 1 && shCoords.y <= 1 && shCoords.x >= 0 && shCoords.y >= 0
 			&&proj.z <=1 && proj.z >= 0 ){
-				highp vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+				highp vec2 texelSize =  1.0 / ShadowTexSize;
 				for(int x = -1; x <= 1; ++x)
 				{
 				    for(int y = -1; y <= 1; ++y)
 				    {
-				        float pcfDepth = texture(shadowMap, shCoords + vec2((float)x, (float)y) * texelSize).r;
+				        float pcfDepth = texture2D(shadowMap, shCoords + vec2(x,y) * texelSize).r;
 								if (proj.z > pcfDepth +0.001)
 								{
 									//pixel en la sombra
@@ -101,7 +102,7 @@ void main(){
 				    }
 				}
 				shadow /= 9.0;
-				Final.xyz = Final.xyz *(1-shadow);
+				Final.xyz = Final.xyz *(1.0-shadow);
 			}
 			//End Shadow Map ========================
 			Ambient = color * 0.2;

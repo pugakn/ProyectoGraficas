@@ -79,6 +79,7 @@ public:
 	GLint LightColorsLoc;
 	GLint CameraPositionLoc;
 	GLint NumLightsLoc;
+	GLint ShadowMapSize;
 
 	GLint CamVPLoc;
 	GLint ShadowMapLoc;
