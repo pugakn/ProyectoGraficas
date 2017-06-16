@@ -29,17 +29,17 @@ void MeshParser::ReadFile()
 	char* bufferEnd = &m_pointer[fileSize - 1];
 	m_pointer = strstr(m_pointer,"Mesh ");
 	m_pointer = m_pointer + 64;
-	m_pointer = strstr(m_pointer, "Mesh ");
+	m_pointer = strstr(m_pointer, "Frame ");
 	while (m_pointer != bufferEnd)
 	{
-		m_name.clear();
-		m_type = 0;
+		m_ActualName.clear();
+		m_ActualType = 0;
 
 		m_pointer = strstr(m_pointer,"{");
 		if (m_pointer == NULL) return;
-		m_name = getName();
-		m_type = getType(m_pointer - 3 - m_name.length());
-		switch (m_type)
+		m_ActualName = getName();
+		m_ActualType = getType(m_pointer - 3 - m_ActualName.length());
+		switch (m_ActualType)
 		{
 			case TYPE_MESH:
 				m_meshes.push_back(xMesh());
@@ -65,6 +65,12 @@ void MeshParser::ReadFile()
 				m_meshes.back().m_vertexAttributes |= xf::attributes::E::HAS_BINORMAL;
 				m_meshes.back().m_vertexAttributes |= xf::attributes::E::HAS_TANGENT;
 				getDeclData();
+				break;
+			case TYPE_FRAME:
+				m_pointer--;
+				getBones();
+				InsertBonesBrothersOnEachBone();
+				//bones[0].dad = 0;
 				break;
 		}
 		++m_pointer;
@@ -94,7 +100,8 @@ int MeshParser::getType(char* tempPointer)
 		type.push_back(*tempPointer);
 		tempPointer--;
 	}
-	if (type == "emarF")
+	if (type == "emarF" )
+		if ((m_ActualName.find("piB") != std::string::npos))
 		return TYPE_FRAME;
 	if (type == "hseM")
 		return TYPE_MESH;
@@ -108,7 +115,7 @@ int MeshParser::getType(char* tempPointer)
 		return TYPE_MESH_MATERIAL_LIST;
 	if (type == "lairetaM")
 		return TYPE_MESH_MATERIAL;
-	if (m_name == "ataDlceD")
+	if (m_ActualName == "ataDlceD")
 		return TYPE_MESH_DECL_DATA;
 	
 
@@ -699,6 +706,91 @@ void MeshParser::getDeclData()
 		++m_pointer;*/
 	//}
 }
+void MeshParser::getBones()
+{
+	static int actualDad = -1;
+	static int openBlocks = 0;
+	static int actualBone = 0;
+	m_pointer = strstr(m_pointer, "{");
+	openBlocks++;
+	bones.push_back(xBone());
+	bones.back().dad = actualDad;
+	if (actualDad != -1)
+		bones[actualDad].child.push_back(actualBone);
+	actualDad++;
+	bones.back().name = getName();
+	bones.back().bone = getFrameTransformMatrix();
+	ignoreObjectMatrixComment();
+	while (IsNextACloseBlock())
+	{
+		m_pointer = strstr(m_pointer, "}");
+		m_pointer++;
+		actualDad--;
+		openBlocks--;
+	}
+	if (openBlocks != 0) {
+		actualBone++;
+		getBones();
+	}
+}
+void MeshParser::InsertBonesBrothersOnEachBone()
+{
+	//for (size_t i = 1; i < bones.size();i++)
+	//{
+	//	bones[i].dad--;
+	//}
+	for (size_t bone1 = 1; bone1 < bones.size(); bone1++) {
+		for (size_t bone2 = 1; bone2 < bones.size(); bone2++) {
+			if (bones[bone1].dad == bones[bone2].dad)
+			{
+				bones[bone1].brothers.push_back(bone2);
+			}
+		}
+	}
+	//bones[0].dad = 0;
+}
+Matrix4D MeshParser::getFrameTransformMatrix()
+{
+	m_pointer++;
+	m_pointer = strstr(m_pointer, "{");
+	m_pointer+=2;
+	Matrix4D TMatrix;
+	int i = 0;
+	while (*m_pointer != ';')
+	{
+		std::string numString;
+		while (!(*m_pointer == ',' || *m_pointer == ';'))
+		{
+			numString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		float matrixCell = std::stof(numString);
+		TMatrix.v[i++] = matrixCell;
+	}
+	m_pointer = strstr(m_pointer, "}");
+	m_pointer++;
+	return TMatrix;
+}
+void MeshParser::ignoreObjectMatrixComment()
+{
+	m_pointer  = strstr(m_pointer, "}");
+	m_pointer++;
+}
+
+bool MeshParser::IsNextACloseBlock()
+{
+	char* toCloseBlock;
+	char* toNewBone;
+
+	toCloseBlock = strstr(m_pointer, "}");
+	toNewBone = strstr(m_pointer, "{");
+	if (toCloseBlock - m_pointer < toNewBone - m_pointer)
+		return true;
+	return false;
+}
+
+
 void MeshParser::Deallocate()
 {
 	m_vbo.clear();

@@ -3,6 +3,7 @@
 #include <vector>
 #include "Config.h"
 #include "Vector3D.h"
+#include "Matrix4D.h"
 #define TYPE_FRAME 1
 #define TYPE_MESH 2
 #define TYPE_TEMPLATE 3
@@ -11,6 +12,7 @@
 #define TYPE_MESH_MATERIAL_LIST 6
 #define TYPE_MESH_MATERIAL 7
 #define TYPE_MESH_DECL_DATA 8
+
 
 namespace xf {
 	namespace attributes {
@@ -70,14 +72,22 @@ struct xMesh{
 	unsigned long m_vertexAttributes;
 };
 
+struct xBone {
+	std::string name;
+	Matrix4D bone;
+	std::vector<int> child;
+	std::vector<int> brothers;
+	int dad;
+};
+
 class MeshParser
 {
 private:
 	char* m_pointer;
 	unsigned int m_meshCount = 0;
 	size_t fileSize;
-	std::string m_name;
-	int m_type;
+	std::string m_ActualName;
+	int m_ActualType;
 
 	std::string getName();
 	int getType(char* tempPointer);
@@ -88,20 +98,24 @@ private:
 	void createSubsetts();
 	void getMaterials();
 	void getDeclData();
+	void getBones();
+	void InsertBonesBrothersOnEachBone();
+	Matrix4D getFrameTransformMatrix();
+	void ignoreObjectMatrixComment();
+	bool IsNextACloseBlock();
 	//std::string SearchElement(char condition);
 public:
 	std::vector<vertexStruct> m_vbo;
-	//std::vector<unsigned short>	m_indexBuffer;
 	std::vector<xMesh> m_meshes;
 
 	int m_vertexSize;
-	//size_t indexPos;
 	size_t vertexPos;
 	size_t normalPos;
 	size_t textCordsPos;
 	size_t declDataPos;
-
 	size_t offset;
+
+	std::vector<xBone> bones;
 
 	bool LoadFile(const char* fileName);
 	void ReadFile();
