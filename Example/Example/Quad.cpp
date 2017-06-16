@@ -84,6 +84,7 @@ void Quad::Create() {
 		LightColorsLoc = glGetUniformLocation(shaderID, "LightColors");
 		CameraPositionLoc = glGetUniformLocation(shaderID, "CameraPosition");
 		NumLightsLoc = glGetUniformLocation(shaderID, "NumLights");
+		ShadowMapSize = glGetUniformLocation(shaderID, "ShadowTexSize");
 
 		diffuseLoc = glGetUniformLocation(shaderID, "difuse");
 		normalTextLoc = glGetUniformLocation(shaderID, "normalText");
@@ -330,9 +331,13 @@ void Quad::Draw(float *t) {
 		}
 		if (shadowMapTexture)
 		{
-			glActiveTexture(GL_TEXTURE0+c);
+			glActiveTexture(GL_TEXTURE0 + c);
 			glBindTexture(GL_TEXTURE_2D, shadowMapTexture->id);
 			glUniform1i(ShadowMapLoc, c++);
+			if (ShadowMapSize != -1){
+				float smsize[] = { static_cast<float>(shadowMapTexture->x) , static_cast<float>(shadowMapTexture->y) };
+				glUniform2fv(ShadowMapSize, 1, &smsize[0]);
+			}
 		}
 	}
 
