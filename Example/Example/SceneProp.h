@@ -36,6 +36,7 @@ struct Light{
 struct LightWShadow {
 	Vector3D Position;
 	Vector3D Color;
+	Vector3D dir;
 	int		 Type;
 	int		 Enabled;
 	Matrix4D VP;
@@ -45,7 +46,8 @@ struct SceneProps{
 	SceneProps() : ActiveCamera(0) , ActiveLights(0), renderMode(RM::SOLID) {}
 
 	void	AddLight(Vector3D Pos, Vector3D Color,bool enabled);
-	void	AddLightWShadow(Vector3D Pos, Vector3D Color, bool enabled, Matrix4D VP);
+	void	AddLightWShadow(Vector3D Pos, Vector3D Color, bool enabled, Vector3D target);
+	void	ModifyLightWShadow(int index, Vector3D Pos, Vector3D Color, bool enabled, Vector3D target);
 	void	RemoveLight(unsigned int index);
 	void	SetLightPos(unsigned int index, Vector3D);
 
@@ -66,6 +68,7 @@ struct SceneProps{
 	float attMax;
 
 	RM::RenderMode renderMode;
+	Matrix4D shadowLightProj;
 };
 
 #endif

@@ -80,6 +80,7 @@ public:
 	GLint CameraPositionLoc;
 	GLint NumLightsLoc;
 
+	GLint LinearLightDirLoc;
 	GLint CamVPLoc;
 	GLint ShadowMapLoc;
 

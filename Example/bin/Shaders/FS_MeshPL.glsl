@@ -99,9 +99,9 @@ gl_FragDepth = pos.z / camFar; //gl_FragCoord.z
 
 
 #elif defined G_SHADOW_PASS
-lowp vec4 color = vec4(0.0,1.0,0.0,1.0);
-color = texture2D(diffuse,vecUVCoords);
-gl_FragData[0] = color;
+//lowp vec4 color = vec4(0.0,1.0,0.0,1.0);
+//color = texture2D(diffuse,vecUVCoords);
+//gl_FragData[0] = color;
 //#ifndef LINEAR_DEPTH
 //gl_FragDepth = pos.z / pos.w;
 //gl_FragDepth = gl_FragCoord.z;

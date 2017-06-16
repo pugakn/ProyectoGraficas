@@ -13,8 +13,10 @@ uniform mediump sampler2D normalText;
 uniform mediump sampler2D specularText;
 uniform mediump sampler2D depthText;
 
+uniform highp vec3 linearLight;
 uniform highp mat4 CamVP;
 uniform mediump sampler2D shadowMap;
+
 
 varying highp vec2 vecUVCoords;
 //varying highp vec4 Pos;
@@ -25,7 +27,7 @@ void main(){
 	lowp vec4 Final  =  vec4(0.0,0.0,0.0,1.0);
 	lowp vec4 color  =  texture2D(difuse,coords);
 	color.w = 1.0;
-	highp float depth  =	texture2D(depthText,coords).r;
+	highp float depth  =	texture2D(depthText,coords);
 	lowp vec4 Lambert = vec4(0.0,0.0,0.0,1.0);
 	lowp vec4 Specular = vec4(0.0,0.0,0.0,1.0);
 	lowp vec4 Ambient = vec4(0.0,0.0,0.0,1.0);
@@ -43,7 +45,7 @@ void main(){
 	highp vec3  eyeDir   = normalize(CameraPosition-position).xyz;
 	highp float shinness = 4.0;
 	shinness = normal.a + shinness;
-	highp float attMax = 30.0;
+	highp float attMax = 40.0;
 	for(highp int i=0;i<NumLights;i++){
 				highp float dist = distance(LightPositions[i],position);
 				if(dist < (attMax*2)){
@@ -75,12 +77,18 @@ void main(){
 					Final += Specular*attenuation ;
 				}
 			}
+
+			//Linear light
+			highp float att = 1.0;
+			//linearLight = normalize(linearLight);
+			att = pow(dot(normal.xyz,linearLight) * 0.5 + 0.5,2.0);
+			att = clamp( att,0.0,1.0) ;
+			Final		+= color*att;
+			//Linear Light End
 			//Shadow Map=============================
 			highp vec4 fromCamPos;
 			position.w = 1.0;
 			fromCamPos = CamVP*position;
-			//fromCamPos.z = fromCamPos.z/fromCamPos.w;
-			//fromCamPos.z
 			highp vec3 proj = fromCamPos.xyz / fromCamPos.w;
 			proj = 0.5 * (proj + 1.0);
 			highp vec2 shCoords =  proj.xy;
@@ -93,7 +101,7 @@ void main(){
 				    for(int y = -1; y <= 1; ++y)
 				    {
 				        float pcfDepth = texture(shadowMap, shCoords + vec2((float)x, (float)y) * texelSize).r;
-								if (proj.z > pcfDepth +0.001)
+								if (proj.z > pcfDepth +0.002)
 								{
 									//pixel en la sombra
 									shadow += 1.0;
@@ -104,9 +112,9 @@ void main(){
 				Final.xyz = Final.xyz *(1-shadow);
 			}
 			//End Shadow Map ========================
-			Ambient = color * 0.2;
+			Ambient = color * 0.05;
 			Final+= Ambient;
-		//gl_FragColor = vec4(fromCamPos.z,0.0,0.0,1.0);
+		//gl_FragColor = vec4(position.xyz,1.0);
 		//gl_FragColor = vec4(color.xyz,1.0);
 		//gl_FragColor = vec4(specularmap.xyz,1.0);
 		gl_FragColor = vec4(Final.xyz,1.0);

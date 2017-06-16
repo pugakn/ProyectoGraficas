@@ -35,13 +35,11 @@ void TestApp::InitVars() {
 	cam.Init();
 
 	SceneProp.AddCamera(&cam);
-	
+	const float factor = 720.0f / 1280.0;
+	SceneProp.shadowLightProj =  ProjOrthoRH(50, 50 * factor, 1.2, 50);
 	Vector3D shadowLightPos(10, 8, 10);
-	Matrix4D shadowLightVP = LookAtRH(shadowLightPos,Vector3D(0,0,1),Vector3D(0,1,0));
-	float factor =  720.0f/1280.0;
-	shadowLightVP = shadowLightVP* ProjOrthoRH(180,180*factor,1,250);
-	SceneProp.AddLightWShadow(shadowLightPos,Vector3D(0.5,0.2,0.1),true,shadowLightVP);
-	for (int i = SceneProp.LightsWShadow.size(); i < NUM_LIGHTS; i++)
+	SceneProp.AddLightWShadow(shadowLightPos,Vector3D(0.5,0.2,0.1),true,Vector3D(0,0,0));
+	for (int i = 0; i < NUM_LIGHTS; i++)
 	{
 		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
@@ -196,7 +194,7 @@ void TestApp::CreateAssets() {
 	index = PrimitiveMgr.CreateModel("Models/NuBatman.X", true);
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(0.5);
+	Models.back().ScaleAbsolute(0.2);
 	Models.back().TranslateAbsolute(0, 0, 0);
 	Models.back().Update();
 
@@ -204,8 +202,8 @@ void TestApp::CreateAssets() {
 	index = PrimitiveMgr.CreateModel("Models/NuVenomJok.X",true);
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(0.5);
-	Models.back().TranslateAbsolute(50, 0, 0);
+	Models.back().ScaleAbsolute(0.1);
+	Models.back().TranslateAbsolute(10, 0, 0);
 	Models.back().Update();
 
 
@@ -255,14 +253,14 @@ void TestApp::CreateAssets() {
 	DebugRT.back().ScaleAbsolute(1);
 	DebugRT.back().Update();
 
-	index = PrimitiveMgr.CreateQuad();
-	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->difTex = Tools::RTs[1]->pDepthTexture;
+	//index = PrimitiveMgr.CreateQuad();
 	//dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->difTex = Tools::RTs[1]->pDepthTexture;
-	DebugRT.push_back(PrimitiveInst());
-	DebugRT.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	DebugRT.back().TranslateAbsolute(-0.6,0.3, 0);
-	DebugRT.back().ScaleAbsolute(0.3);
-	DebugRT.back().Update();
+	////dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->difTex = Tools::RTs[1]->pDepthTexture;
+	//DebugRT.push_back(PrimitiveInst());
+	//DebugRT.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	//DebugRT.back().TranslateAbsolute(-0.6,0.3, 0);
+	//DebugRT.back().ScaleAbsolute(0.3);
+	//DebugRT.back().Update();
 
 
 
@@ -369,12 +367,6 @@ void TestApp::OnDraw() {
 	//Tools::UseOriginalFBO();
 	//====================================================
 	// ====================== RTs========================
-	Tools::UseRT(0);
-	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_BUFF_PASS);
-	for (int i = 0; i < Models.size(); i++) {
-		Models[i].Draw();
-	}
-	Tools::UseOriginalFBO();
 	//Shadow Pass
 	Tools::UseRT(1);
 	//pFramework->pVideoDriver->SetCullFace(BaseDriver::BACK);
@@ -383,8 +375,14 @@ void TestApp::OnDraw() {
 		Models[i].Draw();
 	}
 	Tools::UseOriginalFBO();
-	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_FORWARD_PASS);
 	//pFramework->pVideoDriver->SetCullFace(BaseDriver::FRONT);
+	Tools::UseRT(0);
+	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_BUFF_PASS);
+	for (int i = 0; i < Models.size(); i++) {
+		Models[i].Draw();
+	}
+	Tools::UseOriginalFBO();
+	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_FORWARD_PASS);
 	//====================================================
 	pFramework->pVideoDriver->Clear();
 	
@@ -406,19 +404,19 @@ void TestApp::OnDraw() {
 
 void TestApp::OnInput() {
 	if (IManager.PressedKey(SDLK_w)) {
-		cam.TraslateFront(-40.0f*DtTimer.GetDTSecs());
+		cam.TraslateFront(-20.0f*DtTimer.GetDTSecs());
 	}
 
 	if (IManager.PressedKey(SDLK_s)) {
-		cam.TraslateFront(40.0f*DtTimer.GetDTSecs());
+		cam.TraslateFront(20.0f*DtTimer.GetDTSecs());
 	}
 
 	if (IManager.PressedKey(SDLK_d)) {
-		cam.TraslateSide(40.0f*DtTimer.GetDTSecs());
+		cam.TraslateSide(20.0f*DtTimer.GetDTSecs());
 	}
 
 	if (IManager.PressedKey(SDLK_a)) {
-		cam.TraslateSide(-40.0f*DtTimer.GetDTSecs());
+		cam.TraslateSide(-20.0f*DtTimer.GetDTSecs());
 	}
 
 	if (IManager.PressedKey(SDLK_r)) {
@@ -432,12 +430,16 @@ void TestApp::OnInput() {
 	}
 
 	//Light
-
+	static float lightParam = 0;
 	if (IManager.PressedKey(SDLK_KP4)) {
-		SceneProp.Lights[0].Position.z += 100 * DtTimer.GetDTSecs();
+		lightParam -= DtTimer.GetDTSecs();
+		//SceneProp.Lights[0].Position.z += 100 * DtTimer.GetDTSecs();
+		SceneProp.ModifyLightWShadow(0, Vector3D(10 *sinf(lightParam) ,SceneProp.LightsWShadow[0].Position.y,10 *cosf(lightParam) ), Vector3D(0.5, 0.2, 0.1), true, Vector3D(0, 0, 0));
 	}
 	if (IManager.PressedKey(SDLK_KP6)) {
-		SceneProp.Lights[0].Position.z += -100 * DtTimer.GetDTSecs();
+		lightParam += DtTimer.GetDTSecs();
+		//SceneProp.Lights[0].Position.z += -100 * DtTimer.GetDTSecs();
+		SceneProp.ModifyLightWShadow(0, Vector3D( 10* sinf(lightParam), SceneProp.LightsWShadow[0].Position.y, 10 * cosf(lightParam)), Vector3D(0.5, 0.2, 0.1), true, Vector3D(0, 0, 0));
 	}
 	if (IManager.PressedKey(SDLK_KP8)) {
 		SceneProp.Lights[0].Position.x += -100 * DtTimer.GetDTSecs();

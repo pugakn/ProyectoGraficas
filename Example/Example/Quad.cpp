@@ -92,6 +92,7 @@ void Quad::Create() {
 
 
 		CamVPLoc = glGetUniformLocation(shaderID, "CamVP");
+		LinearLightDirLoc = glGetUniformLocation(shaderID, "linearLight");
 		ShadowMapLoc = glGetUniformLocation(shaderID, "shadowMap");
 	}
 #elif defined(USING_D3D11)
@@ -275,8 +276,9 @@ void Quad::Draw(float *t) {
 	if (LightPositionsLoc != -1)
 		glUniform4fv(LightPositionsLoc, LightPositions.size(), &LightPositions[0].x);
 
+	Vector4D campos = Vector4D(pScProp->pCameras[0]->m_pos.x, pScProp->pCameras[0]->m_pos.y, pScProp->pCameras[0]->m_pos.z,1.0);
 	if (CameraPositionLoc != -1)
-		glUniform4fv(CameraPositionLoc, 1, &pScProp->pCameras[0]->m_pos.x);
+		glUniform4fv(CameraPositionLoc, 1, &campos.x);
 	int ligthSize = pScProp->Lights.size();
 	if (NumLightsLoc != -1)
 		glUniform1iv(NumLightsLoc, 1, &ligthSize);
@@ -284,6 +286,8 @@ void Quad::Draw(float *t) {
 	Matrix4D LightVP = pScProp->LightsWShadow[0].VP;
 	if (CamVPLoc != -1)
 		glUniformMatrix4fv(CamVPLoc, 1, GL_FALSE, &LightVP.m[0][0]);
+	if (LinearLightDirLoc != -1)
+		glUniform3fv(LinearLightDirLoc,1,&pScProp->LightsWShadow[0].dir.x);
 
 	//if (uvAttribLoc != -1)
 	glBindBuffer(GL_ARRAY_BUFFER, VB);

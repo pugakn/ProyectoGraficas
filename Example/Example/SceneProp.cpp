@@ -9,14 +9,27 @@ void	SceneProps::AddLight(Vector3D Pos, Vector3D Color, bool enabled){
 	Lights.push_back(l);
 }
 
-void SceneProps::AddLightWShadow(Vector3D Pos, Vector3D Color, bool enabled, Matrix4D VP) {
+void SceneProps::AddLightWShadow(Vector3D Pos, Vector3D Color, bool enabled, Vector3D target) {
 	LightWShadow l;
 	l.Position = Pos;
 	l.Color = Color;
 	l.Enabled = (int)enabled;
-	//Matrix4D tmp = LookAtRH(Pos, target, up);
-	l.VP = VP;
+	Matrix4D shadowLightVP = LookAtRH(Pos, target, Vector3D(0, 1, 0));
+	shadowLightVP = shadowLightVP* shadowLightProj;
+	l.VP = shadowLightVP;
+	l.dir = Normalize(Pos - target);
 	LightsWShadow.push_back(l);
+}
+void SceneProps::ModifyLightWShadow(int index, Vector3D Pos, Vector3D Color, bool enabled, Vector3D target) {
+	LightWShadow l;
+	l.Position = Pos;
+	l.Color = Color;
+	l.Enabled = (int)enabled;
+	Matrix4D shadowLightVP = LookAtRH(Pos, target, Vector3D(0, 1, 0));
+	shadowLightVP = shadowLightVP*shadowLightProj;
+	l.VP = shadowLightVP;
+	l.dir = Normalize(Pos - target);
+	LightsWShadow[index] = (l);
 }
 
 void	SceneProps::RemoveLight(unsigned int index){
