@@ -70,7 +70,10 @@ void MeshParser::ReadFile()
 				m_pointer--;
 				getBones();
 				InsertBonesBrothersOnEachBone();
-				//bones[0].dad = 0;
+				bones[0].dad = 0;
+				break;
+			case TYPE_MESH_BONE_WIGHTS:
+				LoadWeights();
 				break;
 		}
 		++m_pointer;
@@ -117,6 +120,8 @@ int MeshParser::getType(char* tempPointer)
 		return TYPE_MESH_MATERIAL;
 	if (m_ActualName == "ataDlceD")
 		return TYPE_MESH_DECL_DATA;
+	if (type == "sthgieWnikS")
+		return TYPE_MESH_BONE_WIGHTS;
 	
 
 	return 0;
@@ -137,6 +142,7 @@ void MeshParser::getMeshPositions()
 	offset = m_vertexSize;
 	m_vertexSize += nPositions;
 	m_vbo.resize(m_vertexSize);
+	boneWeightInfo.resize(m_vertexSize);//
 	for (; vertexPos < m_vertexSize; vertexPos++)
 	{
 		m_pointer += 2;
@@ -719,6 +725,7 @@ void MeshParser::getBones()
 		bones[actualDad].child.push_back(actualBone);
 	actualDad++;
 	bones.back().name = getName();
+	bones.back().name = std::string(bones.back().name.rbegin(), bones.back().name.rend());
 	bones.back().bone = getFrameTransformMatrix();
 	ignoreObjectMatrixComment();
 	while (IsNextACloseBlock())
@@ -735,10 +742,6 @@ void MeshParser::getBones()
 }
 void MeshParser::InsertBonesBrothersOnEachBone()
 {
-	//for (size_t i = 1; i < bones.size();i++)
-	//{
-	//	bones[i].dad--;
-	//}
 	for (size_t bone1 = 1; bone1 < bones.size(); bone1++) {
 		for (size_t bone2 = 1; bone2 < bones.size(); bone2++) {
 			if (bones[bone1].dad == bones[bone2].dad)
@@ -747,7 +750,6 @@ void MeshParser::InsertBonesBrothersOnEachBone()
 			}
 		}
 	}
-	//bones[0].dad = 0;
 }
 Matrix4D MeshParser::getFrameTransformMatrix()
 {
@@ -788,6 +790,118 @@ bool MeshParser::IsNextACloseBlock()
 	if (toCloseBlock - m_pointer < toNewBone - m_pointer)
 		return true;
 	return false;
+}
+
+void MeshParser::LoadWeights()
+{
+	m_pointer++;
+	m_pointer = strstr(m_pointer, "\"");
+	m_pointer++;
+	std::string actualBone = LoadBoneName();
+	int actualBoneIndex = 0;
+	for (int i =0 ; i < bones.size(); i++)
+	{
+		if (bones[i].name == actualBone)
+		{
+			actualBoneIndex = i;
+			break;
+		}
+	}
+	m_pointer = strstr(m_pointer, ";");
+	m_pointer += 2;
+	int numWeights = LoadNumWeights();
+	m_pointer += 2;
+	std::vector<int> wIndex = LoadWeightsIndex(numWeights, actualBoneIndex);
+	m_pointer ++;
+	LoadIndexWeights(numWeights, wIndex);
+	for (int i = 0; i < boneWeightInfo.size(); i++) {
+		for (int j = 0; j < boneWeightInfo[i].boneIndex.size(); j++)
+		{
+			m_vbo[i].wIndex[j] = boneWeightInfo[i].boneIndex[j];
+			m_vbo[i].wWeight[j] = boneWeightInfo[i].weight[j];
+		}
+	}
+	m_pointer++;
+	bones[actualBoneIndex].spaceTransformMatrix  = LoadSpaceTransformMatrix();
+}
+
+std::string MeshParser::LoadBoneName()
+{
+	std::string temp;
+	while (*m_pointer != '\"')
+	{
+		temp.push_back(*m_pointer);
+		++m_pointer;
+	}
+	return temp;
+}
+
+int MeshParser::LoadNumWeights()
+{
+	std::string temp;
+	while (*m_pointer != ';')
+	{
+		temp.push_back(*m_pointer);
+		++m_pointer;
+	}
+	return std::stoi(temp);
+}
+
+std::vector<int> MeshParser::LoadWeightsIndex(int numWeights, int actualBoneIndex)
+{
+	std::string indexString;
+	std::vector<int> wIndexs;
+	for (size_t i = 0; i < numWeights; i++)
+	{
+		indexString.clear();
+		while (*m_pointer != ',' && *m_pointer != ';')
+		{
+			indexString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		int index = std::stoi(indexString);
+		int offsetedIndex = index + offset;
+		boneWeightInfo[offsetedIndex].boneIndex.push_back(actualBoneIndex);
+		wIndexs.push_back(offsetedIndex);
+	}
+	return wIndexs;
+}
+
+void MeshParser::LoadIndexWeights(int numWeights, std::vector<int>& index)
+{
+	std::string weightString;
+	for (size_t i = 0; i < numWeights; i++)
+	{
+		weightString.clear();
+		while (*m_pointer != ',' && *m_pointer != ';')
+		{
+			weightString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		float w = std::stof(weightString);
+		boneWeightInfo[index[i]].weight.push_back(w);
+	}
+}
+
+Matrix4D MeshParser::LoadSpaceTransformMatrix()
+{
+	Matrix4D spaceTransform;
+	int i = 0;
+	while (*m_pointer != ';')
+	{
+		std::string cellString;
+		while (*m_pointer != ',' && *m_pointer != ';')
+		{
+			cellString.push_back(*m_pointer);
+			++m_pointer;
+		}
+		m_pointer++;
+		float cell = std::stof(cellString);
+		spaceTransform.v[i++] = cell;
+	}
+	return spaceTransform;
 }
 
 

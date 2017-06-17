@@ -15,8 +15,6 @@ void ModelGL::SetFileName(char * fileName)
 }
 void ModelGL::Create()
 {
-	//------------------------------------------------------------------------//
-	//Leer Archivo .X
 	Timer timer;
 	timer.Init();
 	if (!parser.LoadFile(m_fileName.c_str()))
@@ -26,7 +24,6 @@ void ModelGL::Create()
 	}
 	timer.Update();
 	std::cout << "Archivo cargado en: " << timer.GetDTSecs() << " segundos..." << std::endl;
-	//-------------------------------------------------------------------------//
 	//Iterar cada Mesh y subsets
 	for (auto &meshIt: parser.m_meshes)
 	{	

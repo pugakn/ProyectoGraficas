@@ -12,6 +12,7 @@
 #define TYPE_MESH_MATERIAL_LIST 6
 #define TYPE_MESH_MATERIAL 7
 #define TYPE_MESH_DECL_DATA 8
+#define TYPE_MESH_BONE_WIGHTS 9
 
 
 namespace xf {
@@ -43,6 +44,14 @@ struct vertexStruct {
 	float tx, ty, tz, tw;
 	float bx, by, bz, bw;
 	float s, t;
+	int wIndex[4];
+	float wWeight[4];
+};
+
+struct xBoneWeightInfo
+{
+	std::vector<int> boneIndex;
+	std::vector<float> weight;
 };
 struct xMeshEffects {
 	std::string m_difusePath;
@@ -70,11 +79,13 @@ struct xMesh{
 #endif // USING_32BIT_IB
 	std::vector<xMeshSubset> m_subsets;
 	unsigned long m_vertexAttributes;
+
 };
 
 struct xBone {
 	std::string name;
 	Matrix4D bone;
+	Matrix4D spaceTransformMatrix;
 	std::vector<int> child;
 	std::vector<int> brothers;
 	int dad;
@@ -104,6 +115,14 @@ private:
 	void ignoreObjectMatrixComment();
 	bool IsNextACloseBlock();
 	//std::string SearchElement(char condition);
+
+	void LoadWeights();
+	std::string LoadBoneName();
+	int LoadNumWeights();
+	std::vector<int> LoadWeightsIndex(int numWeights, int actualBoneIndex);
+	void LoadIndexWeights(int numWeights, std::vector<int>& index);
+	std::vector<xBoneWeightInfo> boneWeightInfo;
+	Matrix4D LoadSpaceTransformMatrix();
 public:
 	std::vector<vertexStruct> m_vbo;
 	std::vector<xMesh> m_meshes;
