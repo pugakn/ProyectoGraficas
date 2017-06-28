@@ -108,3 +108,7 @@ void	TextureD3D::LoadAPITexture(const unsigned char* buffer){
 void	TextureD3D::LoadAPITextureCompressed(unsigned char* buffer){
 
 }
+
+void TextureD3D::LoadAPICubeMap(unsigned char * buffer)
+{
+}

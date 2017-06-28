@@ -24,8 +24,6 @@ void MeshParser::ReadFile()
 	textCordsPos = 0;
 	declDataPos = 0;
 
-
-	//Leer Mesh
 	char* bufferEnd = &m_pointer[fileSize - 1];
 	m_pointer = strstr(m_pointer,"Mesh ");
 	m_pointer = m_pointer + 64;
@@ -69,7 +67,7 @@ void MeshParser::ReadFile()
 			case TYPE_FRAME:
 				m_pointer--;
 				getBones();
-				InsertBonesBrothersOnEachBone();
+				InsertBonesSiblingsOnEachBone();
 				bones[0].dad = 0;
 				break;
 			case TYPE_MESH_BONE_WIGHTS:
@@ -740,7 +738,7 @@ void MeshParser::getBones()
 		getBones();
 	}
 }
-void MeshParser::InsertBonesBrothersOnEachBone()
+void MeshParser::InsertBonesSiblingsOnEachBone()
 {
 	for (size_t bone1 = 1; bone1 < bones.size(); bone1++) {
 		for (size_t bone2 = 1; bone2 < bones.size(); bone2++) {

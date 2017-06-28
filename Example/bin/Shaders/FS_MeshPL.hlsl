@@ -96,7 +96,12 @@ FS_OUT FS( VS_OUTPUT input )   {
     fou.depth		= input.Pos.z / 5000.0;
     return fou;
 }
-#else//G_BUFF_PASS
+#elif defined G_SHADOW_PASS//G_BUFF_PASS
+float4 FS( VS_OUTPUT input ) : SV_TARGET  {
+	return(0,0,0,0);
+}
+
+#else //FORWARD PASS
 float4 FS( VS_OUTPUT input ) : SV_TARGET  {
 
     float4 color;

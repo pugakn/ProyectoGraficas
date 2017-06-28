@@ -41,7 +41,8 @@ uniform highp float camFar;
 //#endif
 varying highp vec4 pos;
 //
-
+uniform mediump samplerCube skybox;
+//
 //G_SHADOW_PASS
 #ifdef G_SHADOW_PASS
 
@@ -69,7 +70,13 @@ mediump float shinness = 2.0;
 #else
 	lowp vec3 norm = normalize(normalTransformed) * 0.5 + 0.5;
 #endif
-	color = texture2D(diffuse,vecUVCoords);
+
+//SKYBOX ===
+	highp vec3 I = normalize(pixelPos - camPos);
+    highp vec3 R = reflect(I, norm);
+	R.xy = R.xy + norm.xy;
+    color = vec4(texture(skybox, R).rgb, 1.0) ;
+	//color = texture2D(diffuse,vecUVCoords);
 #else
 color = normalize(pixelPos*0.5 + 0.5);
 #endif

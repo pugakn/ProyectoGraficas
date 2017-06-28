@@ -27,6 +27,7 @@
     <ClInclude Include="D3DRT.h" />
     <ClInclude Include="D3DShader.h" />
     <ClInclude Include="D3DXDriver.h" />
+    <ClInclude Include="DDSLoader.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FPCamera.h" />
     <ClInclude Include="GLFont.h" />
@@ -74,6 +75,7 @@
     <ClCompile Include="D3DRT.cpp" />
     <ClCompile Include="D3DShader.cpp" />
     <ClCompile Include="D3DXDriver.cpp" />
+    <ClCompile Include="DDSLoader.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FPCamera.cpp" />
     <ClCompile Include="GLFont.cpp" />

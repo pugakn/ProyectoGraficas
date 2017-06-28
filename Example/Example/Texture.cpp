@@ -80,6 +80,32 @@ int Texture::LoadDefaultTxture()
 	LoadAPITexture(buffer);
 	return id;
 }
+#include "DDSLoader.h"
+int Texture::LoadCubeMap(char * path)
+{
+	std::string pathT = "CubeMaps/";
+	pathT += std::string(path);
+	
+	DDSLoader loader;
+	loader.Load(const_cast<char*>(pathT.c_str()));
+	unsigned char *buffer = &loader.cubeMapData.pixelData[0];
+
+	if (!buffer)
+		return -1;
+	int x = loader.cubeMapData.width, y = loader.cubeMapData.height, channels = 3;
+	size = x*y*channels;
+	bounded = 1;
+	this->x = x;
+	this->y = y;
+	mipmaps = loader.cubeMapData.mipMapLevels;
+	this->params = params;
+
+	memcpy(&optname[0], path, strlen(path));
+	optname[strlen(path)] = '\0';
+
+	LoadAPICubeMap(buffer);
+	return id;
+}
 
 
 

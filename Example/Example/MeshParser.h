@@ -110,7 +110,7 @@ private:
 	void getMaterials();
 	void getDeclData();
 	void getBones();
-	void InsertBonesBrothersOnEachBone();
+	void InsertBonesSiblingsOnEachBone();
 	Matrix4D getFrameTransformMatrix();
 	void ignoreObjectMatrixComment();
 	bool IsNextACloseBlock();

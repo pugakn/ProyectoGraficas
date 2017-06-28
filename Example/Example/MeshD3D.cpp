@@ -26,17 +26,6 @@ void MeshD3D::Create()
 	timer.Update();
 	std::cout << "Archivo cargado en: " << timer.GetDTSecs() << " segundos..." << std::endl;
 	//-------------------------------------------------------------------------//
-	//bool errorShader = false;
-	//char *vsSourceP = file2string("Shaders/VS_MeshPL.hlsl");
-	//char *fsSourceP = file2string("Shaders/FS_MeshPL.hlsl");
-	//std::string vstr;
-	//std::string fstr;
-	//if (!vsSourceP || !fsSourceP)
-	//	errorShader = true;
-	//else {
-	//	vstr = std::string(vsSourceP);
-	//	fstr = std::string(fsSourceP);
-	//}
 
 	m_meshInfo.resize(m_parser.m_meshes.size());
 	int meshInfoIndex = 0;
@@ -48,67 +37,6 @@ void MeshD3D::Create()
 		{
 			SubSetInfo *it_subsetinfo =  &m_meshInfo[meshInfoIndex].m_subSets[subsetInfoIndex];
 
-			//if (!errorShader)
-			//{
-			//	std::string Defines = "";
-			//	if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_NORMAL)
-			//		Defines += "#define USE_NORMALS\n\n";
-			//	if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD0)
-			//		Defines += "#define USE_TEXCOORD0\n\n";
-			//	if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD1)
-			//		Defines += "#define USE_TEXCOORD1\n\n";
-			//	if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TANGENT)
-			//		Defines += "#define USE_TANGENTS\n\n";
-			//	if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_BINORMAL)
-			//		Defines += "#define USE_BINORMALS\n\n";
-
-			//	if (subsetIt.m_effects.m_specularMap != "")
-			//		Defines += "#define USE_SPEC_MAP\n\n";
-			//	//if (subsetIt.m_effects.m_glossMap != "")
-			//	//	Defines += "#define USE_GLOSS_MAP\n\n";
-			//	if (subsetIt.m_effects.m_normalMap != "")
-			//		Defines += "#define USE_NORMAL_MAP\n\n";
-
-			//	if (useLight)
-			//	{
-			//		Defines += "#define USE_PIXELLIGHTING \n\n";
-			//		Defines += "#define USING_ATENUATION \n\n";
-			//		Defines += "#define USE_SPECULAR \n\n";
-			//	}
-
-			//	vstr = Defines + vstr;
-			//	fstr = Defines + fstr;
-				////==================== compile VS =====================
-				//it_subsetinfo->VS_blob = nullptr;
-				//ComPtr<ID3DBlob> errorBlob = nullptr;
-				//if (D3DCompile(vstr.c_str(), vstr.size(), 0, 0, 0, "VS", "vs_5_0", 0, 0, &it_subsetinfo->VS_blob, &errorBlob) != S_OK) {
-				//	if (errorBlob) {
-				//		std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
-				//	}
-				//	errorShader = true;
-				//}
-				////=========== Create VS ============
-				//if (D3D11Device->CreateVertexShader(it_subsetinfo->VS_blob->GetBufferPointer(), it_subsetinfo->VS_blob->GetBufferSize(), 0, &it_subsetinfo->pVS) != S_OK) {
-				//	std::cout << "Error Creatong Vertex Shader" << std::endl;
-				//	errorShader = true;
-				//}
-				////==================== compile PS =====================
-				//it_subsetinfo->FS_blob = nullptr;
-				//errorBlob.Reset();
-				//if (D3DCompile(fstr.c_str(), fstr.size(), 0, 0, 0, "FS", "ps_5_0", 0, 0, &it_subsetinfo->FS_blob, &errorBlob) != S_OK) {
-				//	if (errorBlob) {
-				//		std::cout << "ErrorBlob shader" << (char*)errorBlob->GetBufferPointer();
-				//	}
-				//	errorShader = true;
-				//}
-				////=========== Create PS ==============
-				//if (D3D11Device->CreatePixelShader(it_subsetinfo->FS_blob->GetBufferPointer(), it_subsetinfo->FS_blob->GetBufferSize(), 0, &it_subsetinfo->pFS) != S_OK) {
-				//	std::cout << "Error Creating Pixel Shader" << std::endl;
-				//	errorShader = true;
-				//}
-
-				
-			//}
 			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_NORMAL)
 				it_subsetinfo->sig |= Shader::HAS_NORMALS;
 			if (meshIt.m_vertexAttributes&xf::attributes::E::HAS_TEXCOORD0)
@@ -128,19 +56,26 @@ void MeshD3D::Create()
 			if (!useLight)
 				it_subsetinfo->sig |= Shader::NOT_LIGHT;
 
-			it_subsetinfo->m_shader  = (D3DShader*)ShaderManager::GetShaderBySignature(it_subsetinfo->sig);
-			it_subsetinfo->VS_blob = it_subsetinfo->m_shader->VS_blob;
-			it_subsetinfo->FS_blob = it_subsetinfo->m_shader->FS_blob;
-			it_subsetinfo->pVS = it_subsetinfo->m_shader->pVS;
-			it_subsetinfo->pFS = it_subsetinfo->m_shader->pFS;
+			//it_subsetinfo->m_shader  = (D3DShader*)ShaderManager::GetShaderBySignature(it_subsetinfo->sig);
+			//it_subsetinfo->VS_blob = it_subsetinfo->m_shader->VS_blob;
+			//it_subsetinfo->FS_blob = it_subsetinfo->m_shader->FS_blob;
+			//it_subsetinfo->pVS = it_subsetinfo->m_shader->pVS;
+			//it_subsetinfo->pFS = it_subsetinfo->m_shader->pFS;
+
+
+
+			auto  set = ShaderManager::GetShaderSetBySignature(it_subsetinfo->sig);
+			it_subsetinfo->m_shaderSet = set;
+			m_shaderType = Shader::TYPE::G_FORWARD_PASS;
+			it_subsetinfo->m_shader = (D3DShader*)(it_subsetinfo->m_shaderSet)[m_shaderType];
 
 			if (it_subsetinfo->m_shader->errorShader)
 			{
 				meshIt.m_vertexAttributes = 0;
-				it_subsetinfo->VS_blob = Tools::DefaultVS_blob;
-				it_subsetinfo->pVS = Tools::pDefaultVS;
-				it_subsetinfo->FS_blob = Tools::DefaultFS_blob;
-				it_subsetinfo->pFS = Tools::pDefaultFS;
+				//it_subsetinfo->VS_blob = Tools::DefaultVS_blob; //TODO: Add default shader
+				//it_subsetinfo->pVS = Tools::pDefaultVS;
+				//it_subsetinfo->FS_blob = Tools::DefaultFS_blob;
+				//it_subsetinfo->pFS = Tools::pDefaultFS;
 			}
 			else
 			{
@@ -223,7 +158,7 @@ void MeshD3D::Create()
 				it_subsetinfo->VertexDecl.push_back(elementDesc);
 			}
 			//==================== Create Input Layout =====================
-			if (D3D11Device->CreateInputLayout(&it_subsetinfo->VertexDecl[0], it_subsetinfo->VertexDecl.size(), it_subsetinfo->VS_blob->GetBufferPointer(), it_subsetinfo->VS_blob->GetBufferSize(), &it_subsetinfo->Layout) != S_OK) {
+			if (D3D11Device->CreateInputLayout(&it_subsetinfo->VertexDecl[0], it_subsetinfo->VertexDecl.size(), it_subsetinfo->m_shader->VS_blob->GetBufferPointer(), it_subsetinfo->m_shader->VS_blob->GetBufferSize(), &it_subsetinfo->Layout) != S_OK) {
 				std::cout << "Error Creating Input Layout" << std::endl;
 				return;
 			}
@@ -377,8 +312,8 @@ inline void MeshD3D::DrawMeshes(const Matrix4D& VP, const Matrix4D & WVP)
 			it_subsetinfo->CnstBuffer.lightColor = lightCol;
 			it_subsetinfo->CnstBuffer.camPos = camPos;
 			//==================== Set Shaders =====================
-			D3D11DeviceContext->VSSetShader(it_subsetinfo->pVS.Get(), 0, 0);
-			D3D11DeviceContext->PSSetShader(it_subsetinfo->pFS.Get(), 0, 0);
+			D3D11DeviceContext->VSSetShader(it_subsetinfo->m_shader->pVS.Get(), 0, 0);
+			D3D11DeviceContext->PSSetShader(it_subsetinfo->m_shader->pFS.Get(), 0, 0);
 			//==================== Set Input Layout (describe the input-buffer data) =====================
 			D3D11DeviceContext->IASetInputLayout(it_subsetinfo->Layout.Get());
 			//==================== Update Constant Buffers =====================
@@ -454,23 +389,17 @@ void MeshD3D::Destroy()
 {
 
 }
-void MeshD3D::SetShaderBySignature(unsigned long sig)
+void MeshD3D::SetShaderType(Shader::TYPE type)
 {
-	for (auto &meshIt : m_meshInfo)
+	if (m_shaderType != type)
 	{
-		for (auto &subsetIt : meshIt.m_subSets)
+		m_shaderType = type;
+		for (auto &meshIt : m_meshInfo)
 		{
-			Shader* actual = subsetIt.m_shader;
-			subsetIt.m_shader = (D3DShader*)ShaderManager::GetShaderBySignature(subsetIt.sig);
-			if (subsetIt.m_shader != actual)
+			for (auto &subsetIt : meshIt.m_subSets)
 			{
-				subsetIt.m_shader = (D3DShader*)ShaderManager::GetShaderBySignature(subsetIt.sig);
-				subsetIt.VS_blob = subsetIt.m_shader->VS_blob;
-				subsetIt.FS_blob = subsetIt.m_shader->FS_blob;
-				subsetIt.pVS = subsetIt.m_shader->pVS;
-				subsetIt.pFS = subsetIt.m_shader->pFS;
+				subsetIt.m_shader = (D3DShader*)(subsetIt.m_shaderSet)[type];
 			}
-
 		}
 	}
 }

@@ -115,10 +115,10 @@ void main(){
 			//End Shadow Map ========================
 			Ambient = color * 0.05;
 			Final+= Ambient;
-		//gl_FragColor = vec4(position.xyz,1.0);
+		gl_FragColor = vec4(color.xyz,1.0);
 		//gl_FragColor = vec4(color.xyz,1.0);
 		//gl_FragColor = vec4(specularmap.xyz,1.0);
-		gl_FragColor = vec4(Final.xyz,1.0);
+		//gl_FragColor = vec4(Final.xyz,1.0);
 }
 #else //G_BUFF_PASS
 uniform highp sampler2D diffuse;

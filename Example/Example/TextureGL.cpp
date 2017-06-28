@@ -84,14 +84,60 @@ void TextureGL::LoadAPITexture(const unsigned char* buffer) {
 	glTexImage2D(glTarget, 0, glFormat, this->x, this->y, 0, glFormat, glChannel, (void*)(buffer));
 
 	glGenerateMipmap(glTarget);
-
 	SetTextureParams(glTarget);
-
 	this->id = static_cast<unsigned short>(id);
 
 }
 
 void TextureGL::LoadAPITextureCompressed(unsigned char* buffer) {
 	
+}
+void TextureGL::LoadAPICubeMap(unsigned char * buffer)
+{
+	unsigned int id;
+	unsigned int glFormat = 0;
+	unsigned int glChannel = GL_UNSIGNED_BYTE;
+	unsigned int glTarget = GL_TEXTURE_CUBE_MAP;
+
+	glFormat = GL_RGBA;
+	glEnable(GL_TEXTURE_CUBE_MAP_EXT);
+	
+	glGenTextures(1, &id);
+	glBindTexture(glTarget, id);
+	if (this->x % 4 != 0)
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	else
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+	for (int i = 0; i<6; i++) {
+		int nx = this->x;
+		int ny = this->y;
+		size = x* y * 4;
+		glTexImage2D(
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X_EXT + i, 0, glFormat, nx, ny, 0, glFormat, glChannel, (void*)(buffer));
+		buffer += size;
+		for (int y = 1; y < mipmaps; y++) {
+			//gluBuild2DMipmaps(GL_TEXTURE_CUBE_MAP_POSITIVE_X_EXT + i, glFormat, nx, ny,  glFormat, glChannel, (void*)(buffer));
+			nx = (nx + 1) >> 1;
+			ny = (ny + 1) >> 1;
+			size = nx * ny * 4;
+			if (size < 8) size = 8;
+			buffer += size;
+		}
+	}
+	if (mipmaps == 1)
+		glGenerateMipmap(glTarget);
+
+
+
+	
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	this->id = static_cast<unsigned short>(id);
+	glDisable(GL_TEXTURE_CUBE_MAP_EXT);
 }
 #endif

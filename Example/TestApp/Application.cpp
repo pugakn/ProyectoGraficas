@@ -9,6 +9,7 @@
 #include "Quad.h"
 #include "BaseRT.h"
 #include "BaseShader.h"
+#include "DDSLoader.h"
 ///////////////////////////////////////////////////////////////////////////
 //NOTA: PRESIONAR L PARA COMENZAR O PAUSAR LA FISICAS                            <-----------------------------!!
 //////////////////////////////////////////////////////////////////////////
@@ -86,10 +87,11 @@ void TestApp::InitVars() {
 }
 
 void TestApp::CreateAssets() {	
-	
-	int index = PrimitiveMgr.CreateModel("Models/Scene.X",true);
+
+	int index;
+	/*int index = PrimitiveMgr.CreateModel("Models/Scene.X",true);
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));*/
 
 	//index = PrimitiveMgr.CreateModel("Models/Jinx.X",false);
 	//Models.push_back(PrimitiveInst());

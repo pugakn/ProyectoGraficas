@@ -32,10 +32,10 @@ private:
 		Texture*			 glossText;
 		Texture*			 normalText;
 
-		ComPtr<ID3D11VertexShader>  pVS;
-		ComPtr<ID3D11PixelShader>   pFS;
-		ComPtr<ID3DBlob>            VS_blob;
-		ComPtr<ID3DBlob>            FS_blob;
+		//ComPtr<ID3D11VertexShader>  pVS;
+		//ComPtr<ID3D11PixelShader>   pFS;
+		//ComPtr<ID3DBlob>            VS_blob;
+		//ComPtr<ID3DBlob>            FS_blob;
 		ComPtr<ID3D11InputLayout>   Layout;
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC>	VertexDecl;
@@ -44,6 +44,7 @@ private:
 
 		unsigned long sig;
 		D3DShader* m_shader;
+		std::vector<Shader*> m_shaderSet;
 	};
 	struct MeshInfo {
 		std::vector<SubSetInfo>					m_subSets;
@@ -79,7 +80,7 @@ public:
 	void Transform(float *t) override;
 	void Draw(float *t) override;
 	void Destroy() override;
-	void SetShaderBySignature(unsigned long sig) override;
+	void SetShaderType(Shader::TYPE type) override;
 	MeshParser m_parser;
 	std::vector<MeshInfo> m_meshInfo;
 	MeshD3D() { useLight = true; };

@@ -101,6 +101,21 @@ void Quad::Create() {
 	char *vsSourceP = file2string("Shaders/VS_Quad.hlsl");
 	char *fsSourceP = file2string("Shaders/FS_Quad.hlsl");
 
+	std::string vsrc;
+	std::string fsrc;
+	if (vsSourceP && fsSourceP)
+	{
+		vsrc = std::string(vsSourceP);
+		fsrc = std::string(fsSourceP);
+	}
+
+
+	std::string Defines;
+	//Defines += "#define LINEAR_DEPTH\n\n";
+	Defines += "#define G_BUFF_PASS\n\n";
+	vsrc = Defines + vsrc;
+	fsrc = Defines + fsrc;
+
 	if (!vsSourceP || !fsSourceP)
 		errorShader = true;
 	HRESULT hr;
@@ -109,7 +124,7 @@ void Quad::Create() {
 		{
 			VS_blob = nullptr;
 			ComPtr<ID3DBlob> errorBlob = nullptr;
-			hr = D3DCompile(vsSourceP, (UINT)strlen(vsSourceP), 0, 0, 0, "VS", "vs_5_0", 0, 0, &VS_blob, &errorBlob);
+			hr = D3DCompile(vsrc.c_str(), (UINT)strlen(vsrc.c_str()), 0, 0, 0, "VS", "vs_5_0", 0, 0, &VS_blob, &errorBlob);
 			if (hr != S_OK) {
 
 				if (errorBlob) {
@@ -127,7 +142,7 @@ void Quad::Create() {
 		{
 			FS_blob = nullptr;
 			ComPtr<ID3DBlob> errorBlob = nullptr;
-			hr = D3DCompile(fsSourceP, (UINT)strlen(fsSourceP), 0, 0, 0, "FS", "ps_5_0", 0, 0, &FS_blob, &errorBlob);
+			hr = D3DCompile(fsrc.c_str(), (UINT)strlen(fsrc.c_str()), 0, 0, 0, "FS", "ps_5_0", 0, 0, &FS_blob, &errorBlob);
 			if (hr != S_OK) {
 				if (errorBlob) {
 					printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
@@ -216,7 +231,6 @@ void Quad::Create() {
 	bdesc.ByteWidth = sizeof(CVertex) * 4;
 	bdesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	D3D11_SUBRESOURCE_DATA subData = { vertices, 0, 0 };
-		|
 	hr = D3D11Device->CreateBuffer(&bdesc, &subData, &VB);
 	if (hr != S_OK) {
 		printf("Error Creating Vertex Buffer\n");
@@ -354,8 +368,23 @@ void Quad::Draw(float *t) {
 	if (t)
 		transform = t;
 
+	std::vector<Vector4D>LightPositions;
+	std::vector<Vector4D>LightColors;
+	for (unsigned int i = 0; i < pScProp->Lights.size(); i++) {
+		LightPositions.push_back(Vector4D(pScProp->Lights[i].Position, 1.0));
+		LightColors.push_back(Vector4D(pScProp->Lights[i].Color, 1.0));
+	}
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
+	Matrix4D WVPI = Inverse(VP);
 	CnstBuffer.World = transform;
+	CnstBuffer.CameraPosition = Vector4D(pScProp->pCameras[0]->m_pos,1.0);
+	CnstBuffer.CamVP = pScProp->LightsWShadow[0].VP;;
+	CnstBuffer.NumLights = LightPositions.size();
+	CnstBuffer.ShadowTexSize[0] = static_cast<float>(shadowMapTexture->x);
+	CnstBuffer.ShadowTexSize[1] = static_cast<float>(shadowMapTexture->y);
+	CnstBuffer.VPInverse = WVPI;
+	memcpy(CnstBuffer.LightPositions, &LightPositions[0], LightPositions.size());
+	memcpy(CnstBuffer.LightColors, &LightColors[0], LightColors.size());
 
 	UINT stride = sizeof(CVertex);
 	UINT offset = 0;
@@ -366,9 +395,26 @@ void Quad::Draw(float *t) {
 
 	D3D11DeviceContext->UpdateSubresource(pd3dConstantBuffer.Get(), 0, 0, &CnstBuffer.World.m[0][0], 0, 0);
 
+	int slot = 0;
 	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(difTex);
-	D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
-	D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
+	D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
+	D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
+	slot++;
+	texd3d = dynamic_cast<TextureD3D*>(normalTex);
+	D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
+	D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
+	slot++;
+	texd3d = dynamic_cast<TextureD3D*>(specTex);
+	D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
+	D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
+	slot++;
+	texd3d = dynamic_cast<TextureD3D*>(depthTex);
+	D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
+	D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
+	slot++;
+	texd3d = dynamic_cast<TextureD3D*>(shadowMapTexture);
+	D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
+	D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
 
 	D3D11DeviceContext->VSSetConstantBuffers(0, 1, pd3dConstantBuffer.GetAddressOf());
 	D3D11DeviceContext->PSSetConstantBuffers(0, 1, pd3dConstantBuffer.GetAddressOf());

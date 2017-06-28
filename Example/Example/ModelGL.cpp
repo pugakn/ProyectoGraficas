@@ -25,6 +25,7 @@ void ModelGL::Create()
 	timer.Update();
 	std::cout << "Archivo cargado en: " << timer.GetDTSecs() << " segundos..." << std::endl;
 	//Iterar cada Mesh y subsets
+	idCube = cubetxt.LoadCubeMap("tstcuben.dds");
 	for (auto &meshIt: parser.m_meshes)
 	{	
 		m_meshInfo.push_back(MeshInfo());
@@ -90,6 +91,8 @@ void ModelGL::Create()
 					textureID = Tools::LoadTexture(subsetIt.m_effects.m_specularMap.c_str());
 					m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
 				}
+
+				m_meshInfo.back().subsetInfo.back().IdCubeLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "skybox");
 			}
 			//Generar buffer de Indices
 			glGenBuffers(1, &m_meshInfo.back().subsetInfo.back().IB);
@@ -245,6 +248,9 @@ inline void ModelGL::DrawMeshes(const Matrix4D & VP, const Matrix4D & WVP)
 				glBindTexture(GL_TEXTURE_2D, sIt->textInfo.IdsTex[k]);
 				glUniform1i(sIt->textInfo.IdTexUniformLocs[k], k); //Specify location
 			}
+			glActiveTexture(GL_TEXTURE0 + 5);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, idCube);
+			glUniform1i(sIt->IdCubeLoc, 5);
 #if USING_32BIT_IB
 			glDrawElements(GL_TRIANGLES, parser.m_meshes[i].m_subsets[j].m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
 #else
