@@ -1,22 +1,22 @@
-#ifdef G_BUFF_PASS
+#ifdef G_DEFERRED_PASS
 //uniform highp mat4 WVP;
 //uniform highp mat4 World;
 //uniform highp mat4 WorldView;
 uniform highp mat4 VPInverse;
 uniform highp vec4 LightPositions[128];
 uniform highp vec4 LightColors[128];
-uniform highp vec4 CameraPosition;
+uniform highp vec4 camPos;
 uniform highp int NumLights;
 uniform highp vec2 ShadowTexSize;
 
-uniform mediump sampler2D difuse;
-uniform mediump sampler2D normalText;
-uniform mediump sampler2D specularText;
-uniform mediump sampler2D depthText;
+uniform mediump sampler2D texture01;
+uniform mediump sampler2D texture04;
+uniform mediump sampler2D texture03;
+uniform mediump sampler2D texture02;
 
 uniform highp vec3 linearLight;
 uniform highp mat4 CamVP;
-uniform mediump sampler2D shadowMap;
+uniform mediump sampler2D texture05;
 
 
 varying highp vec2 vecUVCoords;
@@ -26,24 +26,24 @@ void main(){
 	highp vec2 coords = vecUVCoords;
 	coords.y = 1.0 - coords.y;
 	lowp vec4 Final  =  vec4(0.0,0.0,0.0,1.0);
-	lowp vec4 color  =  texture2D(difuse,coords);
+	lowp vec4 color  =  texture2D(texture01,coords);
 	color.w = 1.0;
-	highp float depth  =	texture2D(depthText,coords).r;
+	highp float depth  =	texture2D(texture02,coords).r;
 	lowp vec4 Lambert = vec4(0.0,0.0,0.0,1.0);
 	lowp vec4 Specular = vec4(0.0,0.0,0.0,1.0);
 	lowp vec4 Ambient = vec4(0.0,0.0,0.0,1.0);
-	lowp vec4 normalmap = texture2D(normalText,coords);
+	lowp vec4 normalmap = texture2D(texture04,coords);
 	lowp vec4 normal = normalmap*2.0 - 1.0;
 	normal	= normalize(normal);
-	lowp vec4 specularmap = texture2D(specularText,coords);
+	lowp vec4 specularmap = texture2D(texture03,coords);
 	#ifndef LINEAR_DEPTH
 	highp vec2 vcoord = coords *2.0 - 1.0;
 	highp vec4 position = VPInverse*vec4(vcoord ,depth,1.0);
 	position.xyz /= position.w;
 	#else
-	highp vec4 position = CameraPosition + PosCorner*depth;
+	highp vec4 position = camPos + PosCorner*depth;
 	#endif //LINEAR_DEPTH
-	highp vec3  eyeDir   = normalize(CameraPosition-position).xyz;
+	highp vec3  eyeDir   = normalize(camPos-position).xyz;
 	highp float shinness = 4.0;
 	shinness = normal.a + shinness;
 	highp float attMax = 40.0;
@@ -101,7 +101,7 @@ void main(){
 				{
 				    for(int y = -1; y <= 1; ++y)
 				    {
-				        float pcfDepth = texture2D(shadowMap, shCoords + vec2(x,y) * texelSize).r;
+				        float pcfDepth = texture2D(texture05, shCoords + vec2(x,y) * texelSize).r;
 								if (proj.z > pcfDepth +0.002)
 								{
 									//pixel en la sombra
@@ -115,20 +115,21 @@ void main(){
 			//End Shadow Map ========================
 			Ambient = color * 0.05;
 			Final+= Ambient;
-		gl_FragColor = vec4(color.xyz,1.0);
 		//gl_FragColor = vec4(color.xyz,1.0);
+		//gl_FragColor = vec4(1.0,0.0,0.0,1.0);
 		//gl_FragColor = vec4(specularmap.xyz,1.0);
-		//gl_FragColor = vec4(Final.xyz,1.0);
+		gl_FragColor = vec4(Final.xyz,1.0);
 }
-#else //G_BUFF_PASS
-uniform highp sampler2D diffuse;
+#else //G_DEFERRED_PASS
+uniform highp sampler2D texture01;
 varying highp vec2 vecUVCoords;
 void main(){
 	lowp vec2 coords = vecUVCoords;
 	coords.y = 1.0 - coords.y;
-	highp vec4 color = texture2D(diffuse,coords);
+	highp vec4 color = texture2D(texture01,coords);
 	//color = vec4(depth,depth,depth,1.0);
 	color.w = 1.0;
 	gl_FragColor = color;
+	//gl_FragColor = vec4(1.0,0,0,1.0);
 }
 #endif

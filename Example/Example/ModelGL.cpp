@@ -53,7 +53,7 @@ void ModelGL::Create()
 					m_meshInfo.back().subsetInfo.back().sig |= Shader::NOT_LIGHT;
 
 
-				auto  set = ShaderManager::GetShaderSetBySignature(m_meshInfo.back().subsetInfo.back().sig);
+				auto  set = ShaderManager::GetShaderSetBySignature(m_meshInfo.back().subsetInfo.back().sig, "Shaders/VS_MeshPL.glsl", "Shaders/FS_MeshPL.glsl");
 				m_meshInfo.back().subsetInfo.back().m_shaderSet = set;
 				m_shaderType = Shader::TYPE::G_FORWARD_PASS;
 				GLShader * glDefaultShader = (GLShader*)(m_meshInfo.back().subsetInfo.back().m_shaderSet)[m_shaderType];
@@ -70,26 +70,22 @@ void ModelGL::Create()
 				//glLinkProgram(m_meshInfo.back().subsetInfo.back().shadersID);
 				glUseProgram(m_meshInfo.back().subsetInfo.back().shadersID);
 				//=========================== Create Textures ===============================
-				m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "diffuse"));
 				int textureID = Tools::LoadTexture(subsetIt.m_effects.m_difusePath.c_str());
-				m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
+				m_meshInfo.back().subsetInfo.back().diffuseText1ID = textureID;
 				if (subsetIt.m_effects.m_glossMap != "")
 				{
-					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "glossMap"));
 					textureID = Tools::LoadTexture(subsetIt.m_effects.m_glossMap.c_str());
-					m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
+					m_meshInfo.back().subsetInfo.back().GlossText2ID = textureID;
 				}
 				if (subsetIt.m_effects.m_normalMap != "")
 				{
-					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "normalMap"));
 					textureID = Tools::LoadTexture(subsetIt.m_effects.m_normalMap.c_str());
-					m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
+					m_meshInfo.back().subsetInfo.back().NormalText3ID = textureID;
 				}
 				if (subsetIt.m_effects.m_specularMap != "")
 				{
-					m_meshInfo.back().subsetInfo.back().textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "specularMap"));
 					textureID = Tools::LoadTexture(subsetIt.m_effects.m_specularMap.c_str());
-					m_meshInfo.back().subsetInfo.back().textInfo.IdsTex.push_back(textureID);
+					m_meshInfo.back().subsetInfo.back().SpecularText4ID = textureID;
 				}
 
 				m_meshInfo.back().subsetInfo.back().IdCubeLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "skybox");
@@ -104,13 +100,26 @@ void ModelGL::Create()
 #endif // USING_32BIT_IB
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
+		//Generar buffer de vertices
+		glGenBuffers(1, &m_meshInfo.back().VB);
+		glBindBuffer(GL_ARRAY_BUFFER, m_meshInfo.back().VB);
+		glBufferData(GL_ARRAY_BUFFER, meshIt.m_vbo.size()* sizeof(vertexStruct), &meshIt.m_vbo[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
+
+	//TST
+	//for (auto&it : parser.bones)
+	//{
+	//	std::cout << it.name <<std::endl;
+	//	for (auto&it2 : it.child)
+	//	{
+	//		int i = it2;
+	//		std::cout <<"\t"<< parser.bones[it2].name <<std::endl;
+	//	}
+	//}
+	
+	//////////TST
 	//---------------------------------------------------------------//
-	//Generar buffer de vertices
-	glGenBuffers(1, &VB);
-	glBindBuffer(GL_ARRAY_BUFFER, VB);
-	glBufferData(GL_ARRAY_BUFFER, parser.m_vertexSize * sizeof(vertexStruct), &parser.m_vbo[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//===================================Generar Wireframe==================================
 	//Shaders
@@ -127,10 +136,11 @@ void ModelGL::Create()
 	wire.MatWorldViewProjUniformLoc = glGetUniformLocation(wire.ShaderID, "WVP");
 	
 	std::vector<unsigned short> fullIndex;
-	for (auto &it : parser.m_vbo, parser.m_meshes)
+	for (auto &mesh : parser.m_meshes)
 	{
-		fullIndex.insert(fullIndex.end(), it.m_indexBuffer.begin(), it.m_indexBuffer.end());
+		fullIndex.insert(fullIndex.end(), mesh.m_indexBuffer.begin(), mesh.m_indexBuffer.end());
 	}
+	
 	wireframe.CreateWireframe( fullIndex);
 	glGenBuffers(1, &wire.IB);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, wire.IB);
@@ -159,7 +169,7 @@ void ModelGL::Draw(float *t)
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D WVP = transform*VP;
 	//------------------------------------------------------------------//
-	glBindBuffer(GL_ARRAY_BUFFER, VB);
+
 	switch (pScProp->renderMode)
 	{
 	case RM::RenderMode::SOLID:
@@ -175,7 +185,6 @@ void ModelGL::Draw(float *t)
 		DrawWireframe(VP,WVP);
 		break;
 	}
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//----------------------------------------------------------------//
 }
 
@@ -183,6 +192,7 @@ inline void ModelGL::DrawMeshes(const Matrix4D & VP, const Matrix4D & WVP)
 {
 	for (size_t i = 0; i < parser.m_meshes.size(); i++)
 	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_meshInfo[i].VB);
 		for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
 		{
 			SubsetInfo* sIt = &m_meshInfo[i].subsetInfo[j];
@@ -200,10 +210,10 @@ inline void ModelGL::DrawMeshes(const Matrix4D & VP, const Matrix4D & WVP)
 			Matrix4D CamWVP = transform * pScProp->LightsWShadow[0].VP;
 			if (locs.matLightCamWVPLoc != -1)
 				glUniformMatrix4fv(locs.matLightCamWVPLoc, 1, GL_FALSE, &CamWVP.m[0][0]);//CamWVP
-			if (locs.lightLoc != -1)
-				glUniform3fv(locs.lightLoc, 1, &pScProp->Lights[0].Position.x);
-			if (locs.lightColLoc != -1)
-				glUniform3fv(locs.lightColLoc, 1, &pScProp->Lights[0].Color.r);
+			//if (locs.lightLoc != -1)
+			//	glUniform3fv(locs.lightLoc, 1, &pScProp->Lights[0].Position.x);
+			//if (locs.lightColLoc != -1)
+			//	glUniform3fv(locs.lightColLoc, 1, &pScProp->Lights[0].Color.r);
 			if (locs.camPosLoc != -1)
 				glUniform3fv(locs.camPosLoc, 1, &pScProp->pCameras[0]->m_pos.x);
 			if (locs.specExpLoc != -1)
@@ -242,11 +252,34 @@ inline void ModelGL::DrawMeshes(const Matrix4D & VP, const Matrix4D & WVP)
 			}
 			//Bind Buffers
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sIt->IB);
-			for (size_t k = 0; k < sIt->textInfo.IdsTex.size(); k++)
+			int k = 0;
+			if (sIt->diffuseText1ID != -1)
 			{
 				glActiveTexture(GL_TEXTURE0 + k);//Set Active texture unit
-				glBindTexture(GL_TEXTURE_2D, sIt->textInfo.IdsTex[k]);
-				glUniform1i(sIt->textInfo.IdTexUniformLocs[k], k); //Specify location
+				glBindTexture(GL_TEXTURE_2D, sIt->diffuseText1ID);
+				glUniform1i(((GLShader*)sIt->m_shaderSet[m_shaderType])->m_locs.textureLoc01, k); //Specify location
+				k++;
+			}
+			if (sIt->GlossText2ID != -1)
+			{
+				glActiveTexture(GL_TEXTURE0 + k);
+				glBindTexture(GL_TEXTURE_2D, sIt->GlossText2ID);
+				glUniform1i(((GLShader*)sIt->m_shaderSet[m_shaderType])->m_locs.textureLoc02, k); 
+				k++;
+			}
+			if (sIt->NormalText3ID != -1)
+			{
+				glActiveTexture(GL_TEXTURE0 + k);
+				glBindTexture(GL_TEXTURE_2D, sIt->NormalText3ID);
+				glUniform1i(((GLShader*)sIt->m_shaderSet[m_shaderType])->m_locs.textureLoc03, k); 
+				k++;
+			}
+			if (sIt->SpecularText4ID != -1)
+			{
+				glActiveTexture(GL_TEXTURE0 + k);
+				glBindTexture(GL_TEXTURE_2D, sIt->SpecularText4ID);
+				glUniform1i(((GLShader*)sIt->m_shaderSet[m_shaderType])->m_locs.textureLoc04, k);
+				k++;
 			}
 			glActiveTexture(GL_TEXTURE0 + 5);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, idCube);
@@ -268,6 +301,7 @@ inline void ModelGL::DrawMeshes(const Matrix4D & VP, const Matrix4D & WVP)
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glUseProgram(0);
 		}
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 }
 
@@ -275,8 +309,9 @@ inline void ModelGL::DrawWireframe(const Matrix4D & VP, const Matrix4D & WVP)
 {
 	for (size_t i = 0; i < parser.m_meshes.size(); i++)
 	{
-		for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
-		{
+		glBindBuffer(GL_ARRAY_BUFFER, m_meshInfo[i].VB);
+		//for (size_t j = 0; j < parser.m_meshes[i].m_subsets.size(); j++)
+		//{
 			//Set actual shader
 			glUseProgram(wire.ShaderID);
 			//Set Uniforms
@@ -293,10 +328,11 @@ inline void ModelGL::DrawWireframe(const Matrix4D & VP, const Matrix4D & WVP)
 			glDrawElements(GL_LINES, wireframe.m_indexBuffer.size(), GL_UNSIGNED_SHORT, 0);
 #endif // USING_32BIT_IB
 			glDisableVertexAttribArray(wire.VertexAttribLoc);
-		}
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		//}
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 	//Disable Shader
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glUseProgram(0);
 	
 }
@@ -317,11 +353,6 @@ void ModelGL::SetShaderType(Shader::TYPE type)
 					subsetIt.shadersID =((GLShader*)(subsetIt.m_shaderSet)[type])->ShaderID;
 					//glLinkProgram(subsetIt.shadersID);
 					glUseProgram(subsetIt.shadersID);
-					subsetIt.textInfo.IdTexUniformLocs.clear();
-					subsetIt.textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(subsetIt.shadersID, "diffuse"));
-					subsetIt.textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(subsetIt.shadersID, "glossMap"));
-					subsetIt.textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(subsetIt.shadersID, "normalMap"));
-					subsetIt.textInfo.IdTexUniformLocs.push_back(glGetUniformLocation(subsetIt.shadersID, "specularMap"));
 			}
 		}
 	}

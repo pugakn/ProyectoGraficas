@@ -11,6 +11,7 @@ int ShaderManager::CreateShaderSet(char * vsrc, char * fsrcs, unsigned long sig)
 	for (size_t i = 0; i < Shader::TYPE::COUNT; i++)
 	{
 		tmpSahders[i] = new GLShader();
+		tmpSahders[i]->VSPath = vsrc;
 		tmpSahders[i]->Load(vsrc, fsrcs, sig,(Shader::TYPE)i);
 
 	}
@@ -26,18 +27,14 @@ int ShaderManager::CreateShaderSet(char * vsrc, char * fsrcs, unsigned long sig)
 	return m_shaders.size() -1;
 }
 
-std::vector<Shader*> ShaderManager::GetShaderSetBySignature(unsigned long sig)
+std::vector<Shader*> ShaderManager::GetShaderSetBySignature(unsigned long sig, char* VSPath, char* FSPath)
 {
 	for (auto &sh : m_shaders)
 	{
-		if (sh.back()->m_signature == (sig))
+		if (sh.back()->m_signature == (sig) && sh.back()->VSPath == std::string(VSPath))
 			return sh;
 	}
-#ifdef USING_GL_COMMON
-	return m_shaders[CreateShaderSet("Shaders/VS_MeshPL.glsl","Shaders/FS_MeshPL.glsl",  sig )];
-#else
-	return m_shaders[CreateShaderSet("Shaders/VS_MeshPL.hlsl", "Shaders/FS_MeshPL.hlsl", sig )];
-#endif
+	return m_shaders[CreateShaderSet(VSPath,FSPath,  sig )];
 }
 
 ShaderManager::ShaderManager()

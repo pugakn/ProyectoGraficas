@@ -124,16 +124,16 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Example;$(SolutionDir)Librerias\SDL-1.2.14\include;$(SolutionDir)Librerias\OGLES2\pvr\include;$(SolutionDir)Librerias\DXMath\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Librerias\PhysX\Include;$(SolutionDir)Librerias\glew-2.0.0\include;$(SolutionDir)Example;$(SolutionDir)Librerias\SDL-1.2.14\include;$(SolutionDir)Librerias\OGLES2\pvr\include;$(SolutionDir)Librerias\DXMath\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration);$(SolutionDir)Librerias\boost_1_63_0\stage\lib;$(SolutionDir)Librerias\SDL-1.2.14\lib;$(SolutionDir)Librerias\OGLES2\pvr\lib;$(SolutionDir)Librerias\DXMath\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Framework.lib;libEGL.lib;libGLESv2x.lib;SDL.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Librerias\PhysX\Lib;$(SolutionDir)Librerias\glew-2.0.0\lib;$(SolutionDir)$(Configuration);$(SolutionDir)Librerias\boost_1_63_0\stage\lib;$(SolutionDir)Librerias\SDL-1.2.14\lib;$(SolutionDir)Librerias\OGLES2\pvr\lib;$(SolutionDir)Librerias\DXMath\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>PhysX3ExtensionsDEBUG.lib;PxFoundationDEBUG_x86.lib;PhysX3CommonDEBUG_x86.lib;PhysX3DEBUG_x86.lib;Framework.lib;SDL.lib;d3dx9.lib;D3D11.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>

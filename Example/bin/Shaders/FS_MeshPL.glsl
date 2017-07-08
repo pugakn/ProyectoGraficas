@@ -18,14 +18,14 @@ uniform highp float specExp;
 uniform highp float attMax;
 #endif
 #ifdef USE_SPEC_MAP
-uniform mediump sampler2D specularMap;
+uniform mediump sampler2D texture04;
 #endif
-uniform mediump sampler2D diffuse;
+uniform mediump sampler2D texture01;
 #ifdef USE_GLOSS_MAP
-uniform mediump sampler2D glossMap;
+uniform mediump sampler2D texture02;
 #endif
 #ifdef USE_NORMAL_MAP
-uniform mediump sampler2D normalMap;
+uniform mediump sampler2D texture03;
 #endif
 #ifdef USE_TANGENTS
 varying highp vec3 tangentTransformed;
@@ -62,7 +62,7 @@ mediump float shinness = 2.0;
 	lowp vec3 binor = normalize(binormalTransformed);
 	#endif
 #ifdef USE_NORMAL_MAP
-	lowp vec3 norm = texture2D(normalMap,vecUVCoords).xyz * 2.0 - 1.0;
+	lowp vec3 norm = texture2D(texture03,vecUVCoords).xyz * 2.0 - 1.0;
 	norm.g = -norm.g;
 	highp mat3 TBN = mat3(tang,binor,normalize(normalTransformed));
 	norm = TBN * norm;
@@ -75,13 +75,13 @@ mediump float shinness = 2.0;
 	highp vec3 I = normalize(pixelPos - camPos);
     highp vec3 R = reflect(I, norm);
 	R.xy = R.xy + norm.xy;
-    color = vec4(texture(skybox, R).rgb, 1.0) ;
-	//color = texture2D(diffuse,vecUVCoords);
+    //color = vec4(texture(skybox, R).rgb, 1.0) ;
+	color = texture2D(texture01,vecUVCoords);
 #else
 color = normalize(pixelPos*0.5 + 0.5);
 #endif
 #ifdef USE_SPEC_MAP
-specularVec = texture2D(specularMap,vecUVCoords);
+specularVec = texture2D(texture04,vecUVCoords);
 #endif
 #ifdef GLOSS_MAP
 		shinness = texture2D(GlossTex,vecUVCoords).r + shinness;
@@ -107,7 +107,7 @@ gl_FragDepth = pos.z / camFar; //gl_FragCoord.z
 
 #elif defined G_SHADOW_PASS
 //lowp vec4 color = vec4(0.0,1.0,0.0,1.0);
-//color = texture2D(diffuse,vecUVCoords);
+//color = texture2D(texture01,vecUVCoords);
 //gl_FragData[0] = color;
 //#ifndef LINEAR_DEPTH
 //gl_FragDepth = pos.z / pos.w;
@@ -130,7 +130,7 @@ lowp vec4 color = vec4(0.0,0.0,0.0,1.0);
 	lowp vec3 binor = normalize(binormalTransformed);
 	#endif
 #ifdef USE_NORMAL_MAP
-	lowp vec3 norm = texture2D(normalMap,vecUVCoords).xyz * 2.0 - 1.0;
+	lowp vec3 norm = texture2D(texture03,vecUVCoords).xyz * 2.0 - 1.0;
 	norm.g = -norm.g;
 	highp mat3 TBN = mat3(tang,binor,normalize(normalTransformed));
 	norm = TBN * norm;
@@ -138,7 +138,7 @@ lowp vec4 color = vec4(0.0,0.0,0.0,1.0);
 #else
 	lowp vec3 norm = normalize(normalTransformed);
 #endif
-	color = texture2D(diffuse,vecUVCoords);
+	color = texture2D(texture01,vecUVCoords);
 #else
 color = normalize(pixelPos*0.5 + 0.5);
 #endif
@@ -156,7 +156,7 @@ highp float light_mod = clamp( att,0.0,1.0) ;
 	lowp vec3 RL = normalize(eyeDir+lightDir);
 	highp float specular = dot(RL,norm) * 0.5 + 0.5;
 	#ifdef USE_GLOSS_MAP
-				specular = pow( specular ,texture2D(glossMap,vecUVCoords).r);
+				specular = pow( specular ,texture2D(texture02,vecUVCoords).r);
 				//specular = pow( specular ,specExp);
 				#else
 				specular = pow( specular ,specExp);
@@ -182,7 +182,7 @@ Lambert*= color * vec4(light_mod,light_mod,light_mod,1.0);
 lowp vec4 Specular = vec4(lightColor,1.0);
 Specular *= specular;
 #ifdef USE_SPEC_MAP
-Specular *= texture2D(specularMap,vecUVCoords);
+Specular *= texture2D(texture04,vecUVCoords);
 #endif
 Specular *= att;
 #endif

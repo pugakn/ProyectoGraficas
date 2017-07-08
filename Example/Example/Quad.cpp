@@ -1,4 +1,7 @@
 #include "Quad.h"
+#include "GLShader.h"
+#include "ShaderManager.h"
+#include "GLRT.h"
 /*********************************************************
 * Copyright (C) 2017 Daniel Enriquez (camus_mm@hotmail.com)
 * All Rights Reserved
@@ -16,86 +19,19 @@
 extern ComPtr<ID3D11Device>            D3D11Device;
 extern ComPtr<ID3D11DeviceContext>     D3D11DeviceContext;
 #endif
-
+short Quad::deferredRT = -1;
+short Quad::deferredRT_2 = -1;
+short Quad::deferredRT_1 = -1;
 void Quad::Create() {
 	difTextId = Tools::textureChekerID;
 	difTex = Tools::textureCheker;
-
-
-
 #ifdef USING_GL_COMMON
-
-	char *vsSourceP = file2string("Shaders/VS_Quad.glsl");
-	char *fsSourceP = file2string("Shaders/FS_Quad.glsl");
-
-	std::string vsrc;
-	std::string fsrc;
-	if (vsSourceP && fsSourceP)
-	{
-		vsrc = std::string(vsSourceP);
-		fsrc = std::string(fsSourceP);
-	}
-
-	free(vsSourceP);
-	free(fsSourceP);
-
-	std::string Defines;
-#ifdef USING_OPENGL
-	if (vsSourceP != NULL && fsSourceP != NULL)
-	{
-		Defines += "#define lowp\n\n";
-		Defines += "#define mediump\n\n";
-		Defines += "#define highp\n\n";
-	}
-	//Defines += "#define LINEAR_DEPTH\n\n";
-	Defines += "#define G_BUFF_PASS\n\n";
-#endif // USING_OPENGL
-	vsrc = Defines + vsrc;
-	fsrc = Defines + fsrc;
-
-	GLuint vshader_id = createShader(GL_VERTEX_SHADER, (char*)vsrc.c_str());
-	GLuint fshader_id = createShader(GL_FRAGMENT_SHADER, (char*)fsrc.c_str());
-	if (vshader_id == 0 || fshader_id == 0)
-	{
-		shaderID = Tools::DefaultShaderID;
-		//glLinkProgram(shaderID);
+		auto  set = ShaderManager::GetShaderSetBySignature(sig, "Shaders/VS_Quad.glsl", "Shaders/FS_Quad.glsl");
+		m_shaderSet = set;
+		m_shaderType = Shader::TYPE::G_DEFERRED_PASS;
+		GLShader * glDefaultShader = (GLShader*)(m_shaderSet)[m_shaderType];
+		shaderID = glDefaultShader->ShaderID;
 		glUseProgram(shaderID);
-		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
-		matWorldUniformLoc = glGetUniformLocation(shaderID, "W");
-	}
-	else
-	{
-		shaderID = glCreateProgram();
-		glAttachShader(shaderID, vshader_id);
-		glAttachShader(shaderID, fshader_id);
-
-		glLinkProgram(shaderID);
-		glUseProgram(shaderID);
-		//Attributes
-		vertexAttribLoc = glGetAttribLocation(shaderID, "Vertex");
-		uvAttribLoc = glGetAttribLocation(shaderID, "UV");
-		//Uniforms
-		matWorldUniformLoc = glGetUniformLocation(shaderID, "W");
-		WVPLoc = glGetUniformLocation(shaderID, "WVP");
-		WorldLoc = glGetUniformLocation(shaderID, "World");
-		WorldViewLoc = glGetUniformLocation(shaderID, "WorldView");
-		VPInverseLoc = glGetUniformLocation(shaderID, "VPInverse");
-		LightPositionsLoc = glGetUniformLocation(shaderID, "LightPositions");
-		LightColorsLoc = glGetUniformLocation(shaderID, "LightColors");
-		CameraPositionLoc = glGetUniformLocation(shaderID, "CameraPosition");
-		NumLightsLoc = glGetUniformLocation(shaderID, "NumLights");
-		ShadowMapSize = glGetUniformLocation(shaderID, "ShadowTexSize");
-
-		diffuseLoc = glGetUniformLocation(shaderID, "difuse");
-		normalTextLoc = glGetUniformLocation(shaderID, "normalText");
-		specularTextLoc = glGetUniformLocation(shaderID, "specularText");
-		depthTextLoc = glGetUniformLocation(shaderID, "depthText");
-
-
-		CamVPLoc = glGetUniformLocation(shaderID, "CamVP");
-		LinearLightDirLoc = glGetUniformLocation(shaderID, "linearLight");
-		ShadowMapLoc = glGetUniformLocation(shaderID, "shadowMap");
-	}
 #elif defined(USING_D3D11)
 	bool errorShader = false;
 	char *vsSourceP = file2string("Shaders/VS_Quad.hlsl");
@@ -251,6 +187,13 @@ void Quad::Create() {
 #endif
 
 	transform = Identity();
+	deferredRT = Tools::CreateRT(1);
+	deferredRT_2 = Tools::CreateRT(1);
+	deferredRT_1 = Tools::CreateRT(1);
+	for (auto & fx : m_FX)
+	{
+		fx->Init();
+	}
 }
 
 void Quad::Transform(float *t) {
@@ -264,6 +207,8 @@ void Quad::Draw(float *t) {
 	if (t)
 		transform = t;
 
+	Tools::UseRT(deferredRT);
+	SetShaderType(Shader::TYPE::G_DEFERRED_PASS);//
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D W = transform;
 	Matrix4D WVP = W*VP;
@@ -275,95 +220,98 @@ void Quad::Draw(float *t) {
 		LightPositions.push_back(Vector4D(pScProp->Lights[i].Position,1.0));
 		LightColors.push_back(Vector4D(pScProp->Lights[i].Color,1.0));
 	}
-	if (matWorldUniformLoc != -1)
-		glUniformMatrix4fv(matWorldUniformLoc, 1, GL_FALSE, &W.m[0][0]);
-	if (WVPLoc != -1)
-		glUniformMatrix4fv(WVPLoc, 1, GL_FALSE, &WVP.m[0][0]);
-	if (WorldLoc != -1)
-		glUniformMatrix4fv(WorldLoc, 1, GL_FALSE, &W.m[0][0]);
-	if (WorldViewLoc!=-1)
-		glUniformMatrix4fv(WorldViewLoc, 1, GL_FALSE, &WV.m[0][0]);
-	if (VPInverseLoc != -1)
-		glUniformMatrix4fv(VPInverseLoc, 1, GL_FALSE, &WVPI.m[0][0]);
+	auto  sh = ((GLShader*)m_shaderSet[m_shaderType]);
+	//if (matWorldUniformLoc != -1)
+		//glUniformMatrix4fv(sh->m_locs.matWorldUniformLoc, 1, GL_FALSE, &W.m[0][0]);
+	//if (WVPLoc != -1)
+		//glUniformMatrix4fv(sh->m_locs.matWorldViewProjUniformLoc, 1, GL_FALSE, &WVP.m[0][0]);
+	if (sh->m_locs.matWorldUniformLoc != -1)
+		glUniformMatrix4fv(sh->m_locs.matWorldUniformLoc, 1, GL_FALSE, &W.m[0][0]);
+	//if (WorldViewLoc!=-1)
+		//glUniformMatrix4fv(sh->m_locs.matWorldViewUniformLoc, 1, GL_FALSE, &WV.m[0][0]);
+	if (sh->m_locs.VPInverseLoc != -1)
+		glUniformMatrix4fv(sh->m_locs.VPInverseLoc, 1, GL_FALSE, &WVPI.m[0][0]);
 
-	if (LightColorsLoc != -1)
-		glUniform4fv(LightColorsLoc, LightColors.size(), &LightColors[0].x);
-	if (LightPositionsLoc != -1)
-		glUniform4fv(LightPositionsLoc, LightPositions.size(), &LightPositions[0].x);
+	if (sh->m_locs.LightColorsLoc != -1)
+		glUniform4fv(sh->m_locs.LightColorsLoc, LightColors.size(), &LightColors[0].x);
+	if (sh->m_locs.LightPositionsLoc != -1)
+		glUniform4fv(sh->m_locs.LightPositionsLoc, LightPositions.size(), &LightPositions[0].x);
 
 	Vector4D campos = Vector4D(pScProp->pCameras[0]->m_pos.x, pScProp->pCameras[0]->m_pos.y, pScProp->pCameras[0]->m_pos.z,1.0);
-	if (CameraPositionLoc != -1)
-		glUniform4fv(CameraPositionLoc, 1, &campos.x);
+	if (sh->m_locs.camPosLoc != -1)
+		glUniform4fv(sh->m_locs.camPosLoc, 1, &campos.x);
 	int ligthSize = pScProp->Lights.size();
-	if (NumLightsLoc != -1)
-		glUniform1iv(NumLightsLoc, 1, &ligthSize);
+	if (sh->m_locs.NumLightsLoc != -1)
+		glUniform1iv(sh->m_locs.NumLightsLoc, 1, &ligthSize);
 
 	Matrix4D LightVP = pScProp->LightsWShadow[0].VP;
-	if (CamVPLoc != -1)
-		glUniformMatrix4fv(CamVPLoc, 1, GL_FALSE, &LightVP.m[0][0]);
-	if (LinearLightDirLoc != -1)
-		glUniform3fv(LinearLightDirLoc,1,&pScProp->LightsWShadow[0].dir.x);
+	if (sh->m_locs.CamVPLoc != -1)
+		glUniformMatrix4fv(sh->m_locs.CamVPLoc, 1, GL_FALSE, &LightVP.m[0][0]);
+	if (sh->m_locs.LinearLightDirLoc != -1)
+		glUniform3fv(sh->m_locs.LinearLightDirLoc,1,&pScProp->LightsWShadow[0].dir.x);
 
 	//if (uvAttribLoc != -1)
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
 
-	glEnableVertexAttribArray(vertexAttribLoc);
-	if (uvAttribLoc != -1)
-		glEnableVertexAttribArray(uvAttribLoc);
+	glEnableVertexAttribArray(sh->m_locs.vertexAttribLocs);
+	//if (uvAttribLoc != -1)
+		glEnableVertexAttribArray(sh->m_locs.uvAttribLocs);
 
 
-	glVertexAttribPointer(vertexAttribLoc, 4, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(0));
-	if (uvAttribLoc != -1)
-		glVertexAttribPointer(uvAttribLoc, 2, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(16));
+	glVertexAttribPointer(sh->m_locs.vertexAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(0));
+	if (sh->m_locs.uvAttribLocs != -1)
+		glVertexAttribPointer(sh->m_locs.uvAttribLocs, 2, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(16));
 	if (shaderID != Tools::DefaultShaderID)
 	{
 		int c = 0;
-		if (difTex)
+		if (sh->m_locs.textureLoc01 != -1)
 		{
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, difTex->id);
-			glUniform1i(diffuseLoc, c++);
+			glUniform1i(sh->m_locs.textureLoc01, c++);
 		}
-		if (depthTex)
+		if (sh->m_locs.textureLoc02 != -1)
 		{
 			glActiveTexture(GL_TEXTURE0+c);
 			glBindTexture(GL_TEXTURE_2D, depthTex->id);
-			glUniform1i(depthTextLoc, c++);
+			glUniform1i(sh->m_locs.textureLoc02, c++);
 		}
-		if (specTex)
+		if (sh->m_locs.textureLoc03 != -1)
 		{
 			glActiveTexture(GL_TEXTURE0+c);
 			glBindTexture(GL_TEXTURE_2D, specTex->id);
-			glUniform1i(specularTextLoc, c++);
+			glUniform1i(sh->m_locs.textureLoc03, c++);
 		}
-		if (normalTex)
+		if (sh->m_locs.textureLoc04 != -1)
 		{
 			glActiveTexture(GL_TEXTURE0+c);
 			glBindTexture(GL_TEXTURE_2D, normalTex->id);
-			glUniform1i(normalTextLoc, c++);
+			glUniform1i(sh->m_locs.textureLoc04, c++);
 		}
-		if (shadowMapTexture)
+		if (sh->m_locs.textureLoc05 != -1)
 		{
 			glActiveTexture(GL_TEXTURE0 + c);
 			glBindTexture(GL_TEXTURE_2D, shadowMapTexture->id);
-			glUniform1i(ShadowMapLoc, c++);
-			if (ShadowMapSize != -1){
+			glUniform1i(sh->m_locs.textureLoc05, c++);
+			if (sh->m_locs.ShadowMapSize != -1){
 				float smsize[] = { static_cast<float>(shadowMapTexture->x) , static_cast<float>(shadowMapTexture->y) };
-				glUniform2fv(ShadowMapSize, 1, &smsize[0]);
+				glUniform2fv(sh->m_locs.ShadowMapSize, 1, &smsize[0]);
 			}
 		}
 	}
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-	if (uvAttribLoc != -1) 
-		glDisableVertexAttribArray(uvAttribLoc);
+	if (sh->m_locs.uvAttribLocs != -1)
+		glDisableVertexAttribArray(sh->m_locs.uvAttribLocs);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(vertexAttribLoc);
+	glDisableVertexAttribArray(sh->m_locs.vertexAttribLocs);
 
 
 	glUseProgram(0);
+	Tools::UseOriginalFBO();
+	FXPass();
 #elif defined(USING_D3D11)
 	if (t)
 		transform = t;
@@ -427,6 +375,42 @@ void Quad::Draw(float *t) {
 #endif
 
 }
+void Quad::FXPass()
+{
+
+	for (auto & fx : m_FX)
+	{
+		fx->ApplyFX(Tools::RTs[deferredRT]->vColorTextures[0]);
+	}
+
+
+	// FINAL PASS
+	SetShaderType(Shader::TYPE::G_FORWARD_PASS);//
+	Matrix4D W = transform;
+	auto sh = ((GLShader*)m_shaderSet[m_shaderType]);
+	if (sh->m_locs.matWorldUniformLoc != -1)
+		glUniformMatrix4fv(sh->m_locs.matWorldUniformLoc, 1, GL_FALSE, &W.m[0][0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VB);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
+	glEnableVertexAttribArray(sh->m_locs.vertexAttribLocs);
+	glEnableVertexAttribArray(sh->m_locs.uvAttribLocs);
+	glVertexAttribPointer(sh->m_locs.vertexAttribLocs, 4, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(0));
+	if (sh->m_locs.uvAttribLocs != -1)
+		glVertexAttribPointer(sh->m_locs.uvAttribLocs, 2, GL_FLOAT, GL_FALSE, sizeof(CVertex), BUFFER_OFFSET(16));
+	if (shaderID != Tools::DefaultShaderID)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, Tools::RTs[deferredRT_1]->vColorTextures[0]->id);
+		glUniform1i(sh->m_locs.textureLoc01, 0);
+	}
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+	if (sh->m_locs.uvAttribLocs != -1)
+		glDisableVertexAttribArray(sh->m_locs.uvAttribLocs);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(sh->m_locs.vertexAttribLocs);
+	glUseProgram(0);
+}
 void Quad::Destroy() {
 #ifdef USING_GL_COMMON
 	glDeleteProgram(shaderID);
@@ -436,5 +420,11 @@ void Quad::Destroy() {
 
 void Quad::SetShaderType(Shader::TYPE type)
 {
+	if (m_shaderType != type)
+	{
+		m_shaderType = type;
+		shaderID = ((GLShader*)(m_shaderSet)[type])->ShaderID;
+		glUseProgram(shaderID);
+	}
 }
 

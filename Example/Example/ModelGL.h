@@ -22,29 +22,32 @@ class ModelGL : public PrimitiveBase
 {
 private:
 	//GLuint	shaderID;
-	struct TextureInfo
-	{
-		std::vector <int> IdsTex;
-		std::vector <GLint> IdTexUniformLocs;
-	};
 	struct SubsetInfo
 	{
 		GLuint shadersID;
 		//Index Bufer ID
 		GLuint	IB;
 		//Textures
-		TextureInfo textInfo;
+		short diffuseText1ID;
+		short GlossText2ID;
+		short NormalText3ID;
+		short SpecularText4ID;
 		std::vector<Shader*> m_shaderSet;
 		GLint IdCubeLoc;
 		unsigned long sig;
 		SubsetInfo() {
 			sig = 0;
+			diffuseText1ID = -1;
+			GlossText2ID = -1;
+			NormalText3ID = -1;
+			SpecularText4ID = -1;
 		}
 
 	};
 	struct MeshInfo
 	{
 		std::vector<SubsetInfo> subsetInfo;
+		GLuint	 VB;
 	};
 
 	struct WireframeInfo
@@ -58,7 +61,6 @@ private:
 	std::vector<MeshInfo> m_meshInfo;
 	Vector3D lightColor;
 	Matrix4D transform;
-	GLuint	 VB;
 	std::string m_fileName;
 
 

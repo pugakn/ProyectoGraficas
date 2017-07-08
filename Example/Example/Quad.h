@@ -33,8 +33,14 @@
 
 #include "Matrix4D.h"
 #include "PrimitiveBase.h"
+#include "BloomFX.h"
 class Quad : public PrimitiveBase {
+private:
+
 public:
+	static short deferredRT;
+	static short deferredRT_1;
+	static short deferredRT_2;
 	Quad()
 #ifdef USING_GL_COMMON
 		: shaderID(0)
@@ -45,6 +51,7 @@ public:
 		normalTex = nullptr;
 		specTex = nullptr;
 		shadowMapTexture = nullptr;
+		sig = 0;
 	}
 
 #ifdef USING_D3D11
@@ -65,34 +72,12 @@ public:
 	void Create(char *) {}
 	void Transform(float *t);
 	void Draw(float *t) override;
+	void FXPass();
 	void Destroy();
 	void SetShaderType(Shader::TYPE type) override;
 
 #ifdef USING_GL_COMMON
 	GLuint	shaderID;
-	GLint	vertexAttribLoc;
-	GLint	diffuseLoc;
-	GLint normalTextLoc;
-	GLint specularTextLoc;
-	GLint depthTextLoc;
-	GLint   uvAttribLoc;
-
-
-	GLint  matWorldUniformLoc;
-	GLint WVPLoc;
-	GLint WorldLoc;
-	GLint WorldViewLoc;
-	GLint VPInverseLoc;
-	GLint LightPositionsLoc;
-	GLint LightColorsLoc;
-	GLint CameraPositionLoc;
-	GLint NumLightsLoc;
-	GLint ShadowMapSize;
-
-	GLint LinearLightDirLoc;
-	GLint CamVPLoc;
-	GLint ShadowMapLoc;
-
 	GLuint			VB;
 	GLuint			IB;
 #elif defined(USING_D3D11)
@@ -121,5 +106,8 @@ public:
 	CVertex			vertices[4];
 	unsigned short	indices[6];
 	Matrix4D	transform;
+	unsigned long sig;
+	std::vector<Shader*> m_shaderSet;
+	std::vector<BaseFX*> m_FX;
 };
 

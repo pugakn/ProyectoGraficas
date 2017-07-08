@@ -18,7 +18,6 @@ PrimitiveBase*	PrimitiveManager::GetPrimitive(unsigned int index) {
 
 void PrimitiveManager::SetShaderGlobalType(Shader::TYPE type)
 {
-	//ShaderManager::SetGlobalSignature(sig);
 	for (auto &it : primitives)
 	{
 		it->SetShaderType(type);

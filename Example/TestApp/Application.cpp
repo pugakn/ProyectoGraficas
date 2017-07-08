@@ -89,9 +89,9 @@ void TestApp::InitVars() {
 void TestApp::CreateAssets() {	
 
 	int index;
-	/*int index = PrimitiveMgr.CreateModel("Models/Scene.X",true);
+	index = PrimitiveMgr.CreateModel("Models/Scene.X",true);
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));*/
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 
 	//index = PrimitiveMgr.CreateModel("Models/Jinx.X",false);
 	//Models.push_back(PrimitiveInst());
@@ -193,12 +193,12 @@ void TestApp::CreateAssets() {
 		}
 	}*/
 
-	index = PrimitiveMgr.CreateModel("Models/NuBatman.X", true);
-	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(0.2);
-	Models.back().TranslateAbsolute(0, 0, 0);
-	Models.back().Update();
+	//index = PrimitiveMgr.CreateModel("Models/NuBatman.X", true);
+	//Models.push_back(PrimitiveInst());
+	//Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	//Models.back().ScaleAbsolute(0.2);
+	//Models.back().TranslateAbsolute(0, 0, 0);
+	//Models.back().Update();
 
 
 	index = PrimitiveMgr.CreateModel("Models/NuVenomJok.X",true);
@@ -249,6 +249,8 @@ void TestApp::CreateAssets() {
 	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->specTex = Tools::RTs[0]->vColorTextures[2];
 	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->depthTex = Tools::RTs[0]->pDepthTexture;
 	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->shadowMapTexture = Tools::RTs[1]->pDepthTexture;//ShadowMap
+	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->m_FX.push_back(new BloomFX());
+	dynamic_cast<Quad*>(PrimitiveMgr.primitives[index])->m_FX.back()->Init();
 	DebugRT.push_back(PrimitiveInst());
 	DebugRT.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	//DebugRT.back().TranslateAbsolute(-0.6,0.3, 0);
@@ -371,13 +373,11 @@ void TestApp::OnDraw() {
 	// ====================== RTs========================
 	//Shadow Pass
 	Tools::UseRT(1);
-	//pFramework->pVideoDriver->SetCullFace(BaseDriver::BACK);
 	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_SHADOW_PASS);
 	for (int i = 0; i < Models.size(); i++) {
 		Models[i].Draw();
 	}
 	Tools::UseOriginalFBO();
-	//pFramework->pVideoDriver->SetCullFace(BaseDriver::FRONT);
 	Tools::UseRT(0);
 	PrimitiveMgr.SetShaderGlobalType(Shader::TYPE::G_BUFF_PASS);
 	for (int i = 0; i < Models.size(); i++) {

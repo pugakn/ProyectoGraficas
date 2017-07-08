@@ -57,6 +57,8 @@ bool GLRT::Load(int numRt, int colorf, int depthf, int w, int h)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, ctex, 0);
 #endif	
 		pTextureColor->id = ctex;
+		pTextureColor->x = w;
+		pTextureColor->y = h;
 		vColorTextures.push_back(pTextureColor);
 		vFrameBuffers.push_back(fbo);
 		vGLColorTex.push_back(ctex);

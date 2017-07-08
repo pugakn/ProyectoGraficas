@@ -24,15 +24,29 @@ public:
 		GLint  matWorldViewProjUniformLoc;
 		GLint  matWorldViewUniformLoc;
 		GLint  matWorldUniformLoc;
-
 		GLint  matLightCamWVPLoc;
-
-		GLint lightLoc;
-		GLint lightColLoc;
+		//GLint lightLoc;
+		//GLint lightColLoc;
 		GLint camPosLoc;
 		GLint specExpLoc;
 		GLint attMaxLoc;
 		GLint camFarLoc;
+
+		GLint VPInverseLoc;
+		GLint LightPositionsLoc;
+		GLint LightColorsLoc;
+		GLint NumLightsLoc;
+		GLint ShadowMapSize;
+
+		GLint LinearLightDirLoc;
+		GLint CamVPLoc;
+		
+		GLint textureLoc01;
+		GLint textureLoc02;
+		GLint textureLoc03;
+		GLint textureLoc04;
+		GLint textureLoc05;
+		GLint textureLoc06;
 	} m_locs;
 	GLuint vshader_id;
 	GLuint fshader_id;

@@ -4,15 +4,6 @@
 #include "Config.h"
 #include "Vector3D.h"
 #include "Matrix4D.h"
-#define TYPE_FRAME 1
-#define TYPE_MESH 2
-#define TYPE_TEMPLATE 3
-#define TYPE_MESH_NORMALS 4
-#define TYPE_MESH_TEXT_CORDS 5
-#define TYPE_MESH_MATERIAL_LIST 6
-#define TYPE_MESH_MATERIAL 7
-#define TYPE_MESH_DECL_DATA 8
-#define TYPE_MESH_BONE_WIGHTS 9
 
 
 namespace xf {
@@ -63,6 +54,12 @@ struct xMeshEffects {
 	float m_glossines;
 	float m_specLevel;
 };
+struct xSkinWeigths {
+	std::vector<unsigned short> boneIndex;
+	std::vector<float> weight;
+	Matrix4D spaceTransformMatrix;
+};
+
 struct xMeshSubset {
 #if USING_32BIT_IB
 	std::vector<unsigned int> m_indexBuffer;
@@ -79,21 +76,62 @@ struct xMesh{
 #endif // USING_32BIT_IB
 	std::vector<xMeshSubset> m_subsets;
 	unsigned long m_vertexAttributes;
-
+	std::vector<xSkinWeigths> m_skinWeights;
+	std::vector<vertexStruct> m_vbo;
 };
+
 
 struct xBone {
 	std::string name;
 	Matrix4D bone;
-	Matrix4D spaceTransformMatrix;
 	std::vector<int> child;
 	std::vector<int> brothers;
 	int dad;
 };
 
+struct xAnimationKeyRot {
+	//Quat Rot
+	int ticks;
+};
+struct xAnimationKeyPos {
+	Vector3D pos;
+	int ticks;
+};
+struct xAnimationKeyScale {
+	Vector3D scale;
+	int ticks;
+};
+struct xAnimation
+{
+	std::string name;
+	int boneIndex;
+	std::vector<xAnimationKeyRot> rotVec;
+	std::vector<xAnimationKeyPos> posVec;
+	std::vector<xAnimationKeyScale> scaleVec;
+};
+struct xAnimationSet {
+	std::string name;
+	int ticksPS;
+	std::vector<xAnimation> animationsVec;
+};
+
 class MeshParser
 {
 private:
+	enum
+	{
+		TYPE_FRAME = 1,
+		TYPE_MESH ,
+		TYPE_TEMPLATE ,
+		TYPE_MESH_NORMALS ,
+		TYPE_MESH_TEXT_CORDS ,
+		TYPE_MESH_MATERIAL_LIST ,
+		TYPE_MESH_MATERIAL ,
+		TYPE_MESH_DECL_DATA ,
+		TYPE_MESH_BONE_WIGHTS ,
+		TYPE_ANIM_TICKS_PERS_ECOND,
+		TYPE_ANIMATION_SET
+	};
 	char* m_pointer;
 	unsigned int m_meshCount = 0;
 	size_t fileSize;
@@ -114,28 +152,28 @@ private:
 	Matrix4D getFrameTransformMatrix();
 	void ignoreObjectMatrixComment();
 	bool IsNextACloseBlock();
-	//std::string SearchElement(char condition);
 
 	void LoadWeights();
 	std::string LoadBoneName();
 	int LoadNumWeights();
 	std::vector<int> LoadWeightsIndex(int numWeights, int actualBoneIndex);
 	void LoadIndexWeights(int numWeights, std::vector<int>& index);
-	std::vector<xBoneWeightInfo> boneWeightInfo;
 	Matrix4D LoadSpaceTransformMatrix();
+
+	void ReadAnimationTicksPerSecond();
+	void ReadAnimationSet();
+	void ReadAnimationRotations();
+	void ReadAnimationPositions();
+	void ReadAnimationScales();
+
+	int actualDad = -1;
+	int openBlocks = 0;
+	int actualBone = 0;
 public:
-	std::vector<vertexStruct> m_vbo;
 	std::vector<xMesh> m_meshes;
 
-	int m_vertexSize;
-	size_t vertexPos;
-	size_t normalPos;
-	size_t textCordsPos;
-	size_t declDataPos;
-	size_t offset;
-
 	std::vector<xBone> bones;
-
+	std::vector<xAnimationSet> animationSets;
 	bool LoadFile(const char* fileName);
 	void ReadFile();
 	void Deallocate();

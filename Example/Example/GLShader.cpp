@@ -31,12 +31,29 @@ void GLShader::LoadAPI()
 		m_locs.matWorldViewProjUniformLoc = glGetUniformLocation(ShaderID, "WVP");
 		m_locs.matWorldUniformLoc = glGetUniformLocation(ShaderID, "World");
 		m_locs.matLightCamWVPLoc = glGetUniformLocation(ShaderID, "CamWVP");
-		m_locs.lightLoc = glGetUniformLocation(ShaderID, "light");
-		m_locs.lightColLoc = glGetUniformLocation(ShaderID, "lightColor");
+		//m_locs.lightLoc = glGetUniformLocation(ShaderID, "light");
+		//m_locs.lightColLoc = glGetUniformLocation(ShaderID, "lightColor");
 		m_locs.camPosLoc = glGetUniformLocation(ShaderID, "camPos");
 		m_locs.specExpLoc = glGetUniformLocation(ShaderID, "specExp");
 		m_locs.attMaxLoc = glGetUniformLocation(ShaderID, "attMax");
 		m_locs.camFarLoc = glGetUniformLocation(ShaderID, "camFar");
+
+
+		m_locs.VPInverseLoc = glGetUniformLocation(ShaderID, "VPInverse");
+		m_locs.LightPositionsLoc = glGetUniformLocation(ShaderID, "LightPositions");
+		m_locs.LightColorsLoc = glGetUniformLocation(ShaderID, "LightColors");
+		m_locs.NumLightsLoc = glGetUniformLocation(ShaderID, "NumLights");
+		m_locs.ShadowMapSize = glGetUniformLocation(ShaderID, "ShadowTexSize");
+		m_locs.CamVPLoc = glGetUniformLocation(ShaderID, "CamVP");
+		m_locs.LinearLightDirLoc = glGetUniformLocation(ShaderID, "linearLight");
+
+		m_locs.textureLoc01 = glGetUniformLocation(ShaderID, "texture01");
+		m_locs.textureLoc02 = glGetUniformLocation(ShaderID, "texture02");
+		m_locs.textureLoc03 = glGetUniformLocation(ShaderID, "texture03");
+		m_locs.textureLoc04 = glGetUniformLocation(ShaderID, "texture04");
+		m_locs.textureLoc05 = glGetUniformLocation(ShaderID, "texture05");
+		m_locs.textureLoc06 = glGetUniformLocation(ShaderID, "texture06");
+		glUseProgram(0);
 	}
 }
 

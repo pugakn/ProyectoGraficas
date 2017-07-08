@@ -24,6 +24,8 @@ void Shader::Load(char* vsStr, char* fsStr, unsigned long signature, Shader::TYP
 			Defines += "#define G_FORWARD_PASS \n\n";
 		else if (m_type == TYPE::G_SHADOW_PASS)
 			Defines += "#define G_SHADOW_PASS \n\n";
+		else if (m_type == TYPE::G_DEFERRED_PASS)
+			Defines += "#define G_DEFERRED_PASS \n\n";
 		//Signature 
 		if (signature & SIGNATURE::HAS_NORMALS)
 			Defines += "#define USE_NORMALS\n\n";

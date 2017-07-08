@@ -16,6 +16,8 @@
 #include "PhysXManager.h"
 #include "PxCube.h"
 class TestApp : public AppBase {
+private: 
+	int deferredTexture;
 public:
 	TestApp() : AppBase() {}
 	void InitVars();

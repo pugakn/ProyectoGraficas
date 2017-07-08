@@ -17,12 +17,7 @@ bool MeshParser::LoadFile(const char* fileName)
 }
 void MeshParser::ReadFile()
 {
-	m_vertexSize = 0;
 	m_meshCount = 0;
-	vertexPos = 0;
-	normalPos = 0;
-	textCordsPos = 0;
-	declDataPos = 0;
 
 	char* bufferEnd = &m_pointer[fileSize - 1];
 	m_pointer = strstr(m_pointer,"Mesh ");
@@ -65,6 +60,9 @@ void MeshParser::ReadFile()
 				getDeclData();
 				break;
 			case TYPE_FRAME:
+				actualDad = -1;
+				openBlocks = 0;
+				actualBone = 0;
 				m_pointer--;
 				getBones();
 				InsertBonesSiblingsOnEachBone();
@@ -73,6 +71,15 @@ void MeshParser::ReadFile()
 			case TYPE_MESH_BONE_WIGHTS:
 				LoadWeights();
 				break;
+			case TYPE_ANIM_TICKS_PERS_ECOND:
+				animationSets.push_back(xAnimationSet());
+				ReadAnimationTicksPerSecond();
+				break;
+			case TYPE_ANIMATION_SET:
+				animationSets.back().name = m_ActualName;
+				ReadAnimationSet();
+				break;
+
 		}
 		++m_pointer;
 	}
@@ -120,6 +127,10 @@ int MeshParser::getType(char* tempPointer)
 		return TYPE_MESH_DECL_DATA;
 	if (type == "sthgieWnikS")
 		return TYPE_MESH_BONE_WIGHTS;
+	if (type == "dnoceSrePskciTminA")
+		return TYPE_ANIM_TICKS_PERS_ECOND;
+	if (type == "teSnoitaminA")
+		return TYPE_ANIMATION_SET;
 	
 
 	return 0;
@@ -137,11 +148,11 @@ void MeshParser::getMeshPositions()
 	++m_pointer;
 	int nPositions = std::stoi(numString);
 	numString.clear();
-	offset = m_vertexSize;
-	m_vertexSize += nPositions;
-	m_vbo.resize(m_vertexSize);
-	boneWeightInfo.resize(m_vertexSize);//
-	for (; vertexPos < m_vertexSize; vertexPos++)
+	//offset = m_vertexSize;
+	//m_vertexSize += nPositions;
+	m_meshes.back().m_vbo.resize(nPositions);
+	//boneWeightInfo.resize(m_vertexSize);//
+	for (int vertexPos = 0; vertexPos < nPositions; vertexPos++)
 	{
 		m_pointer += 2;
 		while (!(*m_pointer == ';'))
@@ -150,7 +161,7 @@ void MeshParser::getMeshPositions()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[vertexPos].x = std::stof(numString);
+		m_meshes.back().m_vbo[vertexPos].x = std::stof(numString);
 		numString.clear();
 		while (!(*m_pointer == ';'))
 		{
@@ -159,7 +170,7 @@ void MeshParser::getMeshPositions()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[vertexPos].y = std::stof(numString);
+		m_meshes.back().m_vbo[vertexPos].y = std::stof(numString);
 		numString.clear();
 
 		while (!(*m_pointer == ';'))
@@ -168,8 +179,8 @@ void MeshParser::getMeshPositions()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[vertexPos].z = std::stof(numString);
-		m_vbo[vertexPos].w = 1;
+		m_meshes.back().m_vbo[vertexPos].z = std::stof(numString);
+		m_meshes.back().m_vbo[vertexPos].w = 1;
 		numString.clear();
 		m_pointer += 2;
 	}
@@ -201,9 +212,9 @@ void MeshParser::getMeshIndices()
 		}
 		++m_pointer;
 #ifdef USING_OPENGL
-		m_meshes.back().m_indexBuffer[i + 2] = std::stoi(numString) + offset;
+		m_meshes.back().m_indexBuffer[i + 2] = std::stoi(numString) ;
 #else
-		m_meshes.back().m_indexBuffer[i] = std::stoi(numString) + offset;
+		m_meshes.back().m_indexBuffer[i] = std::stoi(numString) ;
 #endif // USING_OPENGL
 		numString.clear();
 		while (!(*m_pointer == ','))
@@ -212,7 +223,7 @@ void MeshParser::getMeshIndices()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_meshes.back().m_indexBuffer[i + 1] = std::stoi(numString) + offset;
+		m_meshes.back().m_indexBuffer[i + 1] = std::stoi(numString);
 		numString.clear();
 
 		while (!(*m_pointer == ';'))
@@ -222,9 +233,9 @@ void MeshParser::getMeshIndices()
 		}
 		++m_pointer;
 #ifdef USING_OPENGL
-		m_meshes.back().m_indexBuffer[i] = std::stoi(numString) + offset;
+		m_meshes.back().m_indexBuffer[i] = std::stoi(numString);
 #else
-		m_meshes.back().m_indexBuffer[i+2] = std::stoi(numString) + offset;
+		m_meshes.back().m_indexBuffer[i+2] = std::stoi(numString);
 #endif // USING_OPENGL
 		numString.clear();
 		++m_pointer;
@@ -243,7 +254,7 @@ void MeshParser::getMeshNormals()
 	++m_pointer;
 	int nNormals = std::stoi(numString);
 	numString.clear();
-	for (; normalPos < m_vertexSize; normalPos++)
+	for (int normalPos = 0; normalPos < nNormals; normalPos++)
 	{
 		m_pointer += 2;
 		while (!(*m_pointer == ';'))
@@ -252,7 +263,7 @@ void MeshParser::getMeshNormals()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[normalPos].nx = std::stof(numString);
+		m_meshes.back().m_vbo[normalPos].nx = std::stof(numString);
 		numString.clear();
 
 		while (!(*m_pointer == ';'))
@@ -261,7 +272,7 @@ void MeshParser::getMeshNormals()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[normalPos].ny = std::stof(numString);
+		m_meshes.back().m_vbo[normalPos].ny = std::stof(numString);
 		numString.clear();
 
 		while (!(*m_pointer == ';'))
@@ -270,8 +281,8 @@ void MeshParser::getMeshNormals()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[normalPos].nz = std::stof(numString);
-		m_vbo[normalPos].nw = 1;
+		m_meshes.back().m_vbo[normalPos].nz = std::stof(numString);
+		m_meshes.back().m_vbo[normalPos].nw = 1;
 		numString.clear();
 		m_pointer += 2;
 	}
@@ -288,7 +299,7 @@ void MeshParser::getMeshTextureCords()
 	++m_pointer;
 	int nTextCords = std::stoi(numString);
 	numString.clear();
-	for (; textCordsPos < m_vertexSize; textCordsPos++)//nTextCords
+	for (int textCordsPos = 0; textCordsPos < nTextCords; textCordsPos++)//nTextCords
 	{
 		++m_pointer;
 		while (!(*m_pointer == ';'))
@@ -297,7 +308,7 @@ void MeshParser::getMeshTextureCords()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[textCordsPos].s = std::stof(numString);
+		m_meshes.back().m_vbo[textCordsPos].s = std::stof(numString);
 		numString.clear();
 		while (!(*m_pointer == ';'))
 		{
@@ -305,7 +316,7 @@ void MeshParser::getMeshTextureCords()
 			++m_pointer;
 		}
 		++m_pointer;
-		m_vbo[textCordsPos].t = std::stof(numString);
+		m_meshes.back().m_vbo[textCordsPos].t = std::stof(numString);
 		numString.clear();
 		++m_pointer;
 	}
@@ -585,11 +596,11 @@ void MeshParser::getDeclData()
 		++m_pointer;
 	}
 	++m_pointer;
-	int numElements = std::stoi(numString)/6 + declDataPos;
+	int numElements = std::stoi(numString)/6 ;
 	numString.clear();
 	//m_meshes.back().m_tangents.resize(numElements);
 	//m_meshes.back().m_binormals.resize(numElements);
-	for (; declDataPos < numElements; declDataPos++)
+	for (int declDataPos = 0; declDataPos < numElements; declDataPos++)
 	{
 		++m_pointer;
 		while (!(*m_pointer == ','))
@@ -600,7 +611,7 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		unsigned long long temp = std::stoul(numString);
 		float *fval = (float*)&temp;
-		m_vbo[declDataPos].bx = *fval;
+		m_meshes.back().m_vbo[declDataPos].bx = *fval;
 		//m_meshes.back().m_tangents[i].x = std::stof(numString);
 		numString.clear();
 		++m_pointer;
@@ -612,7 +623,7 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		temp = std::stoul(numString);
 		fval = (float*)&temp;
-		m_vbo[declDataPos].by = *fval;
+		m_meshes.back().m_vbo[declDataPos].by = *fval;
 		//m_meshes.back().m_tangents[i].y = std::stof(numString);
 		numString.clear();
 		++m_pointer;
@@ -624,11 +635,11 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		temp = std::stoul(numString);
 		fval = (float*)&temp;
-		m_vbo[declDataPos].bz = *fval;
+		m_meshes.back().m_vbo[declDataPos].bz = *fval;
 	//	m_meshes.back().m_tangents[i].z = std::stof(numString);
 		numString.clear();
 		++m_pointer;
-		m_vbo[declDataPos].bw = 0;
+		m_meshes.back().m_vbo[declDataPos].bw = 0;
 
 		//++m_pointer;
 		while (!(*m_pointer == ','))
@@ -639,7 +650,7 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		temp = std::stoul(numString);
 		fval = (float*)&temp;
-		m_vbo[declDataPos].tx = *fval;
+		m_meshes.back().m_vbo[declDataPos].tx = *fval;
 		//m_meshes.back().m_binormals[i].x = std::stof(numString);
 		numString.clear();
 		++m_pointer;
@@ -651,7 +662,7 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		temp = std::stoul(numString);
 		fval = (float*)&temp;
-		m_vbo[declDataPos].ty = *fval;
+		m_meshes.back().m_vbo[declDataPos].ty = *fval;
 		//m_meshes.back().m_binormals[i].y = std::stof(numString);
 		numString.clear();
 		++m_pointer;
@@ -666,10 +677,10 @@ void MeshParser::getDeclData()
 		++m_pointer;
 		temp = std::stoul(numString);
 		fval = (float*)&temp;
-		m_vbo[declDataPos].tz = *fval;
+		m_meshes.back().m_vbo[declDataPos].tz = *fval;
 		//m_meshes.back().m_binormals[i].z = std::stof(numString);
 		numString.clear();
-		m_vbo[declDataPos].tw = 0;
+		m_meshes.back().m_vbo[declDataPos].tw = 0;
 		++m_pointer;
 	}
 
@@ -712,9 +723,6 @@ void MeshParser::getDeclData()
 }
 void MeshParser::getBones()
 {
-	static int actualDad = -1;
-	static int openBlocks = 0;
-	static int actualBone = 0;
 	m_pointer = strstr(m_pointer, "{");
 	openBlocks++;
 	bones.push_back(xBone());
@@ -796,15 +804,15 @@ void MeshParser::LoadWeights()
 	m_pointer = strstr(m_pointer, "\"");
 	m_pointer++;
 	std::string actualBone = LoadBoneName();
-	int actualBoneIndex = 0;
-	for (int i =0 ; i < bones.size(); i++)
-	{
-		if (bones[i].name == actualBone)
-		{
-			actualBoneIndex = i;
-			break;
-		}
-	}
+	static int actualBoneIndex = 0;
+	//for (int i =0 ; i < bones.size(); i++)
+	//{
+	//	if (bones[i].name == actualBone)
+	//	{
+	//		actualBoneIndex = i;
+	//		break;
+	//	}
+	//}
 	m_pointer = strstr(m_pointer, ";");
 	m_pointer += 2;
 	int numWeights = LoadNumWeights();
@@ -812,15 +820,16 @@ void MeshParser::LoadWeights()
 	std::vector<int> wIndex = LoadWeightsIndex(numWeights, actualBoneIndex);
 	m_pointer ++;
 	LoadIndexWeights(numWeights, wIndex);
-	for (int i = 0; i < boneWeightInfo.size(); i++) {
-		for (int j = 0; j < boneWeightInfo[i].boneIndex.size(); j++)
+	for (int i = 0; i < m_meshes.back().m_vbo.size(); i++) {
+		for (int j = 0; j < m_meshes.back().m_skinWeights[i].boneIndex.size(); j++)
 		{
-			m_vbo[i].wIndex[j] = boneWeightInfo[i].boneIndex[j];
-			m_vbo[i].wWeight[j] = boneWeightInfo[i].weight[j];
+			m_meshes.back().m_vbo[i].wIndex[j] = m_meshes.back().m_skinWeights[i].boneIndex[j];
+			m_meshes.back().m_vbo[i].wWeight[j] = m_meshes.back().m_skinWeights[i].weight[j];
 		}
 	}
 	m_pointer++;
-	bones[actualBoneIndex].spaceTransformMatrix  = LoadSpaceTransformMatrix();
+	m_meshes.back().m_skinWeights[actualBoneIndex].spaceTransformMatrix  = LoadSpaceTransformMatrix();
+	actualBoneIndex++;
 }
 
 std::string MeshParser::LoadBoneName()
@@ -859,9 +868,9 @@ std::vector<int> MeshParser::LoadWeightsIndex(int numWeights, int actualBoneInde
 		}
 		++m_pointer;
 		int index = std::stoi(indexString);
-		int offsetedIndex = index + offset;
-		boneWeightInfo[offsetedIndex].boneIndex.push_back(actualBoneIndex);
-		wIndexs.push_back(offsetedIndex);
+		m_meshes.back().m_skinWeights.resize(m_meshes.back().m_vbo.size());
+		m_meshes.back().m_skinWeights[index].boneIndex.push_back(actualBoneIndex);
+		wIndexs.push_back(index);
 	}
 	return wIndexs;
 }
@@ -879,7 +888,7 @@ void MeshParser::LoadIndexWeights(int numWeights, std::vector<int>& index)
 		}
 		++m_pointer;
 		float w = std::stof(weightString);
-		boneWeightInfo[index[i]].weight.push_back(w);
+		m_meshes.back().m_skinWeights[index[i]].weight.push_back(w);
 	}
 }
 
@@ -902,24 +911,69 @@ Matrix4D MeshParser::LoadSpaceTransformMatrix()
 	return spaceTransform;
 }
 
+void MeshParser::ReadAnimationTicksPerSecond()
+{
+	m_pointer++;
+	std::string temp;
+	while (*m_pointer != ';')
+	{
+		temp.push_back(*m_pointer);
+		++m_pointer;
+	}
+	m_pointer++;
+	animationSets.back().ticksPS = 	std::stoi(temp);
+}
+
+void MeshParser::ReadAnimationSet()
+{
+	static int actualBoneIndex = 0;
+	while (actualBoneIndex < bones.size())
+	{
+		m_pointer++;
+		m_pointer = strstr(m_pointer, "{");
+		m_pointer = strstr(m_pointer, "{");
+		m_pointer++;
+		std::string boneName;
+		while (*m_pointer != '}')
+		{
+			boneName.push_back(*m_pointer);
+			++m_pointer;
+		}
+		++m_pointer;
+		animationSets.back().animationsVec.push_back(xAnimation());
+		animationSets.back().animationsVec.back().name = boneName;
+		animationSets.back().animationsVec.back().boneIndex = actualBoneIndex;
+		//Read rot
+		ReadAnimationRotations();
+		//Read scale
+		ReadAnimationScales();
+		//Read pos
+		ReadAnimationPositions();
+		actualBoneIndex++;
+	}
+
+}
+
+void MeshParser::ReadAnimationRotations()
+{
+	m_pointer = strstr(m_pointer, ";");
+	m_pointer++;
+	//Read num keyframes
+}
+
+void MeshParser::ReadAnimationPositions()
+{
+}
+
+void MeshParser::ReadAnimationScales()
+{
+}
+
 
 void MeshParser::Deallocate()
 {
-	m_vbo.clear();
+	for(auto &it : m_meshes)
+		it.m_vbo.clear();
 	//m_meshes.clear();
 }
-//std::string MeshParser::SearchElement(char condition)
-//{
-//	std::string elementString;
-//	while (true)
-//	{
-//		if (fileBuffer[m_pointer] == condition)
-//		{
-//			++m_pointer;
-//			break;
-//		}
-//		elementString.push_back(fileBuffer[m_pointer]);
-//		++m_pointer;
-//	}
-//	return elementString;
-//}
+

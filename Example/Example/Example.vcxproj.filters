@@ -81,6 +81,12 @@
     <Filter Include="Source Files\PhysX">
       <UniqueIdentifier>{06bea7d7-61e9-40b0-8e38-334a01f339f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\FX">
+      <UniqueIdentifier>{9b7e8759-895c-4e91-9ef8-01fd6977405b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FX">
+      <UniqueIdentifier>{7fad3e8b-8fc7-43e3-9f69-1738a82d89ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UtilsGL.h">
@@ -227,6 +233,12 @@
     <ClInclude Include="DDSLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BaseFX.h">
+      <Filter>Header Files\FX</Filter>
+    </ClInclude>
+    <ClInclude Include="BloomFX.h">
+      <Filter>Header Files\FX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UtilsGL.cpp">
@@ -360,6 +372,12 @@
     </ClCompile>
     <ClCompile Include="DDSLoader.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseFX.cpp">
+      <Filter>Source Files\FX</Filter>
+    </ClCompile>
+    <ClCompile Include="BloomFX.cpp">
+      <Filter>Source Files\FX</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

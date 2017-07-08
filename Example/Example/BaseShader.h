@@ -2,6 +2,7 @@
 #include <string>
 #include "Config.h"
 #include "UtilsGL.h"
+#include <string>
 class Shader
 {
 public:
@@ -10,6 +11,7 @@ public:
 		G_BUFF_PASS,
 		G_FORWARD_PASS,
 		G_SHADOW_PASS,
+		G_DEFERRED_PASS,
 		COUNT
 	};
 	enum SIGNATURE
@@ -37,6 +39,7 @@ public:
 	virtual void LoadAPI() = 0;
 	virtual ~Shader() {};
 	bool errorShader;
+	std::string VSPath;
 protected:
 	std::string vstr;
 	std::string fstr;
