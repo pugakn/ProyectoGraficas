@@ -17,7 +17,7 @@
 //extern PxFoundation *g_Foundation;
 //extern PxPhysics* g_Physics;
 //extern PxScene *g_scene;
-const int NUM_LIGHTS = 48;
+const int NUM_LIGHTS = 24;
 void TestApp::InitVars() {
 	//physxManager.Init();
 	//usePhysX = false;
@@ -45,7 +45,8 @@ void TestApp::InitVars() {
 		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		SceneProp.AddLight(Vector3D(rand() / static_cast <float> (RAND_MAX) * 300, 10.0f, rand() / static_cast <float> (RAND_MAX) * 300), Vector3D(r, g, b), true);
+		float theta = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * 6.15;
+		SceneProp.AddLight(Vector3D(cos(theta) , rand() / static_cast <float> (RAND_MAX) * 30,sin (theta) * 100), Vector3D(r, g, b), true);
 	}
 	SceneProp.specExp = 14.0f;
 	SceneProp.attMax = 12000.0f;
@@ -89,9 +90,12 @@ void TestApp::InitVars() {
 void TestApp::CreateAssets() {	
 
 	int index;
-	index = PrimitiveMgr.CreateModel("Models/Scene.X",true);
+	/*index = PrimitiveMgr.CreateModel("Models/Scene.X",true);
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));*/
+
+	//loadThreads.push_back(new std::thread([this]() {LoadModel("Models/Scene.X",Vector3D(0,0,0),1); }));
+
 
 	//index = PrimitiveMgr.CreateModel("Models/Jinx.X",false);
 	//Models.push_back(PrimitiveInst());
@@ -199,14 +203,26 @@ void TestApp::CreateAssets() {
 	//Models.back().ScaleAbsolute(0.2);
 	//Models.back().TranslateAbsolute(0, 0, 0);
 	//Models.back().Update();
+	//loadThreads.push_back(new std::thread([this]() {LoadModel("Models/NuBatman.X", Vector3D(0, 0, 0), 0.2); }));
 
 
-	index = PrimitiveMgr.CreateModel("Models/NuVenomJok.X",true);
+	index = PrimitiveMgr.CreateModel("Models/Cil_Skin.X", true);
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	Models.back().ScaleAbsolute(0.1);
-	Models.back().TranslateAbsolute(10, 0, 0);
-	Models.back().Update();
+	//Models.back().TranslateAbsolute(0, 10, 0);
+	//Models.back().Update();
+	Matrix4D R = Identity();
+	((ModelGL*)PrimitiveMgr.GetPrimitive(index))->TransformBone(1, R);
+
+
+
+	//index = PrimitiveMgr.CreateModel("Models/NuVenomJok.X",true);
+	//Models.push_back(PrimitiveInst());
+	//Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	//Models.back().ScaleAbsolute(0.1);
+	//Models.back().TranslateAbsolute(10, 0, 0);
+	//Models.back().Update();
+	//[this]() {LoadModel("Models/NuVenomJok.X", Vector3D(10, 0, 0), 0.1); }));
 
 
 	//==================== Reflejo ===========================
@@ -326,15 +342,15 @@ void TestApp::OnUpdate() {
 	//		}
 	//}
 
-	static float t = 0.3;
-	t += DtTimer.GetDTSecs()*0.01;
-	if (t > 1)
-		t = 0.3;
-	for (size_t i = 0; i < SceneProp.Lights.size(); i++)
-	{
-		float time = t*i;
-		SceneProp.Lights[i].Position = Vector3D((pow(.95, time)*sinf(time)*200),15,(pow(.89, time)*cosf(time)*200));
-	}
+	//static float t = 0.3;
+	//t += DtTimer.GetDTSecs()*0.01;
+	//if (t > 1)
+	//	t = 0.3;
+	//for (size_t i = 0; i < SceneProp.Lights.size(); i++)
+	//{
+	//	float time = t*i;
+	//	SceneProp.Lights[i].Position = Vector3D((pow(.89, time)*sinf(time)*300),15,(pow(.89, time)*cosf(time)*300));
+	//}
 
 	Vector3D campos = cam.m_pos / 1500.f;
 	dot->TranslateAbsolute(2.44-campos.z,1.45-campos.x,0);
@@ -443,6 +459,22 @@ void TestApp::OnInput() {
 		//SceneProp.Lights[0].Position.z += -100 * DtTimer.GetDTSecs();
 		SceneProp.ModifyLightWShadow(0, Vector3D( 10* sinf(lightParam), SceneProp.LightsWShadow[0].Position.y, 10 * cosf(lightParam)), Vector3D(0.5, 0.2, 0.1), true, Vector3D(0, 0, 0));
 	}
+
+	static float rotZ = 0;
+	if (IManager.PressedKey(SDLK_KP3)) {
+
+		rotZ += 1* DtTimer.GetDTSecs();
+		Matrix4D R = RotationZ(rotZ);
+		((ModelGL*)PrimitiveMgr.GetPrimitive(0))->TransformBone(2, R);
+	}
+
+	if (IManager.PressedKey(SDLK_KP1)) {
+		rotZ -= 1 * DtTimer.GetDTSecs();
+		Matrix4D R = RotationZ(rotZ);
+		((ModelGL*)PrimitiveMgr.GetPrimitive(0))->TransformBone(2, R);
+	}
+
+
 	if (IManager.PressedKey(SDLK_KP8)) {
 		SceneProp.Lights[0].Position.x += -100 * DtTimer.GetDTSecs();
 	}
@@ -499,3 +531,14 @@ void TestApp::OnResume() {
 void TestApp::OnReset() {
 
 }
+
+void TestApp::LoadModel(char * file, Vector3D translate, float scale)
+{
+	int index = PrimitiveMgr.CreateModel(file, true);
+	Models.push_back(PrimitiveInst());
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
+	Models.back().ScaleAbsolute(scale);
+	Models.back().TranslateAbsolute(translate.x, translate.y, translate.z);
+	Models.back().Update();
+}
+

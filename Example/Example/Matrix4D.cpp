@@ -82,6 +82,30 @@ Vector4D operator* (const Matrix4D& M, const Vector4D& V) {
 		Dot(M.Row2, V),
 		Dot(M.Row3, V));
 }
+Matrix4D operator*(const float F, const Matrix4D & B)
+{
+	Matrix4D R = B;
+	R.m[0][0] *= F;
+	R.m[0][1] *= F;
+	R.m[0][2] *= F;
+	R.m[0][3] *= F;
+			  
+	R.m[1][0] *= F;
+	R.m[1][1] *= F;
+	R.m[1][2] *= F;
+	R.m[1][3] *= F;
+			  
+	R.m[2][0] *= F;
+	R.m[2][1] *= F;
+	R.m[2][2] *= F;
+	R.m[2][3] *= F;
+			  
+	R.m[3][0] *= F;
+	R.m[3][1] *= F;
+	R.m[3][2] *= F;
+	R.m[3][3] *= F;
+	return R;
+}
 Matrix4D Zero() {
 	Matrix4D Z;
 	memset(&Z, 0, sizeof(Matrix4D));

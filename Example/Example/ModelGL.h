@@ -48,6 +48,7 @@ private:
 	{
 		std::vector<SubsetInfo> subsetInfo;
 		GLuint	 VB;
+		std::vector<vertexStruct> m_vboOriginal;
 	};
 
 	struct WireframeInfo
@@ -73,6 +74,9 @@ private:
 
 	int idCube;
 	TextureGL cubetxt;
+
+	std::vector<xBone> m_bones;
+
 public:
 	void SetFileName(char* fileName);
 	void Create() override;
@@ -80,6 +84,9 @@ public:
 	void Draw(float *t) override;
 	void Destroy() override;
 	void SetShaderType(Shader::TYPE type) override;
+
+	void TransformBone(int index, Matrix4D t);
+	void CalcCombinedMatrix(int index, Matrix4D t);
 	MeshParser parser;
 	ModelGL() { useLight = true; };
 	~ModelGL();

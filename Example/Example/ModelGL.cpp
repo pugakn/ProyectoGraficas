@@ -24,11 +24,14 @@ void ModelGL::Create()
 	}
 	timer.Update();
 	std::cout << "Archivo cargado en: " << timer.GetDTSecs() << " segundos..." << std::endl;
+	m_bones.resize(parser.bones.size());
+	m_bones = parser.bones;
 	//Iterar cada Mesh y subsets
 	idCube = cubetxt.LoadCubeMap("tstcuben.dds");
 	for (auto &meshIt: parser.m_meshes)
 	{	
 		m_meshInfo.push_back(MeshInfo());
+		m_meshInfo.back().m_vboOriginal = meshIt.m_vbo;
 		for (auto &subsetIt : meshIt.m_subsets)
 		{
 			m_meshInfo.back().subsetInfo.push_back(SubsetInfo());
@@ -147,7 +150,7 @@ void ModelGL::Create()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, wireframe.m_indexBuffer.size() * sizeof(unsigned short), &(wireframe.m_indexBuffer[0]), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	//Liberar Memoria
-	parser.Deallocate();
+	//parser.Deallocate();
 	transform = Identity();
 
 
@@ -355,6 +358,58 @@ void ModelGL::SetShaderType(Shader::TYPE type)
 					glUseProgram(subsetIt.shadersID);
 			}
 		}
+	}
+}
+void ModelGL::TransformBone(int index, Matrix4D t)
+{
+	//parser.bones[index].bone =  t;
+	CalcCombinedMatrix(index, t);
+
+	for (size_t i = 0; i < parser.m_meshes.size(); i++)
+	{
+		for (size_t k = 0; k < parser.m_meshes[i].m_vbo.size(); k++)
+		{
+			auto vertex = &m_meshInfo[i].m_vboOriginal[k];
+			auto vertexNew = &parser.m_meshes[i].m_vbo[k];
+			Vector4D pos(vertex->x,vertex->y,vertex->z,1);
+			Vector4D vertexPos(0,0,0,1);
+
+			Vector4D normal(vertex->nx, vertex->ny, vertex->nz, 1);
+			Vector4D vertexNorm(0, 0, 0, 1);
+			Matrix4D F = Identity();
+			for (size_t j = 0; j < 4; j++)
+			{
+				if (vertex->wIndex[j] != -1)
+				{
+					vertexPos = vertexPos + pos * (vertex->wWeight[j] * (parser.m_meshes[i].m_skinWeightsOffset[vertex->wIndex[j]] * m_bones[vertex->wIndex[j]].bone));
+					vertexNorm = vertexNorm + normal * (vertex->wWeight[j] * (parser.m_meshes[i].m_skinWeightsOffset[vertex->wIndex[j]] * m_bones[vertex->wIndex[j]].bone));
+				}
+
+
+			}
+			//if (vertex->wIndex[0] == -1)
+			//	vertexPos = pos;
+			vertexNew->x = vertexPos.x;
+			vertexNew->y = vertexPos.y;
+			vertexNew->z = vertexPos.z;
+
+			vertexNew->nx = vertexNorm.x;
+			vertexNew->ny = vertexNorm.y;
+			vertexNew->nz = vertexNorm.z;
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, m_meshInfo[i].VB);
+		glBufferData(GL_ARRAY_BUFFER, parser.m_meshes[i].m_vbo.size() * sizeof(vertexStruct), &parser.m_meshes[i].m_vbo[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER,0);
+	}
+
+
+}
+void ModelGL::CalcCombinedMatrix(int index, Matrix4D t)
+{
+	m_bones[index].bone = parser.bones[index].bone * t;
+	for (auto &bone : parser.bones[index].child)
+	{
+		CalcCombinedMatrix(bone, m_bones[index].bone);
 	}
 }
 ModelGL::~ModelGL()

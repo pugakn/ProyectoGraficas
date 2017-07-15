@@ -10,7 +10,7 @@ void main(){
 	coords.y = 1.0 - coords.y;
 	highp vec4 color = texture2D(texture01,coords);
 	highp vec4 color2 = texture2D(texture02,coords);
-	highp vec4 color3 = mix(color,color2,0.65);
+	highp vec4 color3 = mix(color,color2,0.36);
 	//highp vec4 color3 = color + color2;
 	color3.a = 1.0;
 	gl_FragColor = color3;

@@ -32,10 +32,12 @@ void MeshParser::ReadFile()
 		if (m_pointer == NULL) return;
 		m_ActualName = getName();
 		m_ActualType = getType(m_pointer - 3 - m_ActualName.length());
+	
 		switch (m_ActualType)
 		{
 			case TYPE_MESH:
 				m_meshes.push_back(xMesh());
+				m_meshes.back().m_skinWeightsOffset.push_back(Identity());//
 				m_meshes.back().m_vertexAttributes |= xf::attributes::E::HAS_POSITION;
 				getMeshPositions();
 				getMeshIndices();
@@ -81,6 +83,8 @@ void MeshParser::ReadFile()
 				break;
 
 		}
+		if (m_pointer == nullptr)
+			break;
 		++m_pointer;
 	}
 }
@@ -109,7 +113,8 @@ int MeshParser::getType(char* tempPointer)
 		tempPointer--;
 	}
 	if (type == "emarF" )
-		if ((m_ActualName.find("piB") != std::string::npos))
+		//if ((m_ActualName.find("piB") != std::string::npos))
+		if (!(m_ActualName.find("ordniliC") != std::string::npos))
 		return TYPE_FRAME;
 	if (type == "hseM")
 		return TYPE_MESH;
@@ -737,6 +742,8 @@ void MeshParser::getBones()
 	while (IsNextACloseBlock())
 	{
 		m_pointer = strstr(m_pointer, "}");
+		if (m_pointer == nullptr)
+			break;
 		m_pointer++;
 		actualDad--;
 		openBlocks--;
@@ -745,6 +752,7 @@ void MeshParser::getBones()
 		actualBone++;
 		getBones();
 	}
+
 }
 void MeshParser::InsertBonesSiblingsOnEachBone()
 {
@@ -793,7 +801,7 @@ bool MeshParser::IsNextACloseBlock()
 
 	toCloseBlock = strstr(m_pointer, "}");
 	toNewBone = strstr(m_pointer, "{");
-	if (toCloseBlock - m_pointer < toNewBone - m_pointer)
+	if (toCloseBlock - m_pointer < toNewBone - m_pointer || toNewBone == nullptr)
 		return true;
 	return false;
 }
@@ -804,7 +812,7 @@ void MeshParser::LoadWeights()
 	m_pointer = strstr(m_pointer, "\"");
 	m_pointer++;
 	std::string actualBone = LoadBoneName();
-	static int actualBoneIndex = 0;
+	static int actualBoneIndex = 1;
 	//for (int i =0 ; i < bones.size(); i++)
 	//{
 	//	if (bones[i].name == actualBone)
@@ -828,7 +836,8 @@ void MeshParser::LoadWeights()
 		}
 	}
 	m_pointer++;
-	m_meshes.back().m_skinWeights[actualBoneIndex].spaceTransformMatrix  = LoadSpaceTransformMatrix();
+	//m_meshes.back().m_skinWeightsOffset.resize(bones.size());
+	m_meshes.back().m_skinWeightsOffset.push_back( LoadSpaceTransformMatrix());
 	actualBoneIndex++;
 }
 

@@ -15,6 +15,7 @@
 #include "Sprite.h"
 #include "PhysXManager.h"
 #include "PxCube.h"
+#include<thread>
 class TestApp : public AppBase {
 private: 
 	int deferredTexture;
@@ -32,6 +33,9 @@ public:
 	void OnResume();
 
 	void OnReset();
+
+	void LoadModel(char* file , Vector3D translate, float scale);
+	std::vector<std::thread*> loadThreads;
 
 	PrimitiveManager PrimitiveMgr;
 	std::vector<PrimitiveInst>	Models;

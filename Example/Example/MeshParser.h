@@ -37,6 +37,13 @@ struct vertexStruct {
 	float s, t;
 	int wIndex[4];
 	float wWeight[4];
+	vertexStruct()
+	{
+		wIndex[0] = -1;
+		wIndex[1] = -1;
+		wIndex[2] = -1;
+		wIndex[3] = -1;
+	}
 };
 
 struct xBoneWeightInfo
@@ -77,6 +84,7 @@ struct xMesh{
 	std::vector<xMeshSubset> m_subsets;
 	unsigned long m_vertexAttributes;
 	std::vector<xSkinWeigths> m_skinWeights;
+	std::vector<Matrix4D> m_skinWeightsOffset;
 	std::vector<vertexStruct> m_vbo;
 };
 
