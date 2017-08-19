@@ -40,8 +40,16 @@ class BaseRT;
 class BaseDriver;
 
 char *file2string(const char *path);
+namespace COLOR_F {
+	enum FORMAT
+	{
+		RGBA8,
+		RGBA32,
+	};
+};
 class Tools
 {
+	
 private:
 	static std::vector<Texture*> m_textures;
 public:

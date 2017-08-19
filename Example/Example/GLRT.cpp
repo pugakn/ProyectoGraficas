@@ -1,12 +1,18 @@
 #include "GLRT.h"
 #include "TextureGL.h"
-
+#include "UtilsGL.h"
 
 bool GLRT::Load(int numRt, int colorf, int depthf, int w, int h)
 {
 	m_numRT = numRt;
 	GLint depth_fmt = GL_DEPTH_COMPONENT;
-	GLint color_fmt = GL_RGB;
+	GLint color_fmt;
+	if (colorf == COLOR_F::RGBA8) {
+		color_fmt = GL_RGB;
+	}
+	if (colorf == COLOR_F::RGBA32) {
+		color_fmt = GL_RGB32F;
+	}
 	GLuint fbo;
 	GLuint dtex;
 
@@ -36,7 +42,7 @@ bool GLRT::Load(int numRt, int colorf, int depthf, int w, int h)
 		glGenTextures(1, &ctex);
 		glBindTexture(GL_TEXTURE_2D, ctex);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, color_fmt, w, h, 0, color_fmt, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, color_fmt, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

@@ -216,9 +216,9 @@ void Quad::Create() {
 #endif
 
 	transform = Identity();
-	deferredRT = Tools::CreateRT(1);
-	deferredRT_2 = Tools::CreateRT(1);
-	deferredRT_1 = Tools::CreateRT(1);
+	deferredRT = Tools::CreateRT(1,COLOR_F::RGBA32,0,0,0);
+	deferredRT_2 = Tools::CreateRT(1, COLOR_F::RGBA32, 0, 0, 0);
+	deferredRT_1 = Tools::CreateRT(1, COLOR_F::RGBA32, 0, 0, 0);
 	for (auto & fx : m_FX)
 	{
 		fx->Init();

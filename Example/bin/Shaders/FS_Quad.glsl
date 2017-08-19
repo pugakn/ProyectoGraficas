@@ -113,7 +113,7 @@ void main(){
 				Final.xyz = Final.xyz *(1.0-shadow);
 			}
 			//End Shadow Map ========================
-			Ambient = color * 0.05;
+			//Ambient = color * 0.05;
 			Final+= Ambient;
 		//gl_FragColor = fromCamPos;
 		//gl_FragColor = vec4(1.0,0.0,0.0,1.0);
@@ -126,10 +126,15 @@ varying highp vec2 vecUVCoords;
 void main(){
 	lowp vec2 coords = vecUVCoords;
 	coords.y = 1.0 - coords.y;
+	
+	const float gamma = 2.2;
 	highp vec4 color = texture2D(texture01,coords);
-	//color = vec4(depth,depth,depth,1.0);
-	color.w = 1.0;
-	gl_FragColor = color;
-	//gl_FragColor = vec4(1.0,0,0,1.0);
+    highp vec3 mapped = vec3(1.0) - exp(-color.xyz * 0.15);
+    mapped = pow(mapped, vec3(1.0 / gamma));
+    color.w = 1.0;
+    gl_FragColor = vec4(mapped, 1.0);
+	
+	
+	//gl_FragColor = vec4(1,1,0,1);
 }
 #endif
