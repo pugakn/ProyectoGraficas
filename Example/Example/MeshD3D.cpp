@@ -64,7 +64,7 @@ void MeshD3D::Create()
 
 
 
-			auto  set = ShaderManager::GetShaderSetBySignature(it_subsetinfo->sig);
+			auto  set = ShaderManager::GetShaderSetBySignature(it_subsetinfo->sig, "Shaders/VS_MeshPL.hlsl", "Shaders/FS_MeshPL.hlsl");
 			it_subsetinfo->m_shaderSet = set;
 			m_shaderType = Shader::TYPE::G_FORWARD_PASS;
 			it_subsetinfo->m_shader = (D3DShader*)(it_subsetinfo->m_shaderSet)[m_shaderType];
@@ -188,18 +188,19 @@ void MeshD3D::Create()
 			}
 			++subsetInfoIndex;
 		}//End Subsets
+
+		//==================== Create Vertex Buffer =====================
+		D3D11_BUFFER_DESC bdesc = { 0 };
+		bdesc.ByteWidth = m_parser.m_meshes[meshInfoIndex].m_vbo.size() * sizeof(vertexStruct);
+		bdesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		D3D11_SUBRESOURCE_DATA subData = { &m_parser.m_meshes[meshInfoIndex].m_vbo[0], 0, 0 };
+
+		if (D3D11Device->CreateBuffer(&bdesc, &subData, &m_meshInfo[meshInfoIndex].m_VB) != S_OK) {
+			std::cout << "Error Creating VB" << std::endl;
+			return;
+		}
 		++meshInfoIndex;
 	}//End Meshes
-	 //==================== Create Vertex Buffer =====================
-	D3D11_BUFFER_DESC bdesc = { 0 };
-	bdesc.ByteWidth = m_parser.m_vertexSize * sizeof(vertexStruct);
-	bdesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	D3D11_SUBRESOURCE_DATA subData = { &m_parser.m_vbo[0], 0, 0 };
-
-	if (D3D11Device->CreateBuffer(&bdesc, &subData, &m_VB) != S_OK) {
-		std::cout << "Error Creating VB" << std::endl;
-		return;
-	}
 	//delete[] vsSourceP;
 	//delete[] fsSourceP;
 
@@ -229,7 +230,7 @@ void MeshD3D::Create()
 	D3D11DeviceContext->IASetInputLayout(wire.Layout.Get());
 
 	//==================== Create Buffer Layout =====================
-	bdesc = { 0 };
+	D3D11_BUFFER_DESC bdesc = { 0 };
 	bdesc.Usage = D3D11_USAGE_DEFAULT;
 	bdesc.ByteWidth = sizeof(Matrix4D);
 	bdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -241,15 +242,15 @@ void MeshD3D::Create()
 
 	//==================== Create Index Buffer =====================
 	std::vector<unsigned short> fullIndex;
-	for (auto &it : m_parser.m_vbo, m_parser.m_meshes)
+	for (auto &mesh : m_parser.m_meshes)
 	{
-		fullIndex.insert(fullIndex.end(), it.m_indexBuffer.begin(), it.m_indexBuffer.end());
+		fullIndex.insert(fullIndex.end(), mesh.m_indexBuffer.begin(), mesh.m_indexBuffer.end());
 	}
 	wireframe.CreateWireframe(fullIndex);
 	bdesc = { 0 };
 	bdesc.ByteWidth = wireframe.m_indexBuffer.size() * sizeof(USHORT);
 	bdesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	subData = { &wireframe.m_indexBuffer[0], 0, 0 };
+	D3D11_SUBRESOURCE_DATA subData = { &wireframe.m_indexBuffer[0], 0, 0 };
 
 	if (D3D11Device->CreateBuffer(&bdesc, &subData, &wire.IB) != S_OK) {
 		std::cout << "Error Creating IB" << std::endl;
@@ -269,13 +270,11 @@ void MeshD3D::Draw(float * t)
 {
 	if (t)
 		m_transform = t;
+
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
 	Matrix4D WVP = m_transform*VP;
 
 	//==================== Set VB =====================
-	UINT stride = sizeof(vertexStruct);
-	UINT offset = 0;
-	D3D11DeviceContext->IASetVertexBuffers(0, 1, m_VB.GetAddressOf(), &stride, &offset);
 	switch (pScProp->renderMode)
 	{
 	case RM::RenderMode::SOLID:
@@ -301,16 +300,36 @@ inline void MeshD3D::DrawMeshes(const Matrix4D& VP, const Matrix4D & WVP)
 	Vector4D camPos = Vector4D(Vector3D(pScProp->pCameras[0]->m_pos), 0);
 	for (size_t i = 0; i < m_parser.m_meshes.size(); i++)
 	{
+		UINT stride = sizeof(vertexStruct);
+		UINT offset = 0;
+		D3D11DeviceContext->IASetVertexBuffers(0, 1, m_meshInfo[i].m_VB.GetAddressOf(), &stride, &offset);
 		for (std::size_t k = 0; k < m_meshInfo[i].m_subSets.size(); k++) {
 			SubSetInfo *it_subsetinfo = &m_meshInfo[i].m_subSets[k];
 
 			//==================== Set Constant Buffer info =====================
-			it_subsetinfo->CnstBuffer.WV = m_transform*pScProp->pCameras[0]->m_view;
-			it_subsetinfo->CnstBuffer.WVP = WVP;
-			it_subsetinfo->CnstBuffer.World = m_transform;
-			it_subsetinfo->CnstBuffer.lightDir = lightDir;
-			it_subsetinfo->CnstBuffer.lightColor = lightCol;
-			it_subsetinfo->CnstBuffer.camPos = camPos;
+			if (m_shaderType == Shader::TYPE::G_SHADOW_PASS) {
+				it_subsetinfo->CnstBuffer.WV = m_transform*pScProp->LightsWShadow[0].VP;
+				it_subsetinfo->CnstBuffer.WVP = m_transform*pScProp->LightsWShadow[0].VP;
+				it_subsetinfo->CnstBuffer.World = m_transform;
+				it_subsetinfo->CnstBuffer.lightDir = lightDir;
+				it_subsetinfo->CnstBuffer.lightColor = lightCol;
+				it_subsetinfo->CnstBuffer.camPos = Vector4D(pScProp->LightsWShadow[0].Position,1);
+			}
+			else{
+				it_subsetinfo->CnstBuffer.WV = m_transform*pScProp->pCameras[0]->m_view;
+				it_subsetinfo->CnstBuffer.WVP = WVP;
+				it_subsetinfo->CnstBuffer.World = m_transform;
+				it_subsetinfo->CnstBuffer.lightDir = lightDir;
+				it_subsetinfo->CnstBuffer.lightColor = lightCol;
+				it_subsetinfo->CnstBuffer.camPos = camPos;
+			}
+
+			//it_subsetinfo->CnstBuffer.WV = m_transform*pScProp->pCameras[0]->m_view;
+			//it_subsetinfo->CnstBuffer.WVP = WVP;
+			//it_subsetinfo->CnstBuffer.World = m_transform;
+			//it_subsetinfo->CnstBuffer.lightDir = lightDir;
+			//it_subsetinfo->CnstBuffer.lightColor = lightCol;
+			//it_subsetinfo->CnstBuffer.camPos = camPos;
 			//==================== Set Shaders =====================
 			D3D11DeviceContext->VSSetShader(it_subsetinfo->m_shader->pVS.Get(), 0, 0);
 			D3D11DeviceContext->PSSetShader(it_subsetinfo->m_shader->pFS.Get(), 0, 0);
@@ -354,6 +373,7 @@ inline void MeshD3D::DrawMeshes(const Matrix4D& VP, const Matrix4D & WVP)
 					D3D11DeviceContext->PSSetSamplers(3, 1, texd3d->pSampler.GetAddressOf());
 				}
 			}
+			
 			//==================== Set IB =====================
 			D3D11DeviceContext->IASetIndexBuffer(it_subsetinfo->IB.Get(), DXGI_FORMAT_R16_UINT, 0);
 
@@ -366,24 +386,30 @@ inline void MeshD3D::DrawMeshes(const Matrix4D& VP, const Matrix4D & WVP)
 
 inline void MeshD3D::DrawWireframe(const Matrix4D& VP, const Matrix4D & WVP)
 {
-	//==================== Set Constant Buffer info =====================
-	wire.WVP = WVP;
-	//==================== Set Shaders =====================
-	D3D11DeviceContext->VSSetShader(wire.pVS.Get(), 0, 0);
-	D3D11DeviceContext->PSSetShader(wire.pFS.Get(), 0, 0);
-	//==================== Set Input Layout (describe the input-buffer data) =====================
-	D3D11DeviceContext->IASetInputLayout(wire.Layout.Get());
-	//==================== Update Constant Buffers =====================
-	D3D11DeviceContext->UpdateSubresource(wire.ConstantBuffer.Get(), 0, 0, &wire.WVP, 0, 0);
-	D3D11DeviceContext->VSSetConstantBuffers(0, 1, wire.ConstantBuffer.GetAddressOf());
-	D3D11DeviceContext->PSSetConstantBuffers(0, 1, wire.ConstantBuffer.GetAddressOf());
+	for (size_t i = 0; i < m_parser.m_meshes.size(); i++)
+	{
+		UINT stride = sizeof(vertexStruct);
+		UINT offset = 0;
+		D3D11DeviceContext->IASetVertexBuffers(0, 1, m_meshInfo[i].m_VB.GetAddressOf(), &stride, &offset);
+		//==================== Set Constant Buffer info =====================
+		wire.WVP = WVP;
+		//==================== Set Shaders =====================
+		D3D11DeviceContext->VSSetShader(wire.pVS.Get(), 0, 0);
+		D3D11DeviceContext->PSSetShader(wire.pFS.Get(), 0, 0);
+		//==================== Set Input Layout (describe the input-buffer data) =====================
+		D3D11DeviceContext->IASetInputLayout(wire.Layout.Get());
+		//==================== Update Constant Buffers =====================
+		D3D11DeviceContext->UpdateSubresource(wire.ConstantBuffer.Get(), 0, 0, &wire.WVP, 0, 0);
+		D3D11DeviceContext->VSSetConstantBuffers(0, 1, wire.ConstantBuffer.GetAddressOf());
+		D3D11DeviceContext->PSSetConstantBuffers(0, 1, wire.ConstantBuffer.GetAddressOf());
 
-	//==================== Set IB =====================
-	D3D11DeviceContext->IASetIndexBuffer(wire.IB.Get(), DXGI_FORMAT_R16_UINT, 0);
+		//==================== Set IB =====================
+		D3D11DeviceContext->IASetIndexBuffer(wire.IB.Get(), DXGI_FORMAT_R16_UINT, 0);
 
-	//==================== Draw =====================
-	D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	D3D11DeviceContext->DrawIndexed(wireframe.m_indexBuffer.size(), 0, 0);
+		//==================== Draw =====================
+		D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		D3D11DeviceContext->DrawIndexed(wireframe.m_indexBuffer.size(), 0, 0);
+	}
 }
 void MeshD3D::Destroy()
 {
@@ -402,6 +428,12 @@ void MeshD3D::SetShaderType(Shader::TYPE type)
 			}
 		}
 	}
+}
+void MeshD3D::TransformBone(int index, Matrix4D t)
+{
+}
+void MeshD3D::CalcCombinedMatrix(int index, Matrix4D t)
+{
 }
 #endif // USING_D3D11
 

@@ -7,8 +7,11 @@ class BaseFX
 {
 protected:
 	Texture* m_deferredTexture;
+#ifdef USING_D3D11
+#else
 	GLuint			VB;
 	GLuint			IB;
+#endif
 	CVertex			vertices[4];
 	unsigned short	indices[6];
 public:

@@ -4,7 +4,7 @@
 #include "Config.h"
 #include "Vector3D.h"
 #include "Matrix4D.h"
-
+#include "Animation.h"
 
 namespace xf {
 	namespace attributes {
@@ -97,31 +97,7 @@ struct xBone {
 	int dad;
 };
 
-struct xAnimationKeyRot {
-	//Quat Rot
-	int ticks;
-};
-struct xAnimationKeyPos {
-	Vector3D pos;
-	int ticks;
-};
-struct xAnimationKeyScale {
-	Vector3D scale;
-	int ticks;
-};
-struct xAnimation
-{
-	std::string name;
-	int boneIndex;
-	std::vector<xAnimationKeyRot> rotVec;
-	std::vector<xAnimationKeyPos> posVec;
-	std::vector<xAnimationKeyScale> scaleVec;
-};
-struct xAnimationSet {
-	std::string name;
-	int ticksPS;
-	std::vector<xAnimation> animationsVec;
-};
+
 
 class MeshParser
 {
@@ -174,13 +150,18 @@ private:
 	void ReadAnimationPositions();
 	void ReadAnimationScales();
 
+	int ReadAnimTime();
+	float readAnimFloat();
+
 	int actualDad = -1;
 	int openBlocks = 0;
 	int actualBone = 0;
+	int indexPos;
 public:
 	std::vector<xMesh> m_meshes;
 
 	std::vector<xBone> bones;
+	//std::vector<Matrix4D> m_skinWeightsOffset;//
 	std::vector<xAnimationSet> animationSets;
 	bool LoadFile(const char* fileName);
 	void ReadFile();

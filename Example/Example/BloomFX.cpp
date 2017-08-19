@@ -6,6 +6,7 @@
 
 void BloomFX::ApplyFX(Texture * deferredTexture)
 {
+#ifndef USING_D3D11
 	GLShader * actualSH;
 	Matrix4D W = Identity();
 	actualSH = illuminanceShader;
@@ -126,10 +127,14 @@ void BloomFX::ApplyFX(Texture * deferredTexture)
 
 
 	Tools::UseOriginalFBO();
+#else
+
+#endif
 }
 
 void BloomFX::InitAPI()
 {
+#ifndef USING_D3D11
 	illuminanceShader = new GLShader();
 	HorizontalBlurShader = new GLShader();
 	VerticalBlurShader = new GLShader();
@@ -138,6 +143,8 @@ void BloomFX::InitAPI()
 	HorizontalBlurShader->Load("Shaders/FX/VS_hBlur.glsl", "Shaders/FX/FS_hBlur.glsl", 0, (Shader::TYPE)0);
 	VerticalBlurShader->Load("Shaders/FX/VS_vBlur.glsl", "Shaders/FX/FS_vBlur.glsl", 0, (Shader::TYPE)0);
 	SumShader->Load("Shaders/FX/VS_BlurSum.glsl", "Shaders/FX/FS_BlurSum.glsl", 0, (Shader::TYPE)0);
+#else
+#endif
 	
 }
 

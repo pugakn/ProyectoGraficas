@@ -15,6 +15,8 @@ void ModelGL::SetFileName(char * fileName)
 }
 void ModelGL::Create()
 {
+	animationManager.model = this;
+
 	Timer timer;
 	timer.Init();
 	if (!parser.LoadFile(m_fileName.c_str()))
@@ -26,6 +28,7 @@ void ModelGL::Create()
 	std::cout << "Archivo cargado en: " << timer.GetDTSecs() << " segundos..." << std::endl;
 	m_bones.resize(parser.bones.size());
 	m_bones = parser.bones;
+	animationManager.animationSets = parser.animationSets;
 	//Iterar cada Mesh y subsets
 	idCube = cubetxt.LoadCubeMap("tstcuben.dds");
 	for (auto &meshIt: parser.m_meshes)
@@ -362,12 +365,11 @@ void ModelGL::SetShaderType(Shader::TYPE type)
 }
 void ModelGL::TransformBone(int index, Matrix4D t)
 {
-	//parser.bones[index].bone =  t;
 	CalcCombinedMatrix(index, t);
 
 	for (size_t i = 0; i < parser.m_meshes.size(); i++)
 	{
-		for (size_t k = 0; k < parser.m_meshes[i].m_vbo.size(); k++)
+		for (size_t k = 0; k < parser.m_meshes[i].m_vbo.size(); k++) 
 		{
 			auto vertex = &m_meshInfo[i].m_vboOriginal[k];
 			auto vertexNew = &parser.m_meshes[i].m_vbo[k];

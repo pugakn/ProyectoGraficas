@@ -7,11 +7,11 @@ struct VS_INPUT{
 struct VS_OUTPUT{
     float4 hposition : SV_POSITION;
     float2 texture0 : TEXCOORD;
-	#ifdef G_BUFF_PASS
+	#ifdef G_DEFERRED_PASS
 	float4 PosCorner : POSITION1;
 	#endif
 };
-#ifdef G_BUFF_PASS
+#ifdef G_DEFERRED_PASS
 cbuffer ConstantBuffer{
 	 float4x4 W;
 	 float4x4 VPInverse;
@@ -21,14 +21,18 @@ cbuffer ConstantBuffer{
 	 int NumLights;
 	 float2 ShadowTexSize;
 	 float4x4 CamVP;
+	 int NumLights2;
 }
 VS_OUTPUT VS( VS_INPUT input ){
     VS_OUTPUT OUT;
     OUT.texture0 = input.texture0;
     OUT.hposition = mul(W,input.position);
-	OUT.PosCorner = mul(VPInverse,float4(input.position.xy,1.0,1.0));
-	OUT.PosCorner.xyz /= OUT.PosCorner.w;
-	OUT.PosCorner = OUT.PosCorner - CameraPosition;
+	//OUT.PosCorner = mul(VPInverse,float4(input.position.xy,1.0,1.0));
+	//OUT.PosCorner.xyz /= OUT.PosCorner.w;
+	//OUT.PosCorner = OUT.PosCorner - CameraPosition;
+	
+	OUT.PosCorner = float4(input.position.xy,1.0,1.0);
+	
     return OUT;
 }
 

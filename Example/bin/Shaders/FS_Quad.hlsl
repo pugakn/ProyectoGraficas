@@ -2,12 +2,12 @@
 struct VS_OUTPUT{
     float4 hposition : SV_POSITION;
     float2 texture0 : TEXCOORD;
-	#ifdef G_BUFF_PASS
+	#ifdef G_DEFERRED_PASS
 	float4 PosCorner : POSITION1;
 	#endif
 };
 
-#ifdef G_BUFF_PASS
+#ifdef G_DEFERRED_PASS
 
 cbuffer ConstantBuffer{
 	 float4x4 W;
@@ -18,6 +18,7 @@ cbuffer ConstantBuffer{
 	 int NumLights;
 	 float2 ShadowTexSize;
 	 float4x4 CamVP;
+	 int NumLights2;
 }
 
 Texture2D difuse : register(t0);
@@ -30,7 +31,7 @@ SamplerState SS;
 float4 FS( VS_OUTPUT input ) : SV_TARGET  {
 	float2 coords = input.texture0;
 	//coords.y = 1.0 - coords.y;
-	float4 Final  =  float4(1.0,0.0,0.0,1.0);
+	float4 Final  =  float4(0.0,0.0,0.0,1.0);
 	float4 color  =  difuse.Sample( SS, coords);
 	color.w = 1.0;
 	 float depth  =	depthText.Sample(SS,coords).r;
@@ -42,15 +43,19 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
 	normal	= normalize(normal);
 	 float4 specularmap = specularText.Sample(SS,coords);
 	#ifndef LINEAR_DEPTH
-	 float2 vcoord = coords *2.0 - 1.0;
-	 float4 position = mul(VPInverse,float4(vcoord ,depth,1.0));
-	position.xyz /= position.w;
+	 //float2 vcoord = coords *2.0 - 1.0;
+	 //float4 position = mul(VPInverse,float4(vcoord ,depth,1.0));
+	 
+	 float4 position = mul(VPInverse,float4( input.PosCorner.xy ,depth,1.0));
+	 position.xyz /= position.w;
+	 
+	//position.xyz /= position.w;
 	#else
-	 float4 position = CameraPosition + PosCorner*depth;
+	 float4 position = CameraPosition + input.PosCorner*depth;
 	#endif //LINEAR_DEPTH
 	 float  eyeDir   = normalize(CameraPosition-position).xyz;
 	 float shinness = 4.0;
-	shinness = normal.a + shinness;
+	shinness = shinness;//normal.a + shinness;
 	 float attMax = 40.0;
 	for( int i=0;i<NumLights;i++){
 				 float dist = distance(LightPositions[i],position);
@@ -86,8 +91,9 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
 
 			//Shadow Map=============================
 			float4 fromCamPos;
-			position.w = 1.0;
-			fromCamPos = mul(CamVP,position);
+			//position.w = 1.0;
+			float4 p  = float4(position.x,position.y,position.z,position.w);
+			fromCamPos = mul(CamVP,p);
 			float3 proj = fromCamPos.xyz / fromCamPos.w;
 			proj = 0.5 * (proj + 1.0);
 			float2 shCoords =  proj.xy;
@@ -100,24 +106,25 @@ float4 FS( VS_OUTPUT input ) : SV_TARGET  {
 				    for(int y = -1; y <= 1; ++y)
 				    {
 				        float pcfDepth = shadowMap.Sample(SS, shCoords + float2(x,y) * texelSize).r;
-								if (proj.z > pcfDepth +0.002)
+								if (proj.z > pcfDepth +0.02)
 								{
 									//pixel en la sombra
 									shadow += 1.0;
+									//return float4(0,0,1,1);
 								}
 				    }
 				}
 				shadow /= 9.0;
-				Final.xyz = Final.xyz *(1.0-shadow);
+				//Final.xyz = Final.xyz *(1.0-shadow);
 			}
 			//End Shadow Map ========================
-			Ambient = color * 0.5;
+			Ambient = color * 0.2;
 			Final+= Ambient;
-		return color;
-		return float4(depth,depth,depth,1.0);
+			//return float4(shadowMap.Sample(SS, coords).r,shadowMap.Sample(SS, coords).r,shadowMap.Sample(SS, coords).r,1);
+		//return fromCamPos;
 		return float4(Final.xyz,1.0);
 }
-#else //G_BUFF_PASS
+#else //G_DEFERRED_PASS
 
 
 cbuffer ConstantBuffer{

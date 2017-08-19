@@ -17,7 +17,6 @@
 //extern PxFoundation *g_Foundation;
 //extern PxPhysics* g_Physics;
 //extern PxScene *g_scene;
-const int NUM_LIGHTS = 24;
 void TestApp::InitVars() {
 	//physxManager.Init();
 	//usePhysX = false;
@@ -90,9 +89,9 @@ void TestApp::InitVars() {
 void TestApp::CreateAssets() {	
 
 	int index;
-	/*index = PrimitiveMgr.CreateModel("Models/Scene.X",true);
+	index = PrimitiveMgr.CreateModel("Models/Scene.X",true);
 	Models.push_back(PrimitiveInst());
-	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));*/
+	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 
 	//loadThreads.push_back(new std::thread([this]() {LoadModel("Models/Scene.X",Vector3D(0,0,0),1); }));
 
@@ -206,13 +205,14 @@ void TestApp::CreateAssets() {
 	//loadThreads.push_back(new std::thread([this]() {LoadModel("Models/NuBatman.X", Vector3D(0, 0, 0), 0.2); }));
 
 
-	index = PrimitiveMgr.CreateModel("Models/Cil_Skin.X", true);
+	index = PrimitiveMgr.CreateModel("Models/NuBatman.X", true);
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
-	//Models.back().TranslateAbsolute(0, 10, 0);
-	//Models.back().Update();
-	Matrix4D R = Identity();
-	((ModelGL*)PrimitiveMgr.GetPrimitive(index))->TransformBone(1, R);
+	Models.back().ScaleAbsolute(0.3);
+	Models.back().Update();
+	//Matrix4D R = Scaling(1,1,1);
+	//((ModelGL*)PrimitiveMgr.GetPrimitive(index))->TransformBone(0, R);
+	//((ModelGL*)PrimitiveMgr.GetPrimitive(0))->animationManager.Play(DtTimer.GetDTSecs());
 
 
 
@@ -333,6 +333,16 @@ void TestApp::DestroyAssets() {
 
 void TestApp::OnUpdate() {
 	DtTimer.Update();
+
+	static float tt = 0;
+	tt += DtTimer.GetDTSecs();
+	if (tt > 5 )
+	{
+		tt = 0;
+		//((ModelGL*)PrimitiveMgr.GetPrimitive(0))->animationManager.Play(DtTimer.GetDTSecs());
+	}
+
+
 	//if (usePhysX)
 	//{
 	//	if (physxManager.Step(DtTimer.GetDTSecs()))
@@ -465,13 +475,13 @@ void TestApp::OnInput() {
 
 		rotZ += 1* DtTimer.GetDTSecs();
 		Matrix4D R = RotationZ(rotZ);
-		((ModelGL*)PrimitiveMgr.GetPrimitive(0))->TransformBone(2, R);
+		//((ModelGL*)PrimitiveMgr.GetPrimitive(0))->TransformBone(2, R);
 	}
 
 	if (IManager.PressedKey(SDLK_KP1)) {
 		rotZ -= 1 * DtTimer.GetDTSecs();
 		Matrix4D R = RotationZ(rotZ);
-		((ModelGL*)PrimitiveMgr.GetPrimitive(0))->TransformBone(2, R);
+		//((ModelGL*)PrimitiveMgr.GetPrimitive(0))->TransformBone(2, R);
 	}
 
 

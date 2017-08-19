@@ -52,8 +52,9 @@ void Shader::Load(char* vsStr, char* fsStr, unsigned long signature, Shader::TYP
 			Defines += "#define USING_ATENUATION \n\n";
 			Defines += "#define USE_SPECULAR_BLIN \n\n";
 		}
-
+#ifndef USING_OPENGL
 		//Defines += "#define LINEAR_DEPTH \n\n";
+#endif
 #ifdef USING_OPENGL
 		Defines += "#define lowp\n\n";
 		Defines += "#define mediump\n\n";

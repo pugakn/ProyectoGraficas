@@ -48,6 +48,7 @@ private:
 	};
 	struct MeshInfo {
 		std::vector<SubSetInfo>					m_subSets;
+		ComPtr<ID3D11Buffer>  m_VB;
 	};
 
 	struct WireframeInfo
@@ -63,7 +64,6 @@ private:
 		Matrix4D WVP;
 	};
 
-	ComPtr<ID3D11Buffer>  m_VB;
 	std::string			  m_fileName;
 	std::vector<Texture*> m_Textures;
 	Matrix4D			  m_transform;
@@ -81,6 +81,10 @@ public:
 	void Draw(float *t) override;
 	void Destroy() override;
 	void SetShaderType(Shader::TYPE type) override;
+
+
+	void TransformBone(int index, Matrix4D t);
+	void CalcCombinedMatrix(int index, Matrix4D t);
 	MeshParser m_parser;
 	std::vector<MeshInfo> m_meshInfo;
 	MeshD3D() { useLight = true; };

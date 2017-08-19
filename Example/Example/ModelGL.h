@@ -16,6 +16,7 @@
 #include "Matrix4D.h"
 #include "Wireframe.h"
 #include "GLShader.h"
+#include "Animation.h"
 
 class Texture;
 class ModelGL : public PrimitiveBase
@@ -88,6 +89,7 @@ public:
 	void TransformBone(int index, Matrix4D t);
 	void CalcCombinedMatrix(int index, Matrix4D t);
 	MeshParser parser;
+	AnimationManager animationManager;
 	ModelGL() { useLight = true; };
 	~ModelGL();
 };

@@ -18,6 +18,7 @@ bool MeshParser::LoadFile(const char* fileName)
 void MeshParser::ReadFile()
 {
 	m_meshCount = 0;
+	indexPos = 0;
 
 	char* bufferEnd = &m_pointer[fileSize - 1];
 	m_pointer = strstr(m_pointer,"Mesh ");
@@ -37,11 +38,15 @@ void MeshParser::ReadFile()
 		{
 			case TYPE_MESH:
 				m_meshes.push_back(xMesh());
-				m_meshes.back().m_skinWeightsOffset.push_back(Identity());//
+				//m_meshes.back().m_skinWeightsOffset.push_back(Identity());//
+				//m_skinWeightsOffset.push_back(Identity());//
 				m_meshes.back().m_vertexAttributes |= xf::attributes::E::HAS_POSITION;
 				getMeshPositions();
 				getMeshIndices();
 				++m_meshCount;
+				m_meshes.back().m_skinWeightsOffset.resize(bones.size());//
+				for (auto &it : m_meshes.back().m_skinWeightsOffset)
+					it = Identity();
 				break;
 			case TYPE_MESH_NORMALS:
 				m_meshes.back().m_vertexAttributes |= xf::attributes::E::HAS_NORMAL;
@@ -62,13 +67,14 @@ void MeshParser::ReadFile()
 				getDeclData();
 				break;
 			case TYPE_FRAME:
-				actualDad = -1;
+				actualDad = -2;
 				openBlocks = 0;
 				actualBone = 0;
 				m_pointer--;
 				getBones();
 				InsertBonesSiblingsOnEachBone();
 				bones[0].dad = 0;
+				//m_meshes.back().m_skinWeightsOffset.resize(bones.size());//
 				break;
 			case TYPE_MESH_BONE_WIGHTS:
 				LoadWeights();
@@ -113,8 +119,8 @@ int MeshParser::getType(char* tempPointer)
 		tempPointer--;
 	}
 	if (type == "emarF" )
-		//if ((m_ActualName.find("piB") != std::string::npos))
-		if (!(m_ActualName.find("ordniliC") != std::string::npos))
+		if ((m_ActualName.find("piB") != std::string::npos))
+		//if (!(m_ActualName.find("ordniliC") != std::string::npos))
 		return TYPE_FRAME;
 	if (type == "hseM")
 		return TYPE_MESH;
@@ -245,7 +251,7 @@ void MeshParser::getMeshIndices()
 		numString.clear();
 		++m_pointer;
 	}
-	//indexPos++;
+	indexPos++;
 }
 void MeshParser::getMeshNormals()
 {
@@ -728,17 +734,42 @@ void MeshParser::getDeclData()
 }
 void MeshParser::getBones()
 {
+	static bool d = false;
+	static int indx = -1;
+	static int minIndx = 0;
+	static std::vector<int> dads;
 	m_pointer = strstr(m_pointer, "{");
 	openBlocks++;
 	bones.push_back(xBone());
+
+	//
+	if (!d) {
+		actualDad = actualBone-1;
+		indx++;
+		dads.push_back(actualDad);
+	}
+	else {
+		actualDad = dads[indx];
+		for (size_t i = dads.size(); i > indx+1; i--)
+		{
+			dads.pop_back();
+		}
+	}
+
+	d = false;
+
 	bones.back().dad = actualDad;
 	if (actualDad != -1)
 		bones[actualDad].child.push_back(actualBone);
-	actualDad++;
+
+
+
 	bones.back().name = getName();
 	bones.back().name = std::string(bones.back().name.rbegin(), bones.back().name.rend());
 	bones.back().bone = getFrameTransformMatrix();
 	ignoreObjectMatrixComment();
+	if (IsNextACloseBlock())
+		indx++;
 	while (IsNextACloseBlock())
 	{
 		m_pointer = strstr(m_pointer, "}");
@@ -746,7 +777,9 @@ void MeshParser::getBones()
 			break;
 		m_pointer++;
 		actualDad--;
+		indx--;
 		openBlocks--;
+		d = true;
 	}
 	if (openBlocks != 0) {
 		actualBone++;
@@ -812,15 +845,15 @@ void MeshParser::LoadWeights()
 	m_pointer = strstr(m_pointer, "\"");
 	m_pointer++;
 	std::string actualBone = LoadBoneName();
-	static int actualBoneIndex = 1;
-	//for (int i =0 ; i < bones.size(); i++)
-	//{
-	//	if (bones[i].name == actualBone)
-	//	{
-	//		actualBoneIndex = i;
-	//		break;
-	//	}
-	//}
+	static int actualBoneIndex = 0;
+	for (int i =0 ; i < bones.size(); i++)
+	{
+		if (bones[i].name == actualBone)
+		{
+			actualBoneIndex = i;
+			break;
+		}
+	}
 	m_pointer = strstr(m_pointer, ";");
 	m_pointer += 2;
 	int numWeights = LoadNumWeights();
@@ -837,8 +870,8 @@ void MeshParser::LoadWeights()
 	}
 	m_pointer++;
 	//m_meshes.back().m_skinWeightsOffset.resize(bones.size());
-	m_meshes.back().m_skinWeightsOffset.push_back( LoadSpaceTransformMatrix());
-	actualBoneIndex++;
+	m_meshes.back().m_skinWeightsOffset[actualBoneIndex] =  LoadSpaceTransformMatrix();
+	//actualBoneIndex++;
 }
 
 std::string MeshParser::LoadBoneName()
@@ -877,6 +910,7 @@ std::vector<int> MeshParser::LoadWeightsIndex(int numWeights, int actualBoneInde
 		}
 		++m_pointer;
 		int index = std::stoi(indexString);
+		//index -= indexPos;
 		m_meshes.back().m_skinWeights.resize(m_meshes.back().m_vbo.size());
 		m_meshes.back().m_skinWeights[index].boneIndex.push_back(actualBoneIndex);
 		wIndexs.push_back(index);
@@ -955,9 +989,18 @@ void MeshParser::ReadAnimationSet()
 		//Read rot
 		ReadAnimationRotations();
 		//Read scale
+		m_pointer = strstr(m_pointer, "{");
+		m_pointer++;
 		ReadAnimationScales();
 		//Read pos
+		m_pointer = strstr(m_pointer, "{");
+		m_pointer++;
 		ReadAnimationPositions();
+		animationSets.back().animationsVec.back().maxIndex = animationSets.back().animationsVec.back().rotVec.size();
+		if (animationSets.back().animationsVec.back().posVec.size() > animationSets.back().animationsVec.back().maxIndex)
+			animationSets.back().animationsVec.back().maxIndex = animationSets.back().animationsVec.back().posVec.size();
+		if (animationSets.back().animationsVec.back().scaleVec.size() > animationSets.back().animationsVec.back().maxIndex)
+			animationSets.back().animationsVec.back().maxIndex = animationSets.back().animationsVec.back().scaleVec.size();
 		actualBoneIndex++;
 	}
 
@@ -968,14 +1011,156 @@ void MeshParser::ReadAnimationRotations()
 	m_pointer = strstr(m_pointer, ";");
 	m_pointer++;
 	//Read num keyframes
+	std::string temp;
+	while (*m_pointer != ';')
+	{
+		temp.push_back(*m_pointer);
+		++m_pointer;
+	}
+	m_pointer++;
+	int n = std::stoi(temp);
+
+	for (size_t i = 0; i < n; i++)
+	{
+		//ReadTime
+		int time = ReadAnimTime();
+		m_pointer = strstr(m_pointer, ";");
+		m_pointer++;
+		//Read 4 floats
+		float f1 = readAnimFloat();
+		float f2 = readAnimFloat();
+		float f3 = readAnimFloat();
+		float f4 = readAnimFloat();
+		m_pointer+=3;
+		xAnimationKeyRot rot;
+		rot.QRot = Vector4D(f1, f2, f3, f4);
+		rot.ticks = time;
+		int index = time / 160;
+		if (animationSets.back().animationsVec.back().rotVec.size() < index + 1) {
+			int tmp = animationSets.back().animationsVec.back().rotVec.size()-1;
+			animationSets.back().animationsVec.back().rotVec.resize(index + 1);
+			for (size_t j = tmp; j < index; j++)
+			{
+				animationSets.back().animationsVec.back().rotVec[j].QRot = animationSets.back().animationsVec.back().rotVec[tmp].QRot;
+				//animationSets.back().animationsVec.back().rotVec[j].ticks = animationSets.back().animationsVec.back().rotVec[tmp].ticks + 160;
+			}
+		}
+
+		animationSets.back().animationsVec.back().rotVec[index] = rot;
+		//animationSets.back().animationsVec.back().rotVec.push_back(rot);
+	}
 }
+
+
 
 void MeshParser::ReadAnimationPositions()
 {
+	m_pointer = strstr(m_pointer, ";");
+	m_pointer++;
+	//Read num keyframes
+	std::string temp;
+	while (*m_pointer != ';')
+	{
+		temp.push_back(*m_pointer);
+		++m_pointer;
+	}
+	m_pointer++;
+	int n = std::stoi(temp);
+
+	for (size_t i = 0; i < n; i++)
+	{
+		//ReadTime
+		int time = ReadAnimTime();
+		m_pointer = strstr(m_pointer, ";");
+		m_pointer++;
+		//Read 4 floats
+		float f1 = readAnimFloat();
+		float f2 = readAnimFloat();
+		float f3 = readAnimFloat();
+		m_pointer += 3;
+		xAnimationKeyPos sc;
+		sc.pos = Vector3D(f1, f2, f3);
+		sc.ticks = time;
+		int index = time / 160;
+		if (animationSets.back().animationsVec.back().posVec.size() < index + 1) {
+			int tmp = animationSets.back().animationsVec.back().posVec.size() - 1;
+			animationSets.back().animationsVec.back().posVec.resize(index + 1);
+			for (size_t j = tmp; j < index; j++)
+			{
+				animationSets.back().animationsVec.back().posVec[j].pos = animationSets.back().animationsVec.back().posVec[tmp].pos;
+				//animationSets.back().animationsVec.back().rotVec[j].ticks = animationSets.back().animationsVec.back().rotVec[tmp].ticks + 160;
+			}
+		}
+		animationSets.back().animationsVec.back().posVec[index] = sc;
+		//animationSets.back().animationsVec.back().posVec.push_back(sc);
+	}
 }
 
 void MeshParser::ReadAnimationScales()
 {
+	m_pointer = strstr(m_pointer, ";");
+	m_pointer++;
+	//Read num keyframes
+	std::string temp;
+	while (*m_pointer != ';')
+	{
+		temp.push_back(*m_pointer);
+		++m_pointer;
+	}
+	m_pointer++;
+	int n = std::stoi(temp);
+
+	for (size_t i = 0; i < n; i++)
+	{
+		//ReadTime
+		int time = ReadAnimTime();
+		m_pointer = strstr(m_pointer, ";");
+		m_pointer++;
+		//Read 4 floats
+		float f1 = readAnimFloat();
+		float f2 = readAnimFloat();
+		float f3 = readAnimFloat();
+		m_pointer += 3;
+		xAnimationKeyScale sc;
+		sc.scale = Vector3D(f1, f2, f3);
+		sc.ticks = time;
+		int index = time / 160;
+		if (animationSets.back().animationsVec.back().scaleVec.size() < index + 1) {
+			int tmp = animationSets.back().animationsVec.back().scaleVec.size() - 1;
+			animationSets.back().animationsVec.back().scaleVec.resize(index + 1);
+			for (size_t j = tmp; j < index; j++)
+			{
+				animationSets.back().animationsVec.back().scaleVec[j].scale = animationSets.back().animationsVec.back().scaleVec[tmp].scale;
+				//animationSets.back().animationsVec.back().rotVec[j].ticks = animationSets.back().animationsVec.back().rotVec[tmp].ticks + 160;
+			}
+		}
+		animationSets.back().animationsVec.back().scaleVec[index] = sc;
+		//animationSets.back().animationsVec.back().scaleVec.push_back(sc);
+	}
+}
+
+int MeshParser::ReadAnimTime()
+{
+	std::string timestr;
+	while (*m_pointer != ';')
+	{
+		timestr.push_back(*m_pointer);
+		++m_pointer;
+	}
+	m_pointer++;
+	return std::stoi(timestr);
+}
+
+float MeshParser::readAnimFloat()
+{
+	std::string fstr;
+	while (*m_pointer != ',' && *m_pointer != ';')
+	{
+		fstr.push_back(*m_pointer);
+		++m_pointer;
+	}
+	m_pointer++;
+	return std::stof(fstr);
 }
 
 

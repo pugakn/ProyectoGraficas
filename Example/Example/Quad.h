@@ -34,6 +34,7 @@
 #include "Matrix4D.h"
 #include "PrimitiveBase.h"
 #include "BloomFX.h"
+#define NUM_LIGHTS 24
 class Quad : public PrimitiveBase {
 private:
 
@@ -83,10 +84,6 @@ public:
 #elif defined(USING_D3D11)
 	ComPtr<ID3D11Buffer>		IB;
 	ComPtr<ID3D11Buffer>		VB;
-	ComPtr<ID3D11VertexShader>  pVS;
-	ComPtr<ID3D11PixelShader>   pFS;
-	ComPtr<ID3DBlob>            VS_blob;
-	ComPtr<ID3DBlob>            FS_blob;
 	ComPtr<ID3D11InputLayout>   Layout;
 	ComPtr<ID3D11Buffer>        pd3dConstantBuffer;
 

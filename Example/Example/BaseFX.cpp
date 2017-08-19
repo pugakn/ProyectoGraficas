@@ -25,7 +25,7 @@ void BaseFX::Init()
 	indices[3] = 3;
 	indices[4] = 2;
 	indices[5] = 0;
-
+#ifndef USING_D3D11
 	glGenBuffers(1, &VB);
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(CVertex), &vertices[0], GL_STATIC_DRAW);
@@ -35,6 +35,8 @@ void BaseFX::Init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned short), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+#else
+#endif
 
 	InitAPI();
 }

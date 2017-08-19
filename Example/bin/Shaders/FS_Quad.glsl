@@ -115,7 +115,7 @@ void main(){
 			//End Shadow Map ========================
 			Ambient = color * 0.05;
 			Final+= Ambient;
-		//gl_FragColor = vec4(color.xyz,1.0);
+		//gl_FragColor = fromCamPos;
 		//gl_FragColor = vec4(1.0,0.0,0.0,1.0);
 		//gl_FragColor = vec4(specularmap.xyz,1.0);
 		gl_FragColor = vec4(Final.xyz,1.0);

@@ -4,6 +4,11 @@
 
 Matrix4D::Matrix4D()
 {
+	memset(this, 0, sizeof(Matrix4D));
+	this->m[0][0] = 1.f;
+	this->m[1][1] = 1.f;
+	this->m[2][2] = 1.f;
+	this->m[3][3] = 1.f;
 }
 Matrix4D::Matrix4D(float * pMatrix)
 {

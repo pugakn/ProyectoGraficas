@@ -1,5 +1,6 @@
 #include "Quad.h"
 #include "GLShader.h"
+#include "D3DShader.h"
 #include "ShaderManager.h"
 #include "GLRT.h"
 /*********************************************************
@@ -33,75 +34,82 @@ void Quad::Create() {
 		shaderID = glDefaultShader->ShaderID;
 		glUseProgram(shaderID);
 #elif defined(USING_D3D11)
-	bool errorShader = false;
-	char *vsSourceP = file2string("Shaders/VS_Quad.hlsl");
-	char *fsSourceP = file2string("Shaders/FS_Quad.hlsl");
-
-	std::string vsrc;
-	std::string fsrc;
-	if (vsSourceP && fsSourceP)
-	{
-		vsrc = std::string(vsSourceP);
-		fsrc = std::string(fsSourceP);
-	}
+	auto  set = ShaderManager::GetShaderSetBySignature(sig, "Shaders/VS_Quad.hlsl", "Shaders/FS_Quad.hlsl");
+	m_shaderSet = set;
+	m_shaderType = Shader::TYPE::G_DEFERRED_PASS;
+	D3DShader * glDefaultShader = (D3DShader*)(m_shaderSet)[m_shaderType];
 
 
-	std::string Defines;
-	//Defines += "#define LINEAR_DEPTH\n\n";
-	Defines += "#define G_BUFF_PASS\n\n";
-	vsrc = Defines + vsrc;
-	fsrc = Defines + fsrc;
 
-	if (!vsSourceP || !fsSourceP)
-		errorShader = true;
-	HRESULT hr;
-	if (!errorShader)
-	{
-		{
-			VS_blob = nullptr;
-			ComPtr<ID3DBlob> errorBlob = nullptr;
-			hr = D3DCompile(vsrc.c_str(), (UINT)strlen(vsrc.c_str()), 0, 0, 0, "VS", "vs_5_0", 0, 0, &VS_blob, &errorBlob);
-			if (hr != S_OK) {
+	//bool errorShader = false;
+	//char *vsSourceP = file2string("Shaders/VS_Quad.hlsl");
+	//char *fsSourceP = file2string("Shaders/FS_Quad.hlsl");
 
-				if (errorBlob) {
-					printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
-				}
-				errorShader = true;
-			}
+	//std::string vsrc;
+	//std::string fsrc;
+	//if (vsSourceP && fsSourceP)
+	//{
+	//	vsrc = std::string(vsSourceP);
+	//	fsrc = std::string(fsSourceP);
+	//}
 
-			hr = D3D11Device->CreateVertexShader(VS_blob->GetBufferPointer(), VS_blob->GetBufferSize(), 0, &pVS);
-			if (hr != S_OK) {
-				printf("Error Creating Vertex Shader\n");
-				errorShader = true;
-			}
-		}
-		{
-			FS_blob = nullptr;
-			ComPtr<ID3DBlob> errorBlob = nullptr;
-			hr = D3DCompile(fsrc.c_str(), (UINT)strlen(fsrc.c_str()), 0, 0, 0, "FS", "ps_5_0", 0, 0, &FS_blob, &errorBlob);
-			if (hr != S_OK) {
-				if (errorBlob) {
-					printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
-				}
-				errorShader = true;
-			}
 
-			hr = D3D11Device->CreatePixelShader(FS_blob->GetBufferPointer(), FS_blob->GetBufferSize(), 0, &pFS);
-			if (hr != S_OK) {
-				printf("Error Creating Pixel Shader\n");
-				errorShader = true;
-			}
-		}
-	}
-	if (errorShader)
-	{
-		VS_blob = Tools::DefaultVS_blob;
-		pVS = Tools::pDefaultVS;
-		FS_blob = Tools::DefaultFS_blob;
-		pFS = Tools::pDefaultFS;
-	}
-	free(vsSourceP);
-	free(fsSourceP);
+	//std::string Defines;
+	////Defines += "#define LINEAR_DEPTH\n\n";
+	//Defines += "#define G_BUFF_PASS\n\n";
+	//vsrc = Defines + vsrc;
+	//fsrc = Defines + fsrc;
+
+	//if (!vsSourceP || !fsSourceP)
+	//	errorShader = true;
+	//HRESULT hr;
+	//if (!errorShader)
+	//{
+	//	{
+	//		VS_blob = nullptr;
+	//		ComPtr<ID3DBlob> errorBlob = nullptr;
+	//		hr = D3DCompile(vsrc.c_str(), (UINT)strlen(vsrc.c_str()), 0, 0, 0, "VS", "vs_5_0", 0, 0, &VS_blob, &errorBlob);
+	//		if (hr != S_OK) {
+
+	//			if (errorBlob) {
+	//				printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
+	//			}
+	//			errorShader = true;
+	//		}
+
+	//		hr = D3D11Device->CreateVertexShader(VS_blob->GetBufferPointer(), VS_blob->GetBufferSize(), 0, &pVS);
+	//		if (hr != S_OK) {
+	//			printf("Error Creating Vertex Shader\n");
+	//			errorShader = true;
+	//		}
+	//	}
+	//	{
+	//		FS_blob = nullptr;
+	//		ComPtr<ID3DBlob> errorBlob = nullptr;
+	//		hr = D3DCompile(fsrc.c_str(), (UINT)strlen(fsrc.c_str()), 0, 0, 0, "FS", "ps_5_0", 0, 0, &FS_blob, &errorBlob);
+	//		if (hr != S_OK) {
+	//			if (errorBlob) {
+	//				printf("errorBlob shader[%s]", (char*)errorBlob->GetBufferPointer());
+	//			}
+	//			errorShader = true;
+	//		}
+
+	//		hr = D3D11Device->CreatePixelShader(FS_blob->GetBufferPointer(), FS_blob->GetBufferSize(), 0, &pFS);
+	//		if (hr != S_OK) {
+	//			printf("Error Creating Pixel Shader\n");
+	//			errorShader = true;
+	//		}
+	//	}
+	//}
+	//if (errorShader)
+	//{
+	//	VS_blob = Tools::DefaultVS_blob;
+	//	pVS = Tools::pDefaultVS;
+	//	FS_blob = Tools::DefaultFS_blob;
+	//	pFS = Tools::pDefaultFS;
+	//}
+	//free(vsSourceP);
+	//free(fsSourceP);
 #endif
 
 	vertices[0] = { -1.0f,  1.0f,  0.9f ,1.0f,  0.0f, 0.0f };//Left Top
@@ -128,15 +136,15 @@ void Quad::Create() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned short), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 #elif defined(USING_D3D11)
-	D3D11DeviceContext->VSSetShader(pVS.Get(), 0, 0);
-	D3D11DeviceContext->PSSetShader(pFS.Get(), 0, 0);
+	D3D11DeviceContext->VSSetShader(glDefaultShader->pVS.Get(), 0, 0);
+	D3D11DeviceContext->PSSetShader(glDefaultShader->pFS.Get(), 0, 0);
 
 	D3D11_INPUT_ELEMENT_DESC vertexDeclaration[] = {
 		{ "POSITION" , 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0,DXGI_FORMAT_R32G32_FLOAT, 0, 16,D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
-	hr = D3D11Device->CreateInputLayout(vertexDeclaration, ARRAYSIZE(vertexDeclaration), VS_blob->GetBufferPointer(), VS_blob->GetBufferSize(), &Layout);
+	HRESULT hr = D3D11Device->CreateInputLayout(vertexDeclaration, ARRAYSIZE(vertexDeclaration), glDefaultShader->VS_blob->GetBufferPointer(), glDefaultShader->VS_blob->GetBufferSize(), &Layout);
 	if (hr != S_OK) {
 		printf("Error Creating Input Layout\n");
 		return;
@@ -145,7 +153,7 @@ void Quad::Create() {
 
 	D3D11_BUFFER_DESC bdesc = { 0 };
 	bdesc.Usage = D3D11_USAGE_DEFAULT;
-	bdesc.ByteWidth = errorShader ? sizeof(Matrix4D) : sizeof(Quad::CBuffer);
+	bdesc.ByteWidth = /*errorShader ? sizeof(Matrix4D) :*/ sizeof(Quad::CBuffer);
 	bdesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 
 	hr = D3D11Device->CreateBuffer(&bdesc, 0, pd3dConstantBuffer.GetAddressOf());
@@ -158,9 +166,30 @@ void Quad::Create() {
 	D3D11DeviceContext->PSSetConstantBuffers(0, 1, pd3dConstantBuffer.GetAddressOf());
 
 
-	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(difTex);
-	D3D11DeviceContext->PSSetShaderResources(0, 1, texd3d->pSRVTex.GetAddressOf());
-	D3D11DeviceContext->PSSetSamplers(0, 1, texd3d->pSampler.GetAddressOf());
+	//int slot = 0;
+	//TextureD3D *texd3d = dynamic_cast<TextureD3D*>(difTex);
+	//D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
+	//D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
+	//slot++;
+	//texd3d = dynamic_cast<TextureD3D*>(normalTex);
+	//D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
+	//D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
+	//slot++;
+	//texd3d = dynamic_cast<TextureD3D*>(specTex);
+	//D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
+	//D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
+	//slot++;
+	//texd3d = dynamic_cast<TextureD3D*>(depthTex);
+	//D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
+	//D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
+	//slot++;
+	//texd3d = dynamic_cast<TextureD3D*>(shadowMapTexture);
+	//D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
+	//D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
+
+	//D3D11DeviceContext->VSSetConstantBuffers(0, 1, pd3dConstantBuffer.GetAddressOf());
+	//D3D11DeviceContext->PSSetConstantBuffers(0, 1, pd3dConstantBuffer.GetAddressOf());
+
 
 
 	bdesc = { 0 };
@@ -313,35 +342,51 @@ void Quad::Draw(float *t) {
 	Tools::UseOriginalFBO();
 	FXPass();
 #elif defined(USING_D3D11)
+
+	//std::vector<Vector4D>LightPositions;
+	//std::vector<Vector4D>LightColors;
+	//for (unsigned int i = 0; i < pScProp->Lights.size(); i++) {
+	//	LightPositions.push_back(Vector4D(pScProp->Lights[i].Position, 1.0));
+	//	LightColors.push_back(Vector4D(pScProp->Lights[i].Color, 1.0));
+	//}
 	if (t)
 		transform = t;
 
-	std::vector<Vector4D>LightPositions;
-	std::vector<Vector4D>LightColors;
-	for (unsigned int i = 0; i < pScProp->Lights.size(); i++) {
-		LightPositions.push_back(Vector4D(pScProp->Lights[i].Position, 1.0));
-		LightColors.push_back(Vector4D(pScProp->Lights[i].Color, 1.0));
-	}
+	//Tools::UseRT(deferredRT);
+	SetShaderType(Shader::TYPE::G_DEFERRED_PASS);//
 	Matrix4D VP = Matrix4D(pScProp->pCameras[0]->VP);
+	Matrix4D W = transform;
+	Matrix4D WVP = W*VP;
+	Matrix4D WV = pScProp->pCameras[0]->m_view;
 	Matrix4D WVPI = Inverse(VP);
+	for (unsigned int i = 0; i < pScProp->Lights.size(); i++) {
+		CnstBuffer.LightPositions[i] = (Vector4D(pScProp->Lights[i].Position, 1.0));
+		CnstBuffer.LightColors[i] =  (Vector4D(pScProp->Lights[i].Color, 1.0));
+	}
+	//Matrix4D WVPI = Inverse(VP);
 	CnstBuffer.World = transform;
-	CnstBuffer.CameraPosition = Vector4D(pScProp->pCameras[0]->m_pos,1.0);
-	CnstBuffer.CamVP = pScProp->LightsWShadow[0].VP;;
-	CnstBuffer.NumLights = LightPositions.size();
+	CnstBuffer.CameraPosition =  Vector4D(pScProp->pCameras[0]->m_pos.x, pScProp->pCameras[0]->m_pos.y, pScProp->pCameras[0]->m_pos.z, 1.0);
+	CnstBuffer.CamVP = transform*pScProp->LightsWShadow[0].VP;
+	CnstBuffer.NumLights = NUM_LIGHTS;
 	CnstBuffer.ShadowTexSize[0] = static_cast<float>(shadowMapTexture->x);
 	CnstBuffer.ShadowTexSize[1] = static_cast<float>(shadowMapTexture->y);
 	CnstBuffer.VPInverse = WVPI;
-	memcpy(CnstBuffer.LightPositions, &LightPositions[0], LightPositions.size());
-	memcpy(CnstBuffer.LightColors, &LightColors[0], LightColors.size());
+	CnstBuffer.NumLights2 = NUM_LIGHTS;
+	//memcpy(CnstBuffer.LightPositions, &LightPositions[0].x, LightPositions.size());
+	//memcpy(CnstBuffer.LightColors, &LightColors[0].x, LightColors.size());
+
+	auto  sh = ((D3DShader*)m_shaderSet[m_shaderType]);
 
 	UINT stride = sizeof(CVertex);
 	UINT offset = 0;
-	D3D11DeviceContext->VSSetShader(pVS.Get(), 0, 0);
-	D3D11DeviceContext->PSSetShader(pFS.Get(), 0, 0);
+	D3D11DeviceContext->VSSetShader(sh->pVS.Get(), 0, 0);
+	D3D11DeviceContext->PSSetShader(sh->pFS.Get(), 0, 0);
 
 	D3D11DeviceContext->IASetInputLayout(Layout.Get());
 
 	D3D11DeviceContext->UpdateSubresource(pd3dConstantBuffer.Get(), 0, 0, &CnstBuffer.World.m[0][0], 0, 0);
+	D3D11DeviceContext->VSSetConstantBuffers(0, 1, pd3dConstantBuffer.GetAddressOf());
+	D3D11DeviceContext->PSSetConstantBuffers(0, 1, pd3dConstantBuffer.GetAddressOf());
 
 	int slot = 0;
 	TextureD3D *texd3d = dynamic_cast<TextureD3D*>(difTex);
@@ -364,14 +409,14 @@ void Quad::Draw(float *t) {
 	D3D11DeviceContext->PSSetShaderResources(slot, 1, texd3d->pSRVTex.GetAddressOf());
 	D3D11DeviceContext->PSSetSamplers(slot, 1, texd3d->pSampler.GetAddressOf());
 
-	D3D11DeviceContext->VSSetConstantBuffers(0, 1, pd3dConstantBuffer.GetAddressOf());
-	D3D11DeviceContext->PSSetConstantBuffers(0, 1, pd3dConstantBuffer.GetAddressOf());
 
 	D3D11DeviceContext->IASetVertexBuffers(0, 1, VB.GetAddressOf(), &stride, &offset);
 	D3D11DeviceContext->IASetIndexBuffer(IB.Get(), DXGI_FORMAT_R16_UINT, 0);
 
 	D3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	D3D11DeviceContext->DrawIndexed(6, 0, 0);
+
+	Tools::UseOriginalFBO();
 #endif
 
 }
@@ -383,7 +428,7 @@ void Quad::FXPass()
 		fx->ApplyFX(Tools::RTs[deferredRT]->vColorTextures[0]);
 	}
 
-
+#ifdef USING_GL_COMMON
 	// FINAL PASS
 	SetShaderType(Shader::TYPE::G_FORWARD_PASS);//
 	Matrix4D W = transform;
@@ -410,6 +455,9 @@ void Quad::FXPass()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(sh->m_locs.vertexAttribLocs);
 	glUseProgram(0);
+#else
+
+#endif
 }
 void Quad::Destroy() {
 #ifdef USING_GL_COMMON
@@ -423,8 +471,15 @@ void Quad::SetShaderType(Shader::TYPE type)
 	if (m_shaderType != type)
 	{
 		m_shaderType = type;
+#ifdef USING_GL_COMMON
 		shaderID = ((GLShader*)(m_shaderSet)[type])->ShaderID;
 		glUseProgram(shaderID);
+#else
+		auto sh = ((D3DShader*)(m_shaderSet)[type]);
+		D3D11DeviceContext->VSSetShader(sh->pVS.Get(), 0, 0);
+		D3D11DeviceContext->PSSetShader(sh->pFS.Get(), 0, 0);
+		
+#endif
 	}
 }
 

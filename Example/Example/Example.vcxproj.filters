@@ -239,6 +239,9 @@
     <ClInclude Include="BloomFX.h">
       <Filter>Header Files\FX</Filter>
     </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UtilsGL.cpp">
@@ -378,6 +381,9 @@
     </ClCompile>
     <ClCompile Include="BloomFX.cpp">
       <Filter>Source Files\FX</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

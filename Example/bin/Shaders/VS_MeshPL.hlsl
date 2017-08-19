@@ -61,7 +61,7 @@ VS_OUTPUT VS( VS_INPUT input ){
     VS_OUTPUT OUT;
     OUT.hposition = mul( WVP , input.position );
     OUT.pixelPos = mul( World , input.position);
-    OUT.Pos = mul( WorldView , input.position );
+    OUT.Pos = mul( WVP , input.position );
 
 #ifdef USE_NORMALS
 	OUT.hnormal = float4(normalize(mul( (float3x3)World , input.normal.xyz )),0.0);

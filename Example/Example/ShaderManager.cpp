@@ -20,6 +20,7 @@ int ShaderManager::CreateShaderSet(char * vsrc, char * fsrcs, unsigned long sig)
 	for (size_t i = 0; i < Shader::TYPE::COUNT; i++)
 	{
 		tmpSahders[i] = new D3DShader();
+		tmpSahders[i]->VSPath = vsrc;
 		tmpSahders[i]->Load(vsrc, fsrcs, sig, (Shader::TYPE)i);
 	}
 #endif

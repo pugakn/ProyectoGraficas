@@ -72,7 +72,8 @@ FS_OUT FS( VS_OUTPUT input )   {
   	norm.y = -norm.y;
   	float3x3 TBN = float3x3(tang,binor,normalize(input.hnormal.xyz));
   	norm = mul(norm ,TBN);
-  	norm = normalize(norm);
+  	//norm = normalize(norm);
+	norm = normalize(norm) * 0.5 + 0.5;
     //float3 norm = normalize(input.hnormal.xyz);
   #else
   	float3 norm = normalize(input.hnormal.xyz);
@@ -86,24 +87,24 @@ FS_OUT FS( VS_OUTPUT input )   {
     Specular = TextureSpecular.Sample( SS, input.texture0 );
   #endif
     FS_OUT fou;
-  	fou.difuse = color;
-  	fou.normal.rgb = norm.rgb;
-  	fou.normal.a 	= shinness;
+	fou.difuse = color;
+  	fou.normal = float4(norm,1);
+  	//fou.normal.a 	= shinness;
 
-  	fou.specular.rgb = Specular.rgb;
-  	fou.specular.a 	= shinness;
+  	fou.specular = Specular;
 
-    fou.depth		= input.Pos.z / 5000.0;
+    fou.depth		= input.Pos.z / input.Pos.w;
     return fou;
 }
 #elif defined G_SHADOW_PASS//G_BUFF_PASS
 float4 FS( VS_OUTPUT input ) : SV_TARGET  {
-	return(0,0,0,0);
+	return input.Pos.z/5000.0;
 }
 
 #else //FORWARD PASS
-float4 FS( VS_OUTPUT input ) : SV_TARGET  {
 
+float4 FS( VS_OUTPUT input ) : SV_TARGET  {
+#if 0
     float4 color;
 
     #ifdef USE_TANGENTS
@@ -190,5 +191,8 @@ return color * 0.3 + color * input.light_mod * lightColor;
     return rc;
     #endif
   #endif
+  
+  #endif
+  return float4(0,1,1,1);
 }
 #endif
