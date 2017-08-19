@@ -97,8 +97,9 @@ FS_OUT FS( VS_OUTPUT input )   {
     return fou;
 }
 #elif defined G_SHADOW_PASS//G_BUFF_PASS
-float4 FS( VS_OUTPUT input ) : SV_TARGET  {
-	return input.Pos.z/5000.0;
+float4 FS( VS_OUTPUT input ) : SV_TARGET0  {
+	//float4 ret = input.Pos.z/input.Pos.w;
+	return input.Pos/input.Pos.w;
 }
 
 #else //FORWARD PASS

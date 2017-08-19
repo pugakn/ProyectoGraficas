@@ -37,6 +37,7 @@ void TestApp::InitVars() {
 	SceneProp.AddCamera(&cam);
 	const float factor = 720.0f / 1280.0;
 	SceneProp.shadowLightProj =  ProjOrthoRH(50, 50 * factor, 1.2, 50);
+	//SceneProp.shadowLightProj =  PerspectiveFOVRH(ToRadian(45.f), 1280.0f / 720.0f, 1.f, 5000);
 	Vector3D shadowLightPos(10, 8, 10);
 	SceneProp.AddLightWShadow(shadowLightPos,Vector3D(0.5,0.2,0.1),true,Vector3D(0,0,0));
 	for (int i = 0; i < NUM_LIGHTS; i++)

@@ -117,7 +117,7 @@ void main(){
 			Final+= Ambient;
 		//gl_FragColor = fromCamPos;
 		//gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-		//gl_FragColor = vec4(specularmap.xyz,1.0);
+		//gl_FragColor = texture2D(texture05, coords);
 		gl_FragColor = vec4(Final.xyz,1.0);
 }
 #else //G_DEFERRED_PASS

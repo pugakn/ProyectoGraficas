@@ -363,10 +363,11 @@ void Quad::Draw(float *t) {
 		CnstBuffer.LightPositions[i] = (Vector4D(pScProp->Lights[i].Position, 1.0));
 		CnstBuffer.LightColors[i] =  (Vector4D(pScProp->Lights[i].Color, 1.0));
 	}
+	Matrix4D LightVP = pScProp->LightsWShadow[0].VP;
 	//Matrix4D WVPI = Inverse(VP);
 	CnstBuffer.World = transform;
 	CnstBuffer.CameraPosition =  Vector4D(pScProp->pCameras[0]->m_pos.x, pScProp->pCameras[0]->m_pos.y, pScProp->pCameras[0]->m_pos.z, 1.0);
-	CnstBuffer.CamVP = transform*pScProp->LightsWShadow[0].VP;
+	CnstBuffer.CamVP = LightVP;
 	CnstBuffer.NumLights = NUM_LIGHTS;
 	CnstBuffer.ShadowTexSize[0] = static_cast<float>(shadowMapTexture->x);
 	CnstBuffer.ShadowTexSize[1] = static_cast<float>(shadowMapTexture->y);

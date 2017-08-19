@@ -59,12 +59,12 @@ public:
 	struct CBuffer {
 		Matrix4D World;
 		Matrix4D VPInverse;
+		Matrix4D CamVP;
 		Vector4D LightPositions[128];
 		Vector4D LightColors[128];
 		Vector4D CameraPosition;
 		int NumLights;
 		float ShadowTexSize[2];
-		Matrix4D CamVP;
 		int NumLights2;
 	};
 #endif
