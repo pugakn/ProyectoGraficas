@@ -388,7 +388,7 @@ void ModelGL::TransformBone(int index, Matrix4D t)
 			{
 				if (vertex->wIndex[j] != -1)
 				{
-					auto mat = (vertex->wWeight[j] * (parser.m_meshes[i].m_skinWeightsOffset[vertex->wIndex[j]] * m_bones[vertex->wIndex[j]].bone) * parser.m_inverseGlobal);
+					auto mat = (vertex->wWeight[j] * (parser.m_meshes[i].m_skinWeightsOffset[vertex->wIndex[j]] * m_bones[vertex->wIndex[j]].bone) );
 					vertexPos = vertexPos + pos *mat ;
 					vertexNorm = vertexNorm + normal * mat;
 				}
@@ -418,7 +418,7 @@ void ModelGL::SetNewTransforms(int index, Matrix4D t) {
 
 void ModelGL::CalcCombinedMatrix(int index, Matrix4D t)
 {
-	m_bones[index].bone = parser.bones[index].bone * t;
+	m_bones[index].bone = m_bones[index].bone * t;
 	for (auto &bone : parser.bones[index].child)
 	{
 		CalcCombinedMatrix(bone, m_bones[index].bone);

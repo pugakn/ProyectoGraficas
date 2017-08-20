@@ -129,7 +129,7 @@ void main(){
 	
 	const float gamma = 2.2;
 	highp vec4 color = texture2D(texture01,coords);
-    highp vec3 mapped = vec3(1.0) - exp(-color.xyz * 0.15);
+    highp vec3 mapped = vec3(1.0) - exp(-color.xyz * 0.1);
     mapped = pow(mapped, vec3(1.0 / gamma));
     color.w = 1.0;
     gl_FragColor = vec4(mapped, 1.0);

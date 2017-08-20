@@ -19,7 +19,7 @@ Vector3D Lerp(Vector3D start, Vector3D end, float percent)
 
 void AnimationManager::Play(float delta)
 {
-	//model->m_bones = model->parser.bones;
+	model->m_bones = model->parser.bones;
 	static int tick = 0;
 	static int prevIndx = -1;
 	static bool transf = true;
