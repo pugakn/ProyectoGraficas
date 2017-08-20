@@ -76,9 +76,9 @@ private:
 	int idCube;
 	TextureGL cubetxt;
 
-	std::vector<xBone> m_bones;
 
 public:
+	std::vector<xBone> m_bones;
 	void SetFileName(char* fileName);
 	void Create() override;
 	void Transform(float *t) override;
@@ -88,6 +88,7 @@ public:
 
 	void TransformBone(int index, Matrix4D t);
 	void CalcCombinedMatrix(int index, Matrix4D t);
+	void SetNewTransforms(int indes, Matrix4D t);
 	MeshParser parser;
 	AnimationManager animationManager;
 	ModelGL() { useLight = true; };

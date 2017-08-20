@@ -46,6 +46,7 @@ public:
 
 	void Play( float delta);
 	void SetAnim(int anim);
+	void ReadNodes();
 	void Stop();
 	AnimationManager();
 

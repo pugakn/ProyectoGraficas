@@ -27,6 +27,10 @@ void ModelGL::Create()
 	timer.Update();
 	std::cout << "Archivo cargado en: " << timer.GetDTSecs() << " segundos..." << std::endl;
 	m_bones.resize(parser.bones.size());
+	if (parser.bones.size())
+		parser.m_inverseGlobal =  Inverse(parser.bones[0].bone);
+
+
 	m_bones = parser.bones;
 	animationManager.animationSets = parser.animationSets;
 	//Iterar cada Mesh y subsets
@@ -365,6 +369,7 @@ void ModelGL::SetShaderType(Shader::TYPE type)
 }
 void ModelGL::TransformBone(int index, Matrix4D t)
 {
+	//m_bones = parser.bones;
 	CalcCombinedMatrix(index, t);
 
 	for (size_t i = 0; i < parser.m_meshes.size(); i++)
@@ -383,8 +388,9 @@ void ModelGL::TransformBone(int index, Matrix4D t)
 			{
 				if (vertex->wIndex[j] != -1)
 				{
-					vertexPos = vertexPos + pos * (vertex->wWeight[j] * (parser.m_meshes[i].m_skinWeightsOffset[vertex->wIndex[j]] * m_bones[vertex->wIndex[j]].bone));
-					vertexNorm = vertexNorm + normal * (vertex->wWeight[j] * (parser.m_meshes[i].m_skinWeightsOffset[vertex->wIndex[j]] * m_bones[vertex->wIndex[j]].bone));
+					auto mat = (vertex->wWeight[j] * (parser.m_meshes[i].m_skinWeightsOffset[vertex->wIndex[j]] * m_bones[vertex->wIndex[j]].bone) * parser.m_inverseGlobal);
+					vertexPos = vertexPos + pos *mat ;
+					vertexNorm = vertexNorm + normal * mat;
 				}
 
 
@@ -406,6 +412,10 @@ void ModelGL::TransformBone(int index, Matrix4D t)
 
 
 }
+void ModelGL::SetNewTransforms(int index, Matrix4D t) {
+	m_bones[index].bone  = m_bones[index].bone*t;
+}
+
 void ModelGL::CalcCombinedMatrix(int index, Matrix4D t)
 {
 	m_bones[index].bone = parser.bones[index].bone * t;

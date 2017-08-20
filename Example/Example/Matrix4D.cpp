@@ -87,6 +87,15 @@ Vector4D operator* (const Matrix4D& M, const Vector4D& V) {
 		Dot(M.Row2, V),
 		Dot(M.Row3, V));
 }
+bool operator!=(const Matrix4D& A,const Matrix4D & B)
+{
+	for (size_t i = 0; i < 16; i++)
+	{
+		if (A.v[i] != B.v[i])
+			return true;
+	}
+	return false;
+}
 Matrix4D operator*(const float F, const Matrix4D & B)
 {
 	Matrix4D R = B;

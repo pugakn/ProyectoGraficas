@@ -1035,19 +1035,19 @@ void MeshParser::ReadAnimationRotations()
 		xAnimationKeyRot rot;
 		rot.QRot = Vector4D(f1, f2, f3, f4);
 		rot.ticks = time;
-		int index = time / 160;
-		if (animationSets.back().animationsVec.back().rotVec.size() < index + 1) {
-			int tmp = animationSets.back().animationsVec.back().rotVec.size()-1;
-			animationSets.back().animationsVec.back().rotVec.resize(index + 1);
-			for (size_t j = tmp; j < index; j++)
-			{
-				animationSets.back().animationsVec.back().rotVec[j].QRot = animationSets.back().animationsVec.back().rotVec[tmp].QRot;
-				//animationSets.back().animationsVec.back().rotVec[j].ticks = animationSets.back().animationsVec.back().rotVec[tmp].ticks + 160;
-			}
-		}
+		//int index = time / 160;
+		//if (animationSets.back().animationsVec.back().rotVec.size() < index + 1) {
+		//	int tmp = animationSets.back().animationsVec.back().rotVec.size()-1;
+		//	animationSets.back().animationsVec.back().rotVec.resize(index + 1);
+		//	for (size_t j = tmp; j < index; j++)
+		//	{
+		//		animationSets.back().animationsVec.back().rotVec[j].QRot = animationSets.back().animationsVec.back().rotVec[tmp].QRot;
+		//		//animationSets.back().animationsVec.back().rotVec[j].ticks = animationSets.back().animationsVec.back().rotVec[tmp].ticks + 160;
+		//	}
+		//}
 
-		animationSets.back().animationsVec.back().rotVec[index] = rot;
-		//animationSets.back().animationsVec.back().rotVec.push_back(rot);
+		//animationSets.back().animationsVec.back().rotVec[i] = rot;
+		animationSets.back().animationsVec.back().rotVec.push_back(rot);
 	}
 }
 
@@ -1081,18 +1081,18 @@ void MeshParser::ReadAnimationPositions()
 		xAnimationKeyPos sc;
 		sc.pos = Vector3D(f1, f2, f3);
 		sc.ticks = time;
-		int index = time / 160;
-		if (animationSets.back().animationsVec.back().posVec.size() < index + 1) {
-			int tmp = animationSets.back().animationsVec.back().posVec.size() - 1;
-			animationSets.back().animationsVec.back().posVec.resize(index + 1);
-			for (size_t j = tmp; j < index; j++)
-			{
-				animationSets.back().animationsVec.back().posVec[j].pos = animationSets.back().animationsVec.back().posVec[tmp].pos;
-				//animationSets.back().animationsVec.back().rotVec[j].ticks = animationSets.back().animationsVec.back().rotVec[tmp].ticks + 160;
-			}
-		}
-		animationSets.back().animationsVec.back().posVec[index] = sc;
-		//animationSets.back().animationsVec.back().posVec.push_back(sc);
+		//int index = time / 160;
+		//if (animationSets.back().animationsVec.back().posVec.size() < index + 1) {
+		//	int tmp = animationSets.back().animationsVec.back().posVec.size() - 1;
+		//	animationSets.back().animationsVec.back().posVec.resize(index + 1);
+		//	for (size_t j = tmp; j < index; j++)
+		//	{
+		//		animationSets.back().animationsVec.back().posVec[j].pos = animationSets.back().animationsVec.back().posVec[tmp].pos;
+		//		//animationSets.back().animationsVec.back().rotVec[j].ticks = animationSets.back().animationsVec.back().rotVec[tmp].ticks + 160;
+		//	}
+		//}
+		//animationSets.back().animationsVec.back().posVec[i] = sc;
+		animationSets.back().animationsVec.back().posVec.push_back(sc);
 	}
 }
 
@@ -1124,18 +1124,18 @@ void MeshParser::ReadAnimationScales()
 		xAnimationKeyScale sc;
 		sc.scale = Vector3D(f1, f2, f3);
 		sc.ticks = time;
-		int index = time / 160;
-		if (animationSets.back().animationsVec.back().scaleVec.size() < index + 1) {
-			int tmp = animationSets.back().animationsVec.back().scaleVec.size() - 1;
-			animationSets.back().animationsVec.back().scaleVec.resize(index + 1);
-			for (size_t j = tmp; j < index; j++)
-			{
-				animationSets.back().animationsVec.back().scaleVec[j].scale = animationSets.back().animationsVec.back().scaleVec[tmp].scale;
-				//animationSets.back().animationsVec.back().rotVec[j].ticks = animationSets.back().animationsVec.back().rotVec[tmp].ticks + 160;
-			}
-		}
-		animationSets.back().animationsVec.back().scaleVec[index] = sc;
-		//animationSets.back().animationsVec.back().scaleVec.push_back(sc);
+		//int index = time / 160;
+		//if (animationSets.back().animationsVec.back().scaleVec.size() < index + 1) {
+		//	int tmp = animationSets.back().animationsVec.back().scaleVec.size() - 1;
+		//	animationSets.back().animationsVec.back().scaleVec.resize(index + 1);
+		//	for (size_t j = tmp; j < index; j++)
+		//	{
+		//		animationSets.back().animationsVec.back().scaleVec[j].scale = animationSets.back().animationsVec.back().scaleVec[tmp].scale;
+		//		//animationSets.back().animationsVec.back().rotVec[j].ticks = animationSets.back().animationsVec.back().rotVec[tmp].ticks + 160;
+		//	}
+		//}
+		//animationSets.back().animationsVec.back().scaleVec[i] = sc;
+		animationSets.back().animationsVec.back().scaleVec.push_back(sc);
 	}
 }
 

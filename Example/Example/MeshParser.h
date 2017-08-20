@@ -161,6 +161,7 @@ public:
 	std::vector<xMesh> m_meshes;
 
 	std::vector<xBone> bones;
+	Matrix4D m_inverseGlobal;
 	//std::vector<Matrix4D> m_skinWeightsOffset;//
 	std::vector<xAnimationSet> animationSets;
 	bool LoadFile(const char* fileName);

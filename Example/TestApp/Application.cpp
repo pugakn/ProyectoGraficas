@@ -210,10 +210,12 @@ void TestApp::CreateAssets() {
 	Models.push_back(PrimitiveInst());
 	Models.back().CreateInstance(PrimitiveMgr.GetPrimitive(index));
 	Models.back().ScaleAbsolute(0.3);
+	Models.back().TranslateAbsolute(0, 7, 0);
 	Models.back().Update();
 	//Matrix4D R = Scaling(1,1,1);
 	//((ModelGL*)PrimitiveMgr.GetPrimitive(index))->TransformBone(0, R);
-	//((ModelGL*)PrimitiveMgr.GetPrimitive(0))->animationManager.Play(DtTimer.GetDTSecs());
+	//((ModelGL*)PrimitiveMgr.GetPrimitive(1))->animationManager.Play(0);
+	//((ModelGL*)PrimitiveMgr.GetPrimitive(1))->animationManager.SetAnim(1);
 
 
 
@@ -337,10 +339,10 @@ void TestApp::OnUpdate() {
 
 	static float tt = 0;
 	tt += DtTimer.GetDTSecs();
-	if (tt > 5 )
+	if (tt > 1/30.0)
 	{
 		tt = 0;
-		//((ModelGL*)PrimitiveMgr.GetPrimitive(0))->animationManager.Play(DtTimer.GetDTSecs());
+		((ModelGL*)PrimitiveMgr.GetPrimitive(1))->animationManager.Play(DtTimer.GetDTSecs());
 	}
 
 
