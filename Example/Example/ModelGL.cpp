@@ -34,7 +34,7 @@ void ModelGL::Create()
 	m_bones = parser.bones;
 	animationManager.animationSets = parser.animationSets;
 	//Iterar cada Mesh y subsets
-	idCube = cubetxt.LoadCubeMap("tstcuben.dds");
+	//idCube = cubetxt.LoadCubeMap("tstcuben.dds");
 	for (auto &meshIt: parser.m_meshes)
 	{	
 		m_meshInfo.push_back(MeshInfo());
@@ -98,7 +98,7 @@ void ModelGL::Create()
 					m_meshInfo.back().subsetInfo.back().SpecularText4ID = textureID;
 				}
 
-				m_meshInfo.back().subsetInfo.back().IdCubeLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "skybox");
+				//m_meshInfo.back().subsetInfo.back().IdCubeLoc = glGetUniformLocation(m_meshInfo.back().subsetInfo.back().shadersID, "skybox");
 			}
 			//Generar buffer de Indices
 			glGenBuffers(1, &m_meshInfo.back().subsetInfo.back().IB);
